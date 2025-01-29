@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Util.PinpointManager;
 
 @Config
-public class PinpointMecanum {
+public class Mecanum {
     OpMode opmode;
     private DcMotorEx Fl, Fr, Bl, Br;
     private volatile double prevFrontLeftPower, prevBackLeftPower, prevFrontRightPower, prevBackRightPower;
@@ -30,7 +30,7 @@ public class PinpointMecanum {
     private double error, lastError;
     ElapsedTime timer = new ElapsedTime();
 
-    public PinpointMecanum() {}
+    public Mecanum() {}
 
     public void initialize(OpMode opmode) {
         this.opmode = opmode;
@@ -54,8 +54,8 @@ public class PinpointMecanum {
         pinpoint.operateTeleOp();
 
         if (angleLockBool) {
-            if (slowModeBool) { driveRobotCentric(Math.pow(opmode.gamepad1.left_stick_x, SCALING_EXPONENT) * SLOW_MODE_FACTOR, -Math.pow(opmode.gamepad1.left_stick_y, SCALING_EXPONENT) * SLOW_MODE_FACTOR, PDTurning(pinpoint.relativeNormalizedHeading, targetAngle)  * SLOW_MODE_FACTOR); }
-            else { driveRobotCentric(Math.pow(opmode.gamepad1.left_stick_x, SCALING_EXPONENT), -Math.pow(opmode.gamepad1.left_stick_y, SCALING_EXPONENT), PDTurning(pinpoint.relativeNormalizedHeading, targetAngle)); }
+            if (slowModeBool) { driveRobotCentric(Math.pow(opmode.gamepad1.left_stick_x, SCALING_EXPONENT) * SLOW_MODE_FACTOR, -Math.pow(opmode.gamepad1.left_stick_y, SCALING_EXPONENT) * SLOW_MODE_FACTOR, PDTurning(pinpoint.getRelativeNormalizedHeading(), targetAngle)  * SLOW_MODE_FACTOR); }
+            else { driveRobotCentric(Math.pow(opmode.gamepad1.left_stick_x, SCALING_EXPONENT), -Math.pow(opmode.gamepad1.left_stick_y, SCALING_EXPONENT), PDTurning(pinpoint.getRelativeNormalizedHeading(), targetAngle)); }
         }
         else {
             if (slowModeBool) { driveRobotCentric(Math.pow(opmode.gamepad1.left_stick_x, SCALING_EXPONENT) * SLOW_MODE_FACTOR, -Math.pow(opmode.gamepad1.left_stick_y, SCALING_EXPONENT) * SLOW_MODE_FACTOR, Math.pow(opmode.gamepad1.right_stick_x, SCALING_EXPONENT) * SLOW_MODE_FACTOR); }
@@ -69,7 +69,7 @@ public class PinpointMecanum {
         // for testing PD auto orienting
         // auto rotate to angle with PID test
         if (opmode.gamepad1.right_trigger > 0.1) {
-            driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, PDTurning(pinpoint.relativeNormalizedHeading, targetAngle));
+            driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, PDTurning(pinpoint.getRelativeNormalizedHeading(), targetAngle));
         }
         // slow mode
         else if (opmode.gamepad1.left_trigger > 0.1) {
