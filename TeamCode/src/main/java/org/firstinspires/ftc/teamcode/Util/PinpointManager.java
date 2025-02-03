@@ -19,7 +19,7 @@ public class PinpointManager { // pinpoint for use during teleop, pedro has its 
     double oldTime;
 
     // all of the following are in degrees
-    double absoluteHeading, normalizedHeading, relativeNormalizedHeading, offset;
+    public double absoluteHeading, normalizedHeading, relativeNormalizedHeading, offset;
 
     public PinpointManager() {}
 

@@ -13,19 +13,19 @@ public class Mecanum {
     OpMode opmode;
     private DcMotorEx Fl, Fr, Bl, Br;
     private volatile double prevFrontLeftPower, prevBackLeftPower, prevFrontRightPower, prevBackRightPower;
-    private PinpointManager pinpoint = new PinpointManager();
+    public PinpointManager pinpoint = new PinpointManager();
 
     public static double SLOW_MODE_FACTOR = 0.5;
     public static double CACHING_THRESHOLD = 0.005;
-    public static double SCALING_EXPONENT = 1;
+    public static double SCALING_EXPONENT = 2.2;
 
     private volatile boolean angleLockBool = false, slowModeBool = false;
 
-    public static double Kp = 0.01;
+    public static double Kp = 0.008;
     public static double Kd = 0;
 
     // variables for later modification
-    private double targetAngle = 0;
+    public double targetAngle = 0;
     // PID
     private double error, lastError;
     ElapsedTime timer = new ElapsedTime();
@@ -34,15 +34,15 @@ public class Mecanum {
 
     public void initialize(OpMode opmode) {
         this.opmode = opmode;
-        this.Fl = opmode.hardwareMap.get(DcMotorEx.class, "");
-        this.Fr = opmode.hardwareMap.get(DcMotorEx.class, "");
-        this.Bl = opmode.hardwareMap.get(DcMotorEx.class, "");
-        this.Br = opmode.hardwareMap.get(DcMotorEx.class, "");
+        this.Fl = opmode.hardwareMap.get(DcMotorEx.class, "leftFront");
+        this.Fr = opmode.hardwareMap.get(DcMotorEx.class, "rightFront");
+        this.Bl = opmode.hardwareMap.get(DcMotorEx.class, "leftRear");
+        this.Br = opmode.hardwareMap.get(DcMotorEx.class, "rightRear");
 
-        Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         Fl.setDirection(DcMotorSimple.Direction.REVERSE);
         Bl.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -54,49 +54,39 @@ public class Mecanum {
         pinpoint.operateTeleOp();
 
         if (angleLockBool) {
-            if (slowModeBool) { driveRobotCentric(Math.pow(opmode.gamepad1.left_stick_x, SCALING_EXPONENT) * SLOW_MODE_FACTOR, -Math.pow(opmode.gamepad1.left_stick_y, SCALING_EXPONENT) * SLOW_MODE_FACTOR, PDTurning(pinpoint.getRelativeNormalizedHeading(), targetAngle)  * SLOW_MODE_FACTOR); }
-            else { driveRobotCentric(Math.pow(opmode.gamepad1.left_stick_x, SCALING_EXPONENT), -Math.pow(opmode.gamepad1.left_stick_y, SCALING_EXPONENT), PDTurning(pinpoint.getRelativeNormalizedHeading(), targetAngle)); }
+            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), -PDTurning(targetAngle, pinpoint.relativeNormalizedHeading), slowModeBool);
         }
         else {
-            if (slowModeBool) { driveRobotCentric(Math.pow(opmode.gamepad1.left_stick_x, SCALING_EXPONENT) * SLOW_MODE_FACTOR, -Math.pow(opmode.gamepad1.left_stick_y, SCALING_EXPONENT) * SLOW_MODE_FACTOR, Math.pow(opmode.gamepad1.right_stick_x, SCALING_EXPONENT) * SLOW_MODE_FACTOR); }
-            else { driveRobotCentric(Math.pow(opmode.gamepad1.left_stick_x, SCALING_EXPONENT), -Math.pow(opmode.gamepad1.left_stick_y, SCALING_EXPONENT), Math.pow(opmode.gamepad1.right_stick_x, SCALING_EXPONENT)); }
+            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, slowModeBool);
         }
     }
 
-    public void operateTesting(OpMode opmode) {
+    public void operateTesting() {
         pinpoint.operateTeleOp();
 
         // for testing PD auto orienting
         // auto rotate to angle with PID test
         if (opmode.gamepad1.right_trigger > 0.1) {
-            driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, PDTurning(pinpoint.getRelativeNormalizedHeading(), targetAngle));
+            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), -PDTurning(targetAngle, pinpoint.relativeNormalizedHeading), false);
         }
-        // slow mode
-        else if (opmode.gamepad1.left_trigger > 0.1) {
-            driveRobotCentric(opmode.gamepad1.left_stick_x * SLOW_MODE_FACTOR, -opmode.gamepad1.left_stick_y * SLOW_MODE_FACTOR, opmode.gamepad1.right_stick_x * SLOW_MODE_FACTOR);
-        }
-        // normal drive
         else {
-//            driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, opmode.gamepad1.right_stick_x);
-            driveRobotCentric(Math.pow(opmode.gamepad1.left_stick_x, SCALING_EXPONENT), -Math.pow(opmode.gamepad1.left_stick_y, SCALING_EXPONENT), Math.pow(opmode.gamepad1.right_stick_x, SCALING_EXPONENT));
+            slowModeBool = opmode.gamepad1.left_trigger > 0.1;
+            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, slowModeBool);
         }
-
-        // gyro reset
-        if (opmode.gamepad1.b) {pinpoint.softResetYaw();}
-
-        // sets target
-        if (opmode.gamepad1.a) {targetAngle = pinpoint.getRelativeNormalizedHeading();}
 
         opmode.telemetry.addData("Current Scaling Exponent: input^", SCALING_EXPONENT);
-        opmode.telemetry.addData("current heading: ", pinpoint.getRelativeNormalizedHeading());
-        opmode.telemetry.addData("absolute heading: ", pinpoint.getNormalizedHeading());
+        opmode.telemetry.addData("current heading: ", pinpoint.relativeNormalizedHeading);
+        opmode.telemetry.addData("absolute heading: ", pinpoint.normalizedHeading);
         opmode.telemetry.addData("target heading: ", targetAngle);
-        opmode.telemetry.addData("gyro offset: ", pinpoint.getOffset());
-        opmode.telemetry.addData("PD calculated rx [-1,1]: ", PDTurning(pinpoint.getRelativeNormalizedHeading(), targetAngle));
-        opmode.telemetry.addData("normalized error: ", normalizeError(targetAngle - pinpoint.getRelativeNormalizedHeading()));
+        opmode.telemetry.addData("gyro offset: ", pinpoint.offset);
+        opmode.telemetry.addData("PD calculated rx [-1,1]: ", PDTurning(targetAngle, pinpoint.relativeNormalizedHeading));
+        opmode.telemetry.addData("normalized error: ", normalizeError(targetAngle - pinpoint.relativeNormalizedHeading));
     }
 
-    public void driveRobotCentric(double x, double y, double rx) {
+    public void driveRobotCentric(double x, double y, double rx, boolean slowmode) {
+        x = x * (slowmode ? SLOW_MODE_FACTOR: 1);
+        y = y * (slowmode ? SLOW_MODE_FACTOR: 1);
+        rx = rx * (slowmode ? SLOW_MODE_FACTOR * 0.75 : 1);
         // calculating output
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
         double frontLeftPower = (y + x + rx) / denominator;
@@ -105,18 +95,38 @@ public class Mecanum {
         double backRightPower = (y + x - rx) / denominator;
 
         // very un-wrappered power caching
-        if (comparePower(prevFrontLeftPower, frontLeftPower)) {
-            Fl.setPower(frontLeftPower);
-        }
-        if (comparePower(prevBackLeftPower, backLeftPower)) {
-            Bl.setPower(backLeftPower);
-        }
-        if (comparePower(prevFrontRightPower, frontRightPower)) {
-            Fr.setPower(frontRightPower);
-        }
-        if (comparePower(prevBackRightPower, backRightPower)) {
-            Br.setPower(backRightPower);
-        }
+        if (comparePower(prevFrontLeftPower, frontLeftPower)) { Fl.setPower(frontLeftPower); }
+        if (comparePower(prevBackLeftPower, backLeftPower)) { Bl.setPower(backLeftPower); }
+        if (comparePower(prevFrontRightPower, frontRightPower)) { Fr.setPower(frontRightPower); }
+        if (comparePower(prevBackRightPower, backRightPower)) { Br.setPower(backRightPower); }
+
+        // assigns for next loop
+        prevFrontLeftPower = frontLeftPower;
+        prevBackLeftPower = backLeftPower;
+        prevFrontRightPower = frontRightPower;
+        prevBackRightPower = backRightPower;
+    }
+
+    public void driveFieldCentric(double x, double y, double rx, double heading, boolean slowmode) {
+        x = x * (slowmode ? SLOW_MODE_FACTOR: 1);
+        y = y * (slowmode ? SLOW_MODE_FACTOR: 1);
+        rx = rx * (slowmode ? SLOW_MODE_FACTOR * 0.75 : 1);
+        // calculating output
+        double headingRads = -Math.toRadians(heading);
+        double rotX = y * Math.cos(headingRads) + x * Math.sin(headingRads);
+        double rotY = y * Math.sin(headingRads) - x * Math.cos(headingRads);
+
+        double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
+        double frontLeftPower = (rotY + rotX + rx) / denominator;
+        double backLeftPower = (rotY - rotX + rx) / denominator;
+        double frontRightPower = (rotY - rotX - rx) / denominator;
+        double backRightPower = (rotY + rotX - rx) / denominator;
+
+        // very un-wrappered power caching
+        if (comparePower(prevFrontLeftPower, frontLeftPower)) { Fl.setPower(frontLeftPower); }
+        if (comparePower(prevBackLeftPower, backLeftPower)) { Bl.setPower(backLeftPower); }
+        if (comparePower(prevFrontRightPower, frontRightPower)) { Fr.setPower(frontRightPower); }
+        if (comparePower(prevBackRightPower, backRightPower)) { Br.setPower(backRightPower); }
 
         // assigns for next loop
         prevFrontLeftPower = frontLeftPower;
@@ -137,8 +147,11 @@ public class Mecanum {
         double derivative = (error - lastError) / timer.seconds();
 
         double output = Math.max(-1, Math.min(1, (Kp * error) + (Kd * derivative)));
-        // square root PID, if robot is too heavy to fix small error
+        // square root PID, if robot is too fat and has too much inertia to fix small error
+        // Jayden will diddle around with PID auto turning on his own time
+        // FLOAT mode might make tuning very hard :noooo:, since it could depend on robot's strafe movement, and a lot on mass
         // double output = Math.signum(output) * Math.min(1, Math.sqrt(Math.abs(output)));
+        // double output = Math.signum(output) * Math.min(1, Math.pow(Math.abs(output), 0.7)); // 0.3-0.7 are all options too depends on robot fatness
 
         // reset stuff for next time
         timer.reset();
@@ -152,6 +165,10 @@ public class Mecanum {
         while (error > 180) error -= 360;
         while (error < -180) error += 360;
         return error;
+    }
+
+    public double scaleJoystick(double input) {
+        return Math.signum(input) * Math.pow(Math.abs(input), SCALING_EXPONENT);
     }
 
     public void setAngleLockTrue() { angleLockBool = true; }
