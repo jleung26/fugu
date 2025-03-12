@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 import java.util.Locale;
 
@@ -16,7 +17,7 @@ import java.util.Locale;
 public class Intake {
     OpMode opmode;
     public DcMotorEx intakeMotor;
-    public Servo wrist;
+    public Servo leftWrist, rightWrist;
     public RevColorSensorV3 colorSensor;
 
     public enum IntakeChamberState {
@@ -41,9 +42,9 @@ public class Intake {
     private double REVERSE_POWER = -1;
     private double NEUTRAL_POWER = 0;
 
-    // wrist constants
-    private double DROP_DOWN_POS = 0;
+    // wrist constants // wrists synchronized :)
     private double TRANSFER_POS = 0;
+    private double DROP_DOWN_POS = 0;
     private double WRIST_TUNING_INCREMENT = 0.001;
 
     // sensor constants
@@ -51,26 +52,23 @@ public class Intake {
     public static double BLUE_RGB_THRESHOLD = 420;
     public static double YELLOW_RGB_THRESHOLD = 500;
 
-    public void initialize(OpMode opmode) {
+    public void initialize(OpMode opmode, RobotHardware robotHardware) {
         this.opmode = opmode;
-        intakeMotor = opmode.hardwareMap.get(DcMotorEx.class, "motor");
-        wrist = opmode.hardwareMap.get(Servo.class, "wrist");
-        colorSensor = opmode.hardwareMap.get(RevColorSensorV3.class, "colorsensor");
-
-        colorSensor.enableLed(true);
-
-        intakeMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-//        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeMotor = robotHardware.intakeMotor;
+        leftWrist = robotHardware.leftIntakeWristServo;
+        rightWrist = robotHardware.rightIntakeWristServo;
+        colorSensor = robotHardware.intakeColorSensor;
     }
 
     public void operateTesting() {
         intakeMotor.setPower(-opmode.gamepad1.left_stick_y);
 
         if (opmode.gamepad1.left_trigger > 0.5) {
-            incremental(-1);
+            incremental(leftWrist, 1);
+            incremental(rightWrist, 1);
         } else if (opmode.gamepad1.right_trigger > 0.5) {
-            incremental(1);
+            incremental(leftWrist, -1);
+            incremental(rightWrist, -1);
         }
 
         if (opmode.gamepad1.a) {
@@ -93,7 +91,9 @@ public class Intake {
 //        opmode.telemetry.addData("distance detected", colorSensor.getDistance(DistanceUnit.INCH));
         opmode.telemetry.addData("chamber color enum: ", chamberState);
         opmode.telemetry.addData("intake state enum: ", intakeState);
-        opmode.telemetry.addData("wrist pos: ", wrist.getPosition());
+        opmode.telemetry.addData("left wrist pos: ", leftWrist.getPosition());
+        opmode.telemetry.addData("right wrist pos: ", rightWrist.getPosition());
+
     }
 
     public void operateTeleOp() {}
@@ -134,9 +134,9 @@ public class Intake {
     }
 
     // wrist methods
-    public void incremental(int sign) {wrist.setPosition(wrist.getPosition() + sign * WRIST_TUNING_INCREMENT);}
-    public void dropDown() { wrist.setPosition(DROP_DOWN_POS);}
-    public void flipUp() { wrist.setPosition(TRANSFER_POS);}
+    public void incremental(Servo servo, int sign) {servo.setPosition(servo.getPosition() + sign * WRIST_TUNING_INCREMENT);}
+    public void dropDown() { leftWrist.setPosition(DROP_DOWN_POS); rightWrist.setPosition(DROP_DOWN_POS);}
+    public void flipUp() { leftWrist.setPosition(TRANSFER_POS); rightWrist.setPosition(TRANSFER_POS);}
 
     public IntakeChamberState getPieceColor() {
         if (colorSensor.getDistance(DistanceUnit.INCH) < DETECTION_THRESHOLD) {
