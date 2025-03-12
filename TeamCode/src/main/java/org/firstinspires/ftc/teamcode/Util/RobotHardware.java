@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Util;
 
 import com.pedropathing.localization.GoBildaPinpointDriver;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -12,35 +13,48 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class RobotHardware {
     public DcMotorEx Fl, Fr, Bl, Br, leftVertMotor, rightVertMotor, horiMotor, intakeMotor;
 
-    public Servo intakeWrist, leftWheelyServo, rightWheelyServo, leftPtoServo, rightPtoServo, armAngleServo, armPitchServo, armClawServo;
+    public Servo leftIntakeWristServo, rightIntakeWristServo, leftWheelyServo, rightWheelyServo, leftPtoServo, rightPtoServo, armAngleServo, armPitchServo, armClawServo;
 
     public GoBildaPinpointDriver odo;
 
+    public RevColorSensorV3 intakeColorSensor;
+
     public void initialize(OpMode opmode) {
         /*
-            CONFIG SHEET:
+            CONFIG:
 
             pinpoint - CHUB i2c 1
             color sensor - CHUB i2c ____
 
             MOTOR
 
-            Br - EHUB ___
-            Fr - EHUB ___
+            Br - EHUB __
+            Fr - EHUB __
             Bl - EHUB __
             Fl - EHUB __
-            hori - CHUB ___ (w/ encoder)
-            right vert - CHUB ___ (w/ encoder)
-            left vert - CHUB ____
-            intake - CHUB ____
+            hori - CHUB __ (w/ encoder)
+            right vert - CHUB __
+            left vert - CHUB __ (w/ encoder)
+            intake - CHUB __
 
             SERVO
 
-            intake wrist - CHUB ___
+            intake left wrist - EHUB __
+            intake right wrist - EHUB __
 
+            arm arm - CHUB __
+            arm wrist - CHUB __
+            arm claw - CHUB __
+
+            left PTO - EHUB
+            right PTO - CHUB
+
+            left wheely - EHUB
+            right wheely - CHUB
 
          */
         odo = opmode.hardwareMap.get(GoBildaPinpointDriver.class, "odo");
+        intakeColorSensor = opmode.hardwareMap.get(RevColorSensorV3.class, "color");
 
         Fl = opmode.hardwareMap.get(DcMotorEx.class, "leftFront");
         Fr = opmode.hardwareMap.get(DcMotorEx.class, "rightFront");
@@ -52,8 +66,8 @@ public class RobotHardware {
         horiMotor = opmode.hardwareMap.get(DcMotorEx.class, "horiSlide");
         intakeMotor = opmode.hardwareMap.get(DcMotorEx.class, "intake");
 
-
-        intakeWrist = opmode.hardwareMap.get(Servo.class, "intakeWrist");
+        leftIntakeWristServo = opmode.hardwareMap.get(Servo.class, "leftIntakeWrist");
+        rightIntakeWristServo = opmode.hardwareMap.get(Servo.class, "rightIntakeWrist");
 
         leftWheelyServo = opmode.hardwareMap.get(Servo.class, "");
         rightWheelyServo = opmode.hardwareMap.get(Servo.class, "");
@@ -76,16 +90,19 @@ public class RobotHardware {
         rightVertMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         horiMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftVertMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftVertMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); // has encoder
         rightVertMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        horiMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        horiMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); // has encoder
 
-        // TODO
-        leftVertMotor.setDirection(DcMotorSimple.Direction.FORWARD); // not too sure which one yet, depends on spooling
+        leftVertMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rightVertMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         horiMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        leftIntakeWristServo.setDirection(Servo.Direction.REVERSE);
+        rightPtoServo.setDirection(Servo.Direction.REVERSE);
+        leftWheelyServo.setDirection(Servo.Direction.REVERSE);
 
         // TODO: offsets, directions (not actually necessary)
         odo.setOffsets(0, 0);
