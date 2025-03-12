@@ -8,6 +8,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
+import com.pedropathing.localization.GoBildaPinpointDriver;
+
+
 import java.util.Locale;
 
 @Config
