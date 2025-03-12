@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.Subsystem;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -13,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 @Config
 public class Hang {
     private OpMode opmode;
-    private Servo leftWheely, rightWheely, leftPtoServo, rightPtoServo;
+    private Servo leftWheely, rightWheely, leftPto, rightPto;
 //    private Servo armAngleServo, armPitchServo;
     private DcMotorEx Fl, Fr, Bl, Br, leftVertMotor, rightVertMotor;
     private ElapsedTime elapsedTime;
@@ -35,8 +34,8 @@ public class Hang {
         this.opmode = opmode;
         this.leftWheely = robotHardware.leftWheelyServo;
         this.rightWheely = robotHardware.rightWheelyServo;
-        this.leftPtoServo = robotHardware.leftPtoServo;
-        this.rightPtoServo = robotHardware.rightPtoServo;
+        this.leftPto = robotHardware.leftPtoServo;
+        this.rightPto = robotHardware.rightPtoServo;
         this.leftVertMotor = robotHardware.leftVertMotor;
         this.rightVertMotor = robotHardware.rightVertMotor;
 //        this.armAngleServo = robotHardware.armAngleServo;
@@ -58,15 +57,15 @@ public class Hang {
         }
 
         if (opmode.gamepad1.y) {
-            incremental(leftPtoServo,1);
+            incremental(leftPto,1);
         } else if (opmode.gamepad1.a) {
-            incremental(rightPtoServo, -1);
+            incremental(leftPto, -1);
         }
 
         if (opmode.gamepad1.x) {
-            incremental(leftPtoServo,1);
+            incremental(rightPto,1);
         } else if (opmode.gamepad1.b) {
-            incremental(rightPtoServo, -1);
+            incremental(rightPto, -1);
         }
 
         double leftStick = -opmode.gamepad1.left_stick_y;
@@ -86,8 +85,8 @@ public class Hang {
 
         opmode.telemetry.addData(leftWheely + " pos: ", leftWheely.getPosition());
         opmode.telemetry.addData(rightWheely + " pos: ", rightWheely.getPosition());
-        opmode.telemetry.addData(leftPtoServo + " pos: ", leftPtoServo.getPosition());
-        opmode.telemetry.addData(rightPtoServo + " pos: ", rightPtoServo.getPosition());
+        opmode.telemetry.addData(leftPto + " pos: ", leftPto.getPosition());
+        opmode.telemetry.addData(rightPto + " pos: ", rightPto.getPosition());
     }
 
     // I am so proud of this. This is a huge improvement compared to what I used to do.
