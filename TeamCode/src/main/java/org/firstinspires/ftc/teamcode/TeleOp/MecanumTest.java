@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystem.Mecanum;
+import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public class MecanumTest extends OpMode {
     // simple driving and PD turning
     private Mecanum drive = new Mecanum();
+    RobotHardware robotHardware;
     private ElapsedTime elapsedtime;
     private List<LynxModule> allHubs;
 
@@ -24,7 +26,8 @@ public class MecanumTest extends OpMode {
 
     @Override
     public void init() {
-        drive.initialize(this);
+        robotHardware.initialize(this);
+        drive.initialize(this, robotHardware);
 
         // loop time stuff
         elapsedtime = new ElapsedTime();

@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Util.PinpointManager;
+import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 @Config
 public class Mecanum {
@@ -32,22 +33,14 @@ public class Mecanum {
 
     public Mecanum() {}
 
-    public void initialize(OpMode opmode) {
+    public void initialize(OpMode opmode, RobotHardware robotHardware) {
         this.opmode = opmode;
-        this.Fl = opmode.hardwareMap.get(DcMotorEx.class, "leftFront");
-        this.Fr = opmode.hardwareMap.get(DcMotorEx.class, "rightFront");
-        this.Bl = opmode.hardwareMap.get(DcMotorEx.class, "leftRear");
-        this.Br = opmode.hardwareMap.get(DcMotorEx.class, "rightRear");
+        this.Fl = robotHardware.Fl;
+        this.Fr = robotHardware.Fr;
+        this.Bl = robotHardware.Bl;
+        this.Br = robotHardware.Br;
 
-        Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-
-        Fl.setDirection(DcMotorSimple.Direction.REVERSE);
-        Bl.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        pinpoint.initialize(opmode);
+        pinpoint.initialize(opmode, robotHardware);
     }
 
     public void operateTeleOp() {

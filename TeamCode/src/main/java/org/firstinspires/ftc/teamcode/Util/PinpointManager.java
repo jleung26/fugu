@@ -26,21 +26,11 @@ public class PinpointManager { // pinpoint for use during teleop, pedro has its 
 
     public PinpointManager() {}
 
-    public void initialize(OpMode opmode) {
+    public void initialize(OpMode opmode, RobotHardware robotHardware) {
         this.opmode = opmode;
         this.telemetry = opmode.telemetry;
-        /* TODO: I2C port ___ */
-        odo = opmode.hardwareMap.get(GoBildaPinpointDriver.class,"odo");
 
-        /* TODO: ask vincent for pod offsets in mm, but pedro will need offsets in inches*/
-        // also potentially unnecessary because we will only use heading during teleop
-        odo.setOffsets(0, 0);
-
-        // defining inches per tick
-        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-
-        /* TODO: */
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo = robotHardware.odo;
 
         odo.resetPosAndIMU();
 
