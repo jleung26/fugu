@@ -39,7 +39,10 @@ public class TemplateTeleOp extends OpMode {
 
     @Override
     public void init() {
+        // init subsystems
+        elapsedtime = new ElapsedTime();
         robotHardware.initialize(this);
+
         // bulk cache reading
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
@@ -63,7 +66,7 @@ public class TemplateTeleOp extends OpMode {
         TelemetryPacket packet = new TelemetryPacket();
         List<Action> newActions = new ArrayList<>();
         for (Action action : runningActions) {
-            action.preview(packet.fieldOverlay());
+            action.preview(packet.fieldOverlay()); // maybe unnecessary, will test eventually
             if (action.run(packet)) { // actually running actions
                 newActions.add(action); // if failed (run() returns true), try again
             }
@@ -72,5 +75,8 @@ public class TemplateTeleOp extends OpMode {
         dash.sendTelemetryPacket(packet);
 
         dashboardTelemetry.update();
+
+        telemetry.addData("Loop Times", elapsedtime.milliseconds());
+        elapsedtime.reset();
     }
 }
