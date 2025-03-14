@@ -4,22 +4,23 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.VerticalSlides;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 @TeleOp
-public class VertSlidesTest extends OpMode {
+public class HoriSlidesTest extends OpMode {
     RobotHardware robotHardware;
-    private VerticalSlides verticalSlides = new VerticalSlides();
+    private HorizontalSlides horizontalSlides = new HorizontalSlides();
 
     @Override
     public void init() {
         robotHardware.initialize(this);
-        verticalSlides.initialize(this, robotHardware, true);
+        horizontalSlides.initialize(this, robotHardware, true);
     }
 
     @Override
     public void loop() {
-        verticalSlides.operateTuning();
+        horizontalSlides.operateTuning();
     }
 }

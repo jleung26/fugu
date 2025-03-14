@@ -69,9 +69,9 @@ public class VerticalSlides {
     }
 
     public void operateTuning() {
-        if (opmode.gamepad2.y) {
+        if (opmode.gamepad1.y) {
             target = highBucketPos;
-        } else if (opmode.gamepad2.a) {
+        } else if (opmode.gamepad1.a) {
             target = retractedPos;
         } else if (opmode.gamepad1.b) {
             target = scoreClipPos;
@@ -82,28 +82,21 @@ public class VerticalSlides {
         slidePower = -opmode.gamepad1.right_stick_y * 0.5;
         usePID = opmode.gamepad1.left_trigger > 0.1;
         if (usePID) {
-            // use PID
             output = controller.calculate(currentPos, target) + Kg;
             leftSlideMotor.setPower(output);
             rightSlideMotor.setPower(output);
         } else {
-            // move manually
+            // manual
             leftSlideMotor.setPower(slidePower);
             rightSlideMotor.setPower(slidePower);
         }
 
-        // if out of range, sets target to back in range
-        if (currentPos > UPPER_LIMIT) {
-            target = UPPER_LIMIT;
-        } else if (currentPos < LOWER_LIMIT) {
-            target = LOWER_LIMIT;
-        }
-
         // updates boolean
-//        slidesRetracted = currentPos < RETRACTED_THRESHOLD;
-        opmode.telemetry.addData("current pos: " , currentPos);
+        slidesRetracted = currentPos < RETRACTED_THRESHOLD;
+        opmode.telemetry.addData("current pos: ", currentPos);
         opmode.telemetry.addData("target: ", target);
         opmode.telemetry.addData("use PID: ", usePID);
+        opmode.telemetry.addData("slidesRetracted: ", slidesRetracted);
     }
 
     public void operateFix() {
