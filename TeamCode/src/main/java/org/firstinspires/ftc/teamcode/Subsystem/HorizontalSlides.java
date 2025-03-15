@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystem;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -64,7 +65,7 @@ public class HorizontalSlides {
         previousOutput = output;
     }
 
-    public void operateTuning() {
+    public void operateTuning(TelemetryPacket packet) {
         if (opmode.gamepad1.y) {
             target = extendedPos;
         } else if (opmode.gamepad1.a) {
@@ -91,6 +92,9 @@ public class HorizontalSlides {
         opmode.telemetry.addData("target: ", target);
         opmode.telemetry.addData("use PID: ", usePID);
         opmode.telemetry.addData("slidesRetracted: ", slidesRetracted);
+
+        packet.put("current pos: ", currentPos);
+        packet.put("target: ", target);
     }
 
 

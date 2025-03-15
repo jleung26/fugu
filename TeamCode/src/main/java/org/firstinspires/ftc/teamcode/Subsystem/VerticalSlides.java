@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystem;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -68,7 +69,7 @@ public class VerticalSlides {
         previousOutput = output;
     }
 
-    public void operateTuning() {
+    public void operateTuning(TelemetryPacket packet) {
         if (opmode.gamepad1.y) {
             target = highBucketPos;
         } else if (opmode.gamepad1.a) {
@@ -97,6 +98,9 @@ public class VerticalSlides {
         opmode.telemetry.addData("target: ", target);
         opmode.telemetry.addData("use PID: ", usePID);
         opmode.telemetry.addData("slidesRetracted: ", slidesRetracted);
+
+        packet.put("current pos: ", currentPos);
+        packet.put("target: ", target);
     }
 
     public void operateFix() {
@@ -117,16 +121,6 @@ public class VerticalSlides {
     public void raiseToScoreClip()   { moveToPosition(scoreClipPos);}
     public void retract()           { moveToPosition(retractedPos);}
 //    public void slamToScoreClip()   { moveToPosition(slamClipPos);}
-
-//    public double telemetryMotorPos() {
-//        return leftSlideMotor.getCurrentPosition();
-//    }
-//    public double telemetryTarget() {
-//        return target;
-//    }
-//    public double telemetryOutput() {
-//        return output;
-//    }
 
     private boolean isDifferent(double val1, double val2) {
         return Math.abs(val1 - val2) >= CACHING_THRESHOLD;
