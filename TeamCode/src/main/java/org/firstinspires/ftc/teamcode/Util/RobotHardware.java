@@ -23,34 +23,34 @@ public class RobotHardware {
         /*
             CONFIG:
 
-            pinpoint - CHUB i2c 1
-            color sensor - CHUB i2c ____
+            pinpoint - CHUB i2c 2
+            color sensor - CHUB i2c 1
 
             MOTOR
 
-            Br - EHUB __
-            Fr - EHUB __
-            Bl - EHUB __
-            Fl - EHUB __
-            hori - CHUB __ (w/ encoder)
-            right vert - CHUB __
-            left vert - CHUB __ (w/ encoder)
-            intake - CHUB __
+            Br - EHUB 3
+            Bl - EHUB 2
+            Fr - EHUB 1
+            Fl - EHUB 0
+            intake - CHUB 0
+            hori - CHUB 1 (w/ encoder)
+            left vert - CHUB 2 (w/ encoder)
+            right vert - CHUB 3
 
             SERVO
 
-            intake left wrist - EHUB __
-            intake right wrist - EHUB __
+            intake right wrist - EHUB 0
+            intake left wrist - EHUB 2
 
-            arm arm - CHUB __
-            arm wrist - CHUB __
-            arm claw - CHUB __
+            left PTO - CHUB 4
+            right PTO - CHUB 5
 
-            left PTO - EHUB
-            right PTO - CHUB
+            arm arm - EHUB 1
+            arm wrist - EHUB 3
+            arm claw - EHUB 5
 
-            left wheely - EHUB
-            right wheely - CHUB
+            left wheely - EHUB 2
+            right wheely - EHUB 0
 
          */
         odo = opmode.hardwareMap.get(GoBildaPinpointDriver.class, "odo");

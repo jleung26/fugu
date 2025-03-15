@@ -87,8 +87,8 @@ public class Intake {
 
         chamberState = getPieceColor();
 
-//        opmode.telemetry.addLine(String.format(Locale.US, "Red %d, Green %d, Blue %d", colorSensor.red(), colorSensor.green(), colorSensor.blue()));
-//        opmode.telemetry.addData("distance detected", colorSensor.getDistance(DistanceUnit.INCH));
+        opmode.telemetry.addLine(String.format(Locale.US, "Red %d, Green %d, Blue %d", colorSensor.red(), colorSensor.green(), colorSensor.blue()));
+        opmode.telemetry.addData("distance detected", colorSensor.getDistance(DistanceUnit.INCH));
         opmode.telemetry.addData("chamber color enum: ", chamberState);
         opmode.telemetry.addData("intake state enum: ", intakeState);
         opmode.telemetry.addData("left wrist pos: ", leftWrist.getPosition());
