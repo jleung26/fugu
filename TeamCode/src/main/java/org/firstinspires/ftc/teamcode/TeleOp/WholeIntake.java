@@ -99,11 +99,11 @@ public class WholeIntake extends OpMode {
              intake.dropDown();
              intake.intake();
          } else if (currentGamepad1.a && !previousGamepad1.a && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-//             intake.dropDown();
+             intake.dropDown();
              intake.reverse();
              runningActions.add(new SequentialAction(
                      new SleepAction(1),
-//                     new InstantAction(() -> intake.flipUp()),
+                     new InstantAction(() -> intake.flipUp()),
                      new InstantAction(() -> intake.neutral())
              ));
          } else if (intake.chamberState != Intake.IntakeChamberState.EMPTY && intake.intakeState != Intake.IntakeState.REVERSE) {

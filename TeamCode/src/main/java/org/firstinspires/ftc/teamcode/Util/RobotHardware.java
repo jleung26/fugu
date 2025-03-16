@@ -32,8 +32,8 @@ public class RobotHardware {
             Bl - EHUB 2
             Fr - EHUB 1
             Fl - EHUB 0
-            intake - CHUB 0
-            hori - CHUB 1 (w/ encoder)
+            hori - CHUB 0 (w/ encoder)
+            intake - CHUB 1
             left vert - CHUB 2 (w/ encoder)
             right vert - CHUB 3
 
@@ -45,8 +45,8 @@ public class RobotHardware {
             left PTO - CHUB 4
             right PTO - CHUB 5
 
-            arm arm - EHUB 1
             arm wrist - EHUB 3
+            arm arm - EHUB 4
             arm claw - EHUB 5
 
             left wheely - EHUB 2

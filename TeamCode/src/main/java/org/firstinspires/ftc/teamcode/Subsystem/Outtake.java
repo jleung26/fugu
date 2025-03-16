@@ -13,7 +13,6 @@ public class Outtake {
     public Claw claw = new Claw();
     public Arm arm = new Arm();
     public Wrist wrist = new Wrist();
-    private final RobotHardware rHardware = new RobotHardware();
 
     public Outtake() {}
 
@@ -86,9 +85,9 @@ public class Outtake {
         public Arm.STATE armPos = STATE.STOW;
         public static double armStowPosition = 0;
         public static double armTransferPosition = 0;
-        public static double armScoringBucketPosition = 0;
+        public static double armScoringBucketPosition = 0.508;
         public static double armScoringClipPosition = 0;
-        public static double armGrabClipWallPosition = 0;
+        public static double armGrabClipWallPosition = 0.1217;
         public static double armIncrement = 0.0005;
 
         public Arm() {}
@@ -137,9 +136,9 @@ public class Outtake {
         public boolean isWristTransferring = true;
         public static double wristStowPosition = 0;
         public static double wristTransferPosition = 0;
-        public static double wristScoreBucketPosition = 0;
+        public static double wristScoreBucketPosition = 0.73;
         public static double wristScoreClipPosition = 0;
-        public static double wristGrabClipWallPosition = 0;
+        public static double wristGrabClipWallPosition = 1;
         public static double wristIncrement = 0.0005;
 
         public Wrist() {}
@@ -183,15 +182,15 @@ public class Outtake {
     public static class Claw {
         public Servo claw;
         public boolean isClawOpen = true;
-        private final double clawTightClosedPosition = 0;
-        private final double clawLooseClosePosition = 0;
-        private final double clawOpenPosition = 0;
+        private final double clawTightClosedPosition = 0.1644;
+        private final double clawLooseClosePosition = 0.255;
+        private final double clawOpenPosition = 0.656;
         private final double clawIncrement = 0.0003;
 
         public Claw() {}
 
         public void initialize(RobotHardware robotHardware) {
-            this.claw = robotHardware.armClawServo;
+this.claw = robotHardware.armClawServo;
         }
 
         // Toggles the claw between open and closed positions

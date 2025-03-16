@@ -18,14 +18,14 @@ public class Hang {
     private ElapsedTime elapsedTime;
     private int hangState;
 
-    public static double leftWheelyStowPos = 0;
-    public static double leftWheelyDeployPos = 0;
-    public static double rightWheelyStowPos = 0;
-    public static double rightWheelyDeployPos = 0;
-    public static double leftPtoStowPos = 0;
-    public static double leftPtoDeployPos = 0;
-    public static double rightPtoStowPos = 0;
-    public static double rightPtoDeployPos = 0;
+    public static double leftWheelyStowPos = 0.7928;
+    public static double leftWheelyDeployPos = 0.097;
+    public static double rightWheelyStowPos = 0.8661;
+    public static double rightWheelyDeployPos = 0.147;
+    public static double leftPtoStowPos = 0.9639;
+    public static double leftPtoDeployPos = 0.7833;
+    public static double rightPtoStowPos = 1;
+    public static double rightPtoDeployPos = 0.8811;
 
 
     public Hang() {}
@@ -87,6 +87,39 @@ public class Hang {
         opmode.telemetry.addData(rightWheely + " pos: ", rightWheely.getPosition());
         opmode.telemetry.addData(leftPto + " pos: ", leftPto.getPosition());
         opmode.telemetry.addData(rightPto + " pos: ", rightPto.getPosition());
+    }
+
+    public void operateSetPos() {
+        if (opmode.gamepad1.a) {
+            leftWheely.setPosition(leftWheelyDeployPos);
+            rightWheely.setPosition(rightWheelyDeployPos);
+        } else if (opmode.gamepad1.b) {
+            leftWheely.setPosition(leftWheelyStowPos);
+            rightWheely.setPosition(rightWheelyStowPos);
+        }
+
+        if (opmode.gamepad1.dpad_down) {
+            leftPto.setPosition(leftPtoDeployPos);
+            rightPto.setPosition(rightPtoDeployPos);
+        } else if (opmode.gamepad1.dpad_left) {
+            leftPto.setPosition(leftPtoStowPos);
+            rightPto.setPosition(rightPtoStowPos);
+        }
+
+        double leftStick = -opmode.gamepad1.left_stick_y;
+        double rightStick = -opmode.gamepad1.right_stick_y;
+        if (Math.abs(leftStick) > 0.05) {
+            // only slides
+            leftVertMotor.setPower(leftStick);
+            rightVertMotor.setPower(leftStick);
+        } else if (Math.abs(rightStick) > 0.05) {
+            leftVertMotor.setPower(rightStick);
+            rightVertMotor.setPower(rightStick);
+            Fl.setPower(-rightStick);
+            Fr.setPower(-rightStick);
+            Bl.setPower(-rightStick);
+            Br.setPower(-rightStick);
+        }
     }
 
     // I am so proud of this. This is a huge improvement compared to what I used to do.

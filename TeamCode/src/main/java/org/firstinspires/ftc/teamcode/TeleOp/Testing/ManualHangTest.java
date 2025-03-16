@@ -19,6 +19,6 @@ public class ManualHangTest extends OpMode {
 
     @Override
     public void loop() {
-        hang.operateManualTesting();
+        hang.operateSetPos();
     }
 }

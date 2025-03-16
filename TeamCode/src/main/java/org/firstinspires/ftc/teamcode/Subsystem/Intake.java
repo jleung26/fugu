@@ -38,14 +38,14 @@ public class Intake {
     public volatile IntakeState intakeState = IntakeState.NEUTRAL;
 
     // motor constants
-    private double INTAKING_POWER = 1;
-    private double REVERSE_POWER = -1;
-    private double NEUTRAL_POWER = 0;
+    public static double INTAKING_POWER = 0.6;
+    public static double REVERSE_POWER = -0.7;
+    public static double NEUTRAL_POWER = 0;
 
     // wrist constants // wrists synchronized :)
-    private double TRANSFER_POS = 0.08;
-    private double DROP_DOWN_POS = 0.416;
-    private double WRIST_TUNING_INCREMENT = 0.001;
+    public static double TRANSFER_POS = 0.08;
+    public static double DROP_DOWN_POS = 0.416;
+    public static double WRIST_TUNING_INCREMENT = 0.001;
 
     // sensor constants
     public static double DETECTION_THRESHOLD = 1.2; // inches
