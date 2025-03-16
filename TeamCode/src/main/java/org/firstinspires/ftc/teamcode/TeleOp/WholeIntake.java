@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 import org.firstinspires.ftc.teamcode.Subsystem.Mecanum;
 import org.firstinspires.ftc.teamcode.Subsystem.SimpleHori;
@@ -25,7 +26,7 @@ import java.util.List;
 public class WholeIntake extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     Intake intake = new Intake();
-    SimpleHori horiSlides = new SimpleHori();
+    HorizontalSlides horiSlides = new HorizontalSlides();
     Mecanum drive = new Mecanum();
     // Action stuff
     private FtcDashboard dash = FtcDashboard.getInstance();
@@ -91,7 +92,7 @@ public class WholeIntake extends OpMode {
 
         // loops
         intake.operateColorChecking(false);
-        horiSlides.operateTest(packet);
+        horiSlides.operate();
         drive.operateSimple();
 
 
@@ -99,11 +100,9 @@ public class WholeIntake extends OpMode {
              intake.dropDown();
              intake.intake();
          } else if (currentGamepad1.a && !previousGamepad1.a && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-             intake.dropDown();
              intake.reverse();
              runningActions.add(new SequentialAction(
                      new SleepAction(1),
-                     new InstantAction(() -> intake.flipUp()),
                      new InstantAction(() -> intake.neutral())
              ));
          } else if (intake.chamberState != Intake.IntakeChamberState.EMPTY && intake.intakeState != Intake.IntakeState.REVERSE) {

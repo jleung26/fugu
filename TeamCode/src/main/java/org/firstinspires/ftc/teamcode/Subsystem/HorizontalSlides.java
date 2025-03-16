@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystem;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,10 +18,9 @@ public class HorizontalSlides {
     public DcMotorEx horiMotor;
 
     // constants
-    public static double Kp = 0.005;
+    public static double Kp = 0.0045;
     public static double Ki = 0;
     public static double Kd = 0.00001;
-    public static double Kg = 0; // no need
     public static double CACHING_THRESHOLD = 0.005;
     public static double RETRACTED_THRESHOLD = 10;
     public static int UPPER_LIMIT = 1100; // this is for 1150s
@@ -46,15 +46,14 @@ public class HorizontalSlides {
         this.opmode = opmode;
         this.horiMotor = robotHardware.horiMotor;
 
-        horiMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        horiMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        horiMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         controller = new PIDController(Kp, Ki, Kd);
 
         if (resetEncoders) {
             horiMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         }
+
+        horiMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
     }
 
     public void operate() {
@@ -71,44 +70,40 @@ public class HorizontalSlides {
         previousOutput = output;
     }
 
-    public void operateTuning() {
+    public void operateTuning(TelemetryPacket packet) {
+        controller.setPID(Kp, Ki, Kd);
+
         horiMotor.setPower(-opmode.gamepad1.left_stick_y);
-//        if (opmode.gamepad1.y) {
-//            target = extendedPos;
-//        } else if (opmode.gamepad1.a) {
-//            target = retractedPos;
-//        }
+        if (opmode.gamepad1.y) {
+            target = extendedPos;
+        } else if (opmode.gamepad1.a) {
+            target = retractedPos;
+        }
 
         int currentPos = horiMotor.getCurrentPosition();
-//        usePID = opmode.gamepad1.left_trigger > 0.1;
-//        if (usePID) {
-//            output = controller.calculate(currentPos, target);
-//            horiMotor.setPower(output);
-//        }
-//        else {
-//            // manual control
-//        horiMotor.setPower(-opmode.gamepad1.left_stick_y);
-//        }
-//        if (opmode.gamepad1.y) {
-//            horiMotor.setPower(0.4);
-//        } else if (opmode.gamepad1.a) {
-//            horiMotor.setPower(0);
-//        }
+        usePID = opmode.gamepad1.left_trigger > 0.1;
+        if (usePID) {
+            output = controller.calculate(currentPos, target);
+            horiMotor.setPower(output);
+        }
+        else {
+            // manual control
+        horiMotor.setPower(-opmode.gamepad1.left_stick_y);
+        }
+
 
         // updates boolean
         slidesRetracted = currentPos < RETRACTED_THRESHOLD;
 
         // telemetry
         opmode.telemetry.addData("current pos: ", currentPos);
-        opmode.telemetry.addData("enabled?: ", horiMotor.isMotorEnabled());
-        opmode.telemetry.addData("current: ", horiMotor.getCurrent(CurrentUnit.AMPS));
         opmode.telemetry.addData("target: ", target);
         opmode.telemetry.addData("use PID: ", usePID);
         opmode.telemetry.addData("slidesRetracted: ", slidesRetracted);
         opmode.telemetry.addData("left stick y", -opmode.gamepad1.left_stick_y);
 
-//        packet.put("current pos: ", currentPos);
-//        packet.put("target: ", target);
+        packet.put("current pos: ", currentPos);
+        packet.put("target: ", target);
     }
 
 
