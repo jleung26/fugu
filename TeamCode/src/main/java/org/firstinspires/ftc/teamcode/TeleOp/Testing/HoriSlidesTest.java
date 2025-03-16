@@ -5,18 +5,19 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
-import org.firstinspires.ftc.teamcode.Subsystem.VerticalSlides;
+import org.firstinspires.ftc.teamcode.Subsystem.SimpleHori;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 @TeleOp
 public class HoriSlidesTest extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
+    SimpleHori horizontalSlides = new SimpleHori();
+
     private FtcDashboard dash = FtcDashboard.getInstance();
     private MultipleTelemetry dashboardTelemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
-    private HorizontalSlides horizontalSlides = new HorizontalSlides();
+
 
     @Override
     public void init() {
@@ -28,10 +29,9 @@ public class HoriSlidesTest extends OpMode {
     public void loop() {
         TelemetryPacket packet = new TelemetryPacket();
 
-        horizontalSlides.operateTuning(packet);
+        horizontalSlides.operateTest(packet);
 
         dash.sendTelemetryPacket(packet);
-
         dashboardTelemetry.update();
     }
 }

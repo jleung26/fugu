@@ -86,19 +86,19 @@ public class RobotHardware {
         Fl.setDirection(DcMotorSimple.Direction.REVERSE);
         Bl.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        leftVertMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        rightVertMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        horiMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
         leftVertMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); // has encoder
         rightVertMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         horiMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER); // has encoder
+
+        leftVertMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightVertMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        horiMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         leftVertMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rightVertMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         horiMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftIntakeWristServo.setDirection(Servo.Direction.REVERSE);
         rightPtoServo.setDirection(Servo.Direction.REVERSE);

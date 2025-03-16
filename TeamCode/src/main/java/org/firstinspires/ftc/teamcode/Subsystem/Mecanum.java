@@ -76,6 +76,10 @@ public class Mecanum {
         opmode.telemetry.addData("normalized error: ", normalizeError(targetAngle - pinpoint.relativeNormalizedHeading));
     }
 
+    public void operateSimple() {
+        driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, opmode.gamepad1.left_trigger > 0.1);
+    }
+
     public void driveRobotCentric(double x, double y, double rx, boolean slowmode) {
         x = x * (slowmode ? SLOW_MODE_FACTOR: 1);
         y = y * (slowmode ? SLOW_MODE_FACTOR: 1);
