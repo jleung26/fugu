@@ -15,7 +15,7 @@ import java.util.List;
 public class MecanumTest extends OpMode {
     // simple driving and PD turning
     private Mecanum drive = new Mecanum();
-    RobotHardware robotHardware;
+    RobotHardware robotHardware = new RobotHardware();
     private ElapsedTime elapsedtime;
     private List<LynxModule> allHubs;
 

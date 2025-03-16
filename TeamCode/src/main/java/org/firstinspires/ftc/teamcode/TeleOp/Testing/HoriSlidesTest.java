@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 @TeleOp
 public class HoriSlidesTest extends OpMode {
-    RobotHardware robotHardware;
+    RobotHardware robotHardware = new RobotHardware();
     private FtcDashboard dash = FtcDashboard.getInstance();
     private MultipleTelemetry dashboardTelemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
     private HorizontalSlides horizontalSlides = new HorizontalSlides();

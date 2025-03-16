@@ -13,7 +13,7 @@ import java.util.List;
 
 @TeleOp
 public class IntakeTest extends OpMode {
-    RobotHardware robotHardware;
+    RobotHardware robotHardware = new RobotHardware();
     Intake intake = new Intake();
     final Gamepad currentGamepad1 = new Gamepad();
     final Gamepad currentGamepad2 = new Gamepad();

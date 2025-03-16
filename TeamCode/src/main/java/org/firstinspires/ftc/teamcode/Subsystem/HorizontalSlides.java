@@ -32,11 +32,11 @@ public class HorizontalSlides {
 
     // declaring variables for later modification
     private volatile double target = 0;
-    private volatile double slidePower;
+    private volatile double slidePower = 0;
     private volatile double output = 0;
     private volatile double previousOutput = 0;
     public volatile boolean slidesRetracted = true;
-    public volatile boolean usePID = true;
+    public volatile boolean usePID = false;
 
     public HorizontalSlides() {}
 
@@ -66,23 +66,23 @@ public class HorizontalSlides {
     }
 
     public void operateTuning(TelemetryPacket packet) {
-        if (opmode.gamepad1.y) {
-            target = extendedPos;
-        } else if (opmode.gamepad1.a) {
-            target = retractedPos;
-        }
+//        if (opmode.gamepad1.y) {
+//            target = extendedPos;
+//        } else if (opmode.gamepad1.a) {
+//            target = retractedPos;
+//        }
 
         int currentPos = slideMotor.getCurrentPosition();
 
-        slidePower = -opmode.gamepad1.right_stick_y * 0.5;
-        usePID = opmode.gamepad1.left_trigger > 0.1;
-        if (usePID) {
-            output = controller.calculate(currentPos, target);
-            slideMotor.setPower(output);
-        } else {
+        slidePower = -opmode.gamepad1.left_stick_y * 0.5;
+//        usePID = opmode.gamepad1.left_trigger > 0.1;
+//        if (usePID) {
+//            output = controller.calculate(currentPos, target);
+//            slideMotor.setPower(output);
+//        } else {
             // manual control
             slideMotor.setPower(slidePower);
-        }
+//        }
 
         // updates boolean
         slidesRetracted = currentPos < RETRACTED_THRESHOLD;
@@ -92,6 +92,7 @@ public class HorizontalSlides {
         opmode.telemetry.addData("target: ", target);
         opmode.telemetry.addData("use PID: ", usePID);
         opmode.telemetry.addData("slidesRetracted: ", slidesRetracted);
+        opmode.telemetry.addData("right stick y", -opmode.gamepad1.left_stick_y);
 
         packet.put("current pos: ", currentPos);
         packet.put("target: ", target);

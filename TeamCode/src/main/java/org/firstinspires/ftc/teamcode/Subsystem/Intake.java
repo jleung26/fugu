@@ -43,8 +43,8 @@ public class Intake {
     private double NEUTRAL_POWER = 0;
 
     // wrist constants // wrists synchronized :)
-    private double TRANSFER_POS = 0;
-    private double DROP_DOWN_POS = 0;
+    private double TRANSFER_POS = 0.08;
+    private double DROP_DOWN_POS = 0.416;
     private double WRIST_TUNING_INCREMENT = 0.001;
 
     // sensor constants
@@ -87,8 +87,8 @@ public class Intake {
 
         chamberState = getPieceColor();
 
-        opmode.telemetry.addLine(String.format(Locale.US, "Red %d, Green %d, Blue %d", colorSensor.red(), colorSensor.green(), colorSensor.blue()));
-        opmode.telemetry.addData("distance detected", colorSensor.getDistance(DistanceUnit.INCH));
+//        opmode.telemetry.addLine(String.format(Locale.US, "Red %d, Green %d, Blue %d", colorSensor.red(), colorSensor.green(), colorSensor.blue()));
+//        opmode.telemetry.addData("distance detected", colorSensor.getDistance(DistanceUnit.INCH));
         opmode.telemetry.addData("chamber color enum: ", chamberState);
         opmode.telemetry.addData("intake state enum: ", intakeState);
         opmode.telemetry.addData("left wrist pos: ", leftWrist.getPosition());

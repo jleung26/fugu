@@ -17,7 +17,7 @@ import java.util.List;
 
 @TeleOp
 public class TemplateTeleOp extends OpMode {
-    RobotHardware robotHardware;
+    RobotHardware robotHardware = new RobotHardware();
     // Action stuff
     private FtcDashboard dash = FtcDashboard.getInstance();
     private List<Action> runningActions = new ArrayList<>();

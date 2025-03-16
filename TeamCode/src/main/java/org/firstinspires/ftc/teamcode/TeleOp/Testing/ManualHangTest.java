@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 @TeleOp
 public class ManualHangTest extends OpMode {
-    RobotHardware robotHardware;
+    RobotHardware robotHardware = new RobotHardware();
     private Hang hang = new Hang();
 
     @Override

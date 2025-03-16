@@ -39,8 +39,8 @@ public class RobotHardware {
 
             SERVO
 
-            intake right wrist - EHUB 0
-            intake left wrist - EHUB 2
+            intake right wrist - CHUB 0
+            intake left wrist - CHUB 2
 
             left PTO - CHUB 4
             right PTO - CHUB 5
@@ -56,27 +56,27 @@ public class RobotHardware {
         odo = opmode.hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         intakeColorSensor = opmode.hardwareMap.get(RevColorSensorV3.class, "color");
 
-        Fl = opmode.hardwareMap.get(DcMotorEx.class, "leftFront");
-        Fr = opmode.hardwareMap.get(DcMotorEx.class, "rightFront");
-        Bl = opmode.hardwareMap.get(DcMotorEx.class, "leftRear");
-        Br = opmode.hardwareMap.get(DcMotorEx.class, "rightRear");
+        Fl = opmode.hardwareMap.get(DcMotorEx.class, "Fl");
+        Fr = opmode.hardwareMap.get(DcMotorEx.class, "Fr");
+        Bl = opmode.hardwareMap.get(DcMotorEx.class, "Bl");
+        Br = opmode.hardwareMap.get(DcMotorEx.class, "Br");
 
         leftVertMotor = opmode.hardwareMap.get(DcMotorEx.class, "leftVert");
         rightVertMotor = opmode.hardwareMap.get(DcMotorEx.class, "rightVert");
-        horiMotor = opmode.hardwareMap.get(DcMotorEx.class, "horiSlide");
+        horiMotor = opmode.hardwareMap.get(DcMotorEx.class, "hori");
         intakeMotor = opmode.hardwareMap.get(DcMotorEx.class, "intake");
 
         leftIntakeWristServo = opmode.hardwareMap.get(Servo.class, "leftIntakeWrist");
         rightIntakeWristServo = opmode.hardwareMap.get(Servo.class, "rightIntakeWrist");
 
-        leftWheelyServo = opmode.hardwareMap.get(Servo.class, "");
-        rightWheelyServo = opmode.hardwareMap.get(Servo.class, "");
-        leftPtoServo = opmode.hardwareMap.get(Servo.class, "");
-        rightPtoServo = opmode.hardwareMap.get(Servo.class, "");
+        leftWheelyServo = opmode.hardwareMap.get(Servo.class, "leftWheely");
+        rightWheelyServo = opmode.hardwareMap.get(Servo.class, "rightWheely");
+        leftPtoServo = opmode.hardwareMap.get(Servo.class, "leftPTO");
+        rightPtoServo = opmode.hardwareMap.get(Servo.class, "rightPTO");
 
-        armAngleServo = opmode.hardwareMap.get(Servo.class, "");
-        armPitchServo = opmode.hardwareMap.get(Servo.class, "");
-        armClawServo = opmode.hardwareMap.get(Servo.class, "");
+        armAngleServo = opmode.hardwareMap.get(Servo.class, "armAngle");
+        armPitchServo = opmode.hardwareMap.get(Servo.class, "armPitch");
+        armClawServo = opmode.hardwareMap.get(Servo.class, "armClaw");
 
         Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
