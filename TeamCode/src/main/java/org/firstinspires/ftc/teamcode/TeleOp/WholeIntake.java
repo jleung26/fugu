@@ -16,7 +16,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 import org.firstinspires.ftc.teamcode.Subsystem.Mecanum;
-import org.firstinspires.ftc.teamcode.Subsystem.SimpleHori;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 import java.util.ArrayList;
