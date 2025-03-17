@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 import java.util.ArrayList;
 import java.util.List;
 
-@TeleOp
+@TeleOp(group = "B")
 public class WholeIntake extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     Intake intake = new Intake();
@@ -64,8 +64,7 @@ public class WholeIntake extends OpMode {
     }
 
     @Override
-    public void init_loop() {
-        // for rising edge detection
+    public void init_loop() {// for rising edge detection
         previousGamepad1.copy(currentGamepad1);
         previousGamepad2.copy(currentGamepad2);
 
@@ -76,12 +75,12 @@ public class WholeIntake extends OpMode {
             rejectBlue = !rejectBlue;
         }
         telemetry.addData("reject Blue bool: ", rejectBlue);
+
     }
 
     @Override
     public void start() {
         intake.flipUp();
-        intake.neutral();
     }
 
     @Override
@@ -102,13 +101,11 @@ public class WholeIntake extends OpMode {
         TelemetryPacket packet = new TelemetryPacket();
         List<Action> newActions = new ArrayList<>();
         for (Action action : runningActions) {
-//            action.preview(packet.fieldOverlay()); // maybe unnecessary, will test eventually
             if (action.run(packet)) { // actually running actions
                 newActions.add(action); // if failed (run() returns true), try again
             }
         }
         runningActions = newActions;
-//        dash.sendTelemetryPacket(packet);
 
         // loops
         intake.operateColorChecking();
@@ -170,41 +167,6 @@ public class WholeIntake extends OpMode {
         } else if (intake.intakeState == Intake.IntakeState.REVERSE) {
             // nothing
         }
-
-
-//         if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper && intake.chamberState == Intake.IntakeChamberState.EMPTY && intake.intakeState != Intake.IntakeState.INTAKING) {
-//             runningActions.add(new SequentialAction(
-//                     new InstantAction(() -> intake.dropDown()),
-//                     new InstantAction(() -> intake.intake())
-//             ));
-//         } else if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-//             runningActions.add(new SequentialAction(
-////                     new InstantAction(() -> intake.dropDown()),
-//                     new InstantAction(() -> intake.reverse()),
-//                     new SleepAction(0.6),
-//                     new InstantAction(() -> intake.flipUp()),
-//                     new InstantAction(() -> intake.neutral())
-//             ));
-//         } else if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper && intake.chamberState == Intake.IntakeChamberState.EMPTY && intake.intakeState == Intake.IntakeState.INTAKING) {
-//             runningActions.add(new SequentialAction(
-//                     new InstantAction(() -> intake.flipUp()),
-//                     new InstantAction(() -> intake.neutral())
-//             ));
-//         } else if ((intake.chamberState == Intake.IntakeChamberState.YELLOW || intake.chamberState == (rejectBlue ? Intake.IntakeChamberState.RED : Intake.IntakeChamberState.BLUE)) && intake.intakeState == Intake.IntakeState.INTAKING) {
-//             runningActions.add(new SequentialAction(
-//                     new InstantAction(() -> intake.flipUp()),
-//                     new InstantAction(() -> intake.neutral())
-//             ));
-//         } else if (intake.chamberState == (rejectBlue ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED) && intake.chamberState != Intake.IntakeChamberState.YELLOW && intake.intakeState != Intake.IntakeState.REVERSE) {
-//                 runningActions.add(new SequentialAction(
-//                         new InstantAction(() -> intake.reverse()),
-//                         new SleepAction(0.6),
-//                         new InstantAction(() -> intake.dropDown()),
-//                         new InstantAction(() -> intake.intake())
-//                 ));
-//         }
-
-//        dashboardTelemetry.update();
 
         telemetry.addData("reject Blue bool: ", rejectBlue);
         telemetry.addData("color to reject: ", COLOR_TO_REJECT);

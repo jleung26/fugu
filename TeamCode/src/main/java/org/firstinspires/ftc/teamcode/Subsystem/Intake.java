@@ -34,10 +34,6 @@ public class Intake {
         NEUTRAL
     }
 
-    public volatile IntakeChamberState chamberState = IntakeChamberState.EMPTY;
-    public volatile IntakeChamberState prevChamberState = IntakeChamberState.EMPTY;
-    public volatile IntakeState intakeState = IntakeState.NEUTRAL;
-
     // motor constants
     public static double INTAKING_POWER = 0.6;
     public static double REVERSE_POWER = -0.6;
@@ -50,8 +46,12 @@ public class Intake {
 
     // sensor constants
     public static double DETECTION_THRESHOLD = 1.2; // inches
-    public static double BLUE_RGB_THRESHOLD = 420;
-    public static double YELLOW_RGB_THRESHOLD = 500;
+
+    // constantly updating states
+    public volatile IntakeChamberState chamberState = IntakeChamberState.EMPTY;
+    public volatile IntakeChamberState prevChamberState = IntakeChamberState.EMPTY;
+    public volatile IntakeState intakeState = IntakeState.NEUTRAL;
+    public volatile boolean wristFlippedUp = true;
 
     public void initialize(OpMode opmode, RobotHardware robotHardware) {
         this.opmode = opmode;
@@ -136,8 +136,8 @@ public class Intake {
 
     // wrist methods
     public void incremental(Servo servo, int sign) {servo.setPosition(servo.getPosition() + sign * WRIST_TUNING_INCREMENT);}
-    public void dropDown() { leftWrist.setPosition(DROP_DOWN_POS); rightWrist.setPosition(DROP_DOWN_POS);}
-    public void flipUp() { leftWrist.setPosition(TRANSFER_POS); rightWrist.setPosition(TRANSFER_POS);}
+    public void dropDown() { leftWrist.setPosition(DROP_DOWN_POS); rightWrist.setPosition(DROP_DOWN_POS); wristFlippedUp = false;}
+    public void flipUp() { leftWrist.setPosition(TRANSFER_POS); rightWrist.setPosition(TRANSFER_POS); wristFlippedUp = true;}
 
     public IntakeChamberState getPieceColor() {
         if (colorSensor.getDistance(DistanceUnit.INCH) < DETECTION_THRESHOLD) {

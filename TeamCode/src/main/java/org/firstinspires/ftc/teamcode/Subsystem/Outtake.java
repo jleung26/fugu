@@ -56,13 +56,16 @@ public class Outtake {
         } else if (opmode.gamepad2.x) { // scoring clip
             wrist.setWristScoreClip();
             arm.setArmScoreClip();
+        } else if (opmode.gamepad2.dpad_down) {
+            wrist.setWristGrabClip();
+            arm.setArmGrabClip();
         }
 
-        if (opmode.gamepad2.dpad_up) {
+        if (opmode.gamepad2.right_bumper) {
             claw.closeClawTight();
         } else if (opmode.gamepad2.dpad_left) {
             claw.closeClawLoose();
-        } else if (opmode.gamepad2.dpad_down) {
+        } else if (opmode.gamepad2.left_bumper) {
             claw.openClaw();
         }
 
@@ -226,6 +229,37 @@ this.claw = robotHardware.armClawServo;
             return claw.getPosition();
         }
     }
+
+    // combined actions
+    // tranfser
+    public void toTransfer() {
+        wrist.setWristTransfer();
+        arm.setArmTransfer();
+    }
+    // stow
+    public void toStow() {
+        wrist.setWristStow();
+        arm.setArmStow();
+    }
+    // score bucket
+    public void toScoreBucket() {
+        wrist.setWristScoreBucket();
+        arm.setArmScoreBucket();
+    }
+    // score clip
+    public void toScoreClip() {
+        wrist.setWristScoreClip();
+        arm.setArmScoreClip();
+    }
+    public void toGrabClip() {
+        wrist.setWristGrabClip();
+        arm.setArmGrabClip();
+    }
+
+    public void closeClawTight() { claw.closeClawTight(); }
+    public void closeClawLoose() { claw.closeClawLoose(); }
+    public void openClaw()       { claw.openClaw(); }
+
 
     // simple util function
     public int getSign(double input) {

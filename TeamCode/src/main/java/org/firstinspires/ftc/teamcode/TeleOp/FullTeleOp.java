@@ -4,6 +4,10 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -31,6 +35,14 @@ public class FullTeleOp extends OpMode {
     Outtake outtake = new Outtake();
     Intake intake = new Intake();
     Hang hang = new Hang();
+
+    // booleans
+    // team color
+    // spec/sample
+    boolean redAlliance = true;
+    boolean sampleMode = true;
+    Intake.IntakeChamberState COLOR_TO_REJECT;
+
 
     // Action stuff
     private FtcDashboard dash = FtcDashboard.getInstance();
@@ -69,12 +81,38 @@ public class FullTeleOp extends OpMode {
     }
 
     @Override
+    public void init_loop() {
+        // for rising edge detection
+        previousGamepad1.copy(currentGamepad1);
+        previousGamepad2.copy(currentGamepad2);
+
+        currentGamepad1.copy(gamepad1);
+        currentGamepad2.copy(gamepad2);
+
+        if ((currentGamepad1.a && !previousGamepad1.a) || (currentGamepad2.a && !previousGamepad2.a)) {
+            redAlliance = !redAlliance;
+        }
+
+        if ((currentGamepad1.b && !previousGamepad1.b) || (currentGamepad2.b && !previousGamepad2.b)) {
+            sampleMode = !sampleMode;
+        }
+        telemetry.addData("red alliance? ", redAlliance);
+        telemetry.addData("sample mode:  ", sampleMode);
+    }
+
+    @Override
+    public void start() {
+        COLOR_TO_REJECT = (redAlliance ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
+        outtake.toStow();
+        intake.flipUp();
+    }
+
+    @Override
     public void loop() {
         // clearing bulk cache
-//        for (LynxModule hub : allHubs) {
-//            hub.clearBulkCache();
-//        }
-        allHubs.get(0).clearBulkCache(); // praying this works
+        for (LynxModule hub : allHubs) {
+            hub.clearBulkCache();
+        }
 
         // for rising edge detection
         previousGamepad1.copy(currentGamepad1);
@@ -87,16 +125,185 @@ public class FullTeleOp extends OpMode {
         TelemetryPacket packet = new TelemetryPacket();
         List<Action> newActions = new ArrayList<>();
         for (Action action : runningActions) {
-            action.preview(packet.fieldOverlay()); // maybe unnecessary, will test eventually
             if (action.run(packet)) { // actually running actions
                 newActions.add(action); // if failed (run() returns true), try again
             }
         }
         runningActions = newActions;
-        dash.sendTelemetryPacket(packet);
+
+        // loops
+        drive.operate();
+        verticalSlides.operate();
+        horizontalSlides.operate();
+        intake.operateColorChecking();
+        // no constant loop for outtake
+        COLOR_TO_REJECT = (redAlliance ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
+
+        // intake and transfer logic
+        if (intake.intakeState == Intake.IntakeState.NEUTRAL) {
+            if (intake.chamberState == Intake.IntakeChamberState.EMPTY) {
+                if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
+                    // start intaking
+                    runningActions.add(new SequentialAction(
+                            new InstantAction(() -> intake.dropDown()),
+                            new InstantAction(() -> intake.intake())
+                    ));
+                }
+            } else if (intake.chamberState != COLOR_TO_REJECT) {
+                    // full transfer sequence
+                    if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && horizontalSlides.slidesRetracted) {
+                        runningActions.add(new SequentialAction(
+                                new ParallelAction(
+                                        new InstantAction(() -> outtake.openClaw()),
+                                        new InstantAction(() -> outtake.toTransfer())
+                                ),
+                                new SleepAction(0.4), // TODO: play around with timings
+                                new InstantAction(() -> outtake.closeClawLoose()),
+                                new SleepAction(0.2),
+                                new InstantAction(() -> intake.dropDown()),
+                                new InstantAction(() -> verticalSlides.raiseToHighBucket()),
+                                new SleepAction(0.5),
+                                new InstantAction(() -> intake.flipUp()),
+                                new SleepAction(1),
+                                new InstantAction(() -> outtake.toScoreBucket())
+                        ));
+                    }
+                    else if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
+                        // spit out (into human player zone or for teammate bucket bot)
+                        runningActions.add(new SequentialAction(
+                                new InstantAction(() -> intake.reverse())
+                        ));
+                    }
+            } else if (intake.chamberState == COLOR_TO_REJECT) { // this case shouldn't ever be reached; wrong color should have been rejecting whilst intaking
+                // reverse, then go back to neutral
+                runningActions.add(new SequentialAction(
+                        new InstantAction(() -> intake.reverse()),
+                        new SleepAction(0.2),
+                        new InstantAction(() -> intake.neutral())
+                ));
+            }
+        } else if (intake.intakeState == Intake.IntakeState.INTAKING) {
+            if (intake.chamberState == Intake.IntakeChamberState.EMPTY) {
+                // keep trying to intake unless driver presses button
+                if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
+                    // flip up stop intaking
+                    runningActions.add(new SequentialAction(
+                            new InstantAction(() -> intake.flipUp()),
+                            new InstantAction(() -> intake.neutral())
+                    ));
+                }
+            } else if (intake.chamberState != COLOR_TO_REJECT) {
+                // yay grabbed sample, can stow now
+                runningActions.add(new SequentialAction(
+                        new InstantAction(() -> intake.flipUp()),
+                        new InstantAction(() -> intake.neutral())
+                ));
+            } else if (intake.chamberState == COLOR_TO_REJECT && intake.prevChamberState == COLOR_TO_REJECT) {
+                // reverse and go back to intaking
+                runningActions.add(new SequentialAction(
+                        new InstantAction(() -> intake.flipUp()),
+                        new SleepAction(0.3),
+                        new ParallelAction( // this could be problematic
+                                new InstantAction(() -> intake.reverse()),
+                                new InstantAction(() -> intake.dropDown())
+                        )
+                ));
+            }
+        } else if (intake.intakeState == Intake.IntakeState.REVERSE) {
+            // TODO: if the following doesn't work, have to go back to timer based
+
+            // stop reversing when no more sample
+            if (intake.wristFlippedUp && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
+                runningActions.add( new InstantAction(() -> intake.neutral()) );
+            } else if (!intake.wristFlippedUp && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
+                runningActions.add(new SequentialAction(
+                        new InstantAction(() -> intake.dropDown()),
+                        new InstantAction(() -> intake.intake())
+                ));
+            }
+        }
+
+        // outtake and scoring logic
+        if (outtake.arm.armPos == Outtake.Arm.STATE.SCORING_BUCKET) {
+            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
+                // deposit in bucket, then retract all
+                runningActions.add(new SequentialAction(
+                        new InstantAction(() -> outtake.openClaw()),
+                        new SleepAction(0.2),
+                        new ParallelAction(
+                                new InstantAction(() -> outtake.toStow()),
+                                new InstantAction(() -> verticalSlides.retract())
+                        )
+                ));
+            }
+        } else if (outtake.arm.armPos == Outtake.Arm.STATE.SCORING_CLIP) {
+            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && !sampleMode) {
+                // finish depositing clip and return to grab another
+                runningActions.add(new SequentialAction(
+                        new InstantAction(() -> outtake.openClaw()),
+                        new SleepAction(0.3),
+                        new InstantAction(() -> outtake.toGrabClip()),
+                        new InstantAction(() -> verticalSlides.retract())
+                ));
+            } else if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && sampleMode) {
+                // finish depositing clip and return to stow
+                runningActions.add(new SequentialAction(
+                        new InstantAction(() -> outtake.openClaw()),
+                        new SleepAction(0.3),
+                        new InstantAction(() -> outtake.toStow()),
+                        new InstantAction(() -> verticalSlides.retract())
+                ));
+            }
+        } else if (outtake.arm.armPos == Outtake.Arm.STATE.GRABBING_CLIP) {
+            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
+                // grab clip and prep for scoring
+                runningActions.add(new SequentialAction(
+                        new InstantAction(() -> outtake.closeClawTight()),
+                        new InstantAction(() -> outtake.toScoreClip()),
+                        new InstantAction(() -> verticalSlides.raiseToScoreClip())
+                ));
+            }
+        } else if (outtake.arm.armPos == Outtake.Arm.STATE.STOW && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
+            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
+                // flip over to grab clip
+                runningActions.add(new SequentialAction(
+                        new InstantAction(() -> verticalSlides.retract()),
+                        new InstantAction(() -> outtake.openClaw()),
+                        new InstantAction(() -> outtake.toGrabClip())
+                ));
+            }
+        }
+
+        // full reset button, in case macros mess up, or driver mixed up
+        if (currentGamepad1.a && !previousGamepad1.a) {
+            runningActions.add(new SequentialAction(
+                    new ParallelAction(
+                            new InstantAction(() -> intake.flipUp()),
+                            new InstantAction(() -> intake.neutral()),
+                            new InstantAction(()-> outtake.toStow()),
+                            new InstantAction(()-> outtake.openClaw())
+                    ),
+                    new SleepAction(0.7),
+                    new ParallelAction(
+                            new InstantAction(() -> verticalSlides.retract()),
+                            new InstantAction(()-> horizontalSlides.retract())
+                    )
+            ));
+        }
+
+        // secondary driver toggles
+        if (currentGamepad2.a && !previousGamepad2.a) {
+            redAlliance = !redAlliance;
+        } else if (currentGamepad2.b && !previousGamepad2.b) {
+            sampleMode = !sampleMode;
+        }
+
+        // hang logic (this is where it gets messy :NOOOOO:)
 
 
-        dashboardTelemetry.update();
+        // telemetry
+        telemetry.addData("red alliance? ", redAlliance);
+        telemetry.addData("sample mode:  ", sampleMode);
         telemetry.addData("Loop Times", elapsedtime.milliseconds());
         elapsedtime.reset();
     }

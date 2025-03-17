@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 import java.util.ArrayList;
 import java.util.List;
 
-@TeleOp
+@TeleOp(group = "W")
 public class TemplateTeleOp extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     // Action stuff

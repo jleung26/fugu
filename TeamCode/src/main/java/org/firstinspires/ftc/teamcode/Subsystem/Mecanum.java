@@ -43,8 +43,10 @@ public class Mecanum {
         pinpoint.initialize(opmode, robotHardware);
     }
 
-    public void operateTeleOp() {
+    public void operate() {
         pinpoint.operateTeleOp();
+
+        slowModeBool = opmode.gamepad1.left_trigger > 0.1;
 
         if (angleLockBool) {
             driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), -PDTurning(targetAngle, pinpoint.relativeNormalizedHeading), slowModeBool);
