@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Subsystem.Outtake;
 import org.firstinspires.ftc.teamcode.Subsystem.VerticalSlides;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
-@TeleOp
+@TeleOp(group = "Testing")
 public class OuttakeTest extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     private Outtake outtake = new Outtake();

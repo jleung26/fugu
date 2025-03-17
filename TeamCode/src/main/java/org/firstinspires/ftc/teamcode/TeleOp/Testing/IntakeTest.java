@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 import java.util.List;
 
-@TeleOp
+@TeleOp(group = "Testing")
 public class IntakeTest extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     Intake intake = new Intake();

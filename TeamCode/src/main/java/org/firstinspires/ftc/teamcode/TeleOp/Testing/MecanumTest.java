@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 import java.util.List;
 
-@TeleOp
+@TeleOp(group = "Testing")
 public class MecanumTest extends OpMode {
     // simple driving and PD turning
     private Mecanum drive = new Mecanum();

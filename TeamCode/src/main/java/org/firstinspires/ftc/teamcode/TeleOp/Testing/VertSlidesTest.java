@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Subsystem.VerticalSlides;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
-@TeleOp
+@TeleOp(group = "Testing")
 public class VertSlidesTest extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     private FtcDashboard dash = FtcDashboard.getInstance();

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import org.firstinspires.ftc.teamcode.Util.PinpointManager;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
-@TeleOp
+@TeleOp(group = "Testing")
 public class PinpointTest extends OpMode {
     RobotHardware robotHardware  = new RobotHardware();
     PinpointManager pinpoint = new PinpointManager();

@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
-@TeleOp
+@TeleOp(group = "Testing")
 public class HoriSlidesTest extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
 //    SimpleHori horizontalSlides = new SimpleHori();
