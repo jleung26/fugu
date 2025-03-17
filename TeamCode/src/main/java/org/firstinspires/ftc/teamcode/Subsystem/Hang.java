@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Subsystem;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -40,7 +41,14 @@ public class Hang {
         this.rightVertMotor = robotHardware.rightVertMotor;
 //        this.armAngleServo = robotHardware.armAngleServo;
 //        this.armPitchServo = robotHardware.armPitchServo;
-
+        this.Fl = robotHardware.Fl;
+        this.Fr = robotHardware.Fr;
+        this.Bl = robotHardware.Bl;
+        this.Br = robotHardware.Br;
+        Fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void operateManualTesting() {
@@ -119,7 +127,15 @@ public class Hang {
             Fr.setPower(-rightStick);
             Bl.setPower(-rightStick);
             Br.setPower(-rightStick);
+        } else {
+            leftVertMotor.setPower(0);
+            rightVertMotor.setPower(0);
+            Fl.setPower(-opmode.gamepad1.right_trigger);
+            Fr.setPower(-opmode.gamepad1.right_trigger);
+            Bl.setPower(-opmode.gamepad1.right_trigger);
+            Br.setPower(-opmode.gamepad1.right_trigger);
         }
+
     }
 
     // I am so proud of this. This is a huge improvement compared to what I used to do.
@@ -132,6 +148,10 @@ public class Hang {
 //        rightVertMotor.setTargetPosition(0);
 //        leftVertMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //        rightVertMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        Fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        Fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        Bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        Br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        // drive and vert slide operates need to be turned off too
 //    }
 //

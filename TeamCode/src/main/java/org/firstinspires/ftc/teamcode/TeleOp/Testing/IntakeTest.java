@@ -72,7 +72,7 @@ public class IntakeTest extends OpMode {
         if (testingManualMode) {
             intake.operateTesting();
         }else {
-            intake.operateColorChecking(rejectBlue);
+            intake.operateColorChecking();
         }
 
         telemetry.addData("manual mode: ", testingManualMode);

@@ -35,16 +35,17 @@ public class Intake {
     }
 
     public volatile IntakeChamberState chamberState = IntakeChamberState.EMPTY;
+    public volatile IntakeChamberState prevChamberState = IntakeChamberState.EMPTY;
     public volatile IntakeState intakeState = IntakeState.NEUTRAL;
 
     // motor constants
     public static double INTAKING_POWER = 0.6;
-    public static double REVERSE_POWER = -0.7;
-    public static double NEUTRAL_POWER = 0;
+    public static double REVERSE_POWER = -0.6;
+    public static double NEUTRAL_POWER = 0.15;
 
     // wrist constants // wrists synchronized :)
-    public static double TRANSFER_POS = 0.08;
-    public static double DROP_DOWN_POS = 0.416;
+    public static double TRANSFER_POS = 0.04;
+    public static double DROP_DOWN_POS = 0.423;
     public static double WRIST_TUNING_INCREMENT = 0.001;
 
     // sensor constants
@@ -96,11 +97,9 @@ public class Intake {
 
     }
 
-    public void operateTeleOp() {}
-
-    public void operateColorChecking(boolean rejectBlue) {
+    public void operateColorChecking() {
+        prevChamberState = chamberState;
         chamberState = getPieceColor();
-
 //        // if empty, start intaking (only once instead of once every loop)
 //        if (chamberState == IntakeChamberState.EMPTY && intakeState != IntakeState.INTAKING) {
 //            intake();
@@ -114,7 +113,9 @@ public class Intake {
 //        }
 
         opmode.telemetry.addData("chamber color enum: ", chamberState);
-        opmode.telemetry.addData("intake state enum: ", intakeState);
+//        opmode.telemetry.addData("intake state enum: ", intakeState);
+//        opmode.telemetry.addData("argb: ", colorSensor.argb());
+//        opmode.telemetry.addLine(String.format(Locale.US, "Red %d, Green %d, Blue %d", colorSensor.red(), colorSensor.green(), colorSensor.blue()));
     }
 
     // intake method
@@ -140,17 +141,31 @@ public class Intake {
 
     public IntakeChamberState getPieceColor() {
         if (colorSensor.getDistance(DistanceUnit.INCH) < DETECTION_THRESHOLD) {
-            double blue = colorSensor.blue();
+            int argb = colorSensor.argb();
+            int red   = (argb >> 16) & 0xFF; // Extract red
+            int green = (argb >> 8)  & 0xFF; // Extract green
+            int blue  = argb & 0xFF;         // Extract blue
+//            double blue = colorSensor.blue();
 //            double red = colorSensor.red();
-            double green = colorSensor.green();
+//            double green = colorSensor.green();
 
             // Minimal comparisons, breaks if the reflected light is too saturated and nearly white
-            if (blue > BLUE_RGB_THRESHOLD) {
+//            if (blue > BLUE_RGB_THRESHOLD) {
+//                return IntakeChamberState.BLUE; // Blue is dominant -> blue
+//            } else if (green > YELLOW_RGB_THRESHOLD) {
+//                return IntakeChamberState.YELLOW; // Green dominant, blue not dominant -> (Yellow)
+//            } else {
+//                return IntakeChamberState.RED; // Not blue or yellow -> red
+//            }
+
+            if (blue > red && blue > green) {
                 return IntakeChamberState.BLUE; // Blue is dominant -> blue
-            } else if (green > YELLOW_RGB_THRESHOLD) {
+            } else if (red > blue && red > green) {
+                return IntakeChamberState.RED; // Not blue or yellow -> red
+            } else if (green > red && green > blue) {
                 return IntakeChamberState.YELLOW; // Green dominant, blue not dominant -> (Yellow)
             } else {
-                return IntakeChamberState.RED; // Not blue or yellow -> red
+                return IntakeChamberState.UNKNOWN; // Handle ambiguous cases
             }
         } else {
             return IntakeChamberState.EMPTY;
