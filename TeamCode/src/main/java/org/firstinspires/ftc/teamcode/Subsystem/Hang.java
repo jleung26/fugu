@@ -26,7 +26,7 @@ public class Hang {
     public static double leftPtoStowPos = 0.9639;
     public static double leftPtoDeployPos = 0.7617;
     public static double rightPtoStowPos = 1;
-    public static double rightPtoDeployPos = 0.8811;
+    public static double rightPtoDeployPos = 0.8078;
 
 
     public Hang() {}

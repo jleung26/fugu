@@ -29,7 +29,7 @@ public class VerticalSlides {
     // encoder positions
     public static int highBucketPos = 1100;
     public static int lowBucketPos = 460;
-    public static int stowBeforeTransfer = 50;
+    public static int stowBeforeTransfer = 30;
     public static int retractedPos = 0;
     public static int prepClipPos = 280;
     public static int pullClipUpPos = 700;
