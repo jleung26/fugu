@@ -22,7 +22,7 @@ public class ResetSlideEncoders extends OpMode {
 
     @Override
     public void start() {
-        requestOpModeStop(); // hopefully this doesn't break anything, otherwise, can just remove
+//        requestOpModeStop(); // hopefully this doesn't break anything, otherwise, can just remove
     }
 
     @Override

@@ -34,7 +34,7 @@ public class FullTeleOp extends OpMode {
     HorizontalSlides horizontalSlides = new HorizontalSlides();
     Outtake outtake = new Outtake();
     Intake intake = new Intake();
-    Hang hang = new Hang();
+//    Hang hang = new Hang();
 
     // booleans
     // team color
@@ -73,7 +73,7 @@ public class FullTeleOp extends OpMode {
         horizontalSlides.initialize(this, robotHardware, false);
         outtake.initialize(this, robotHardware);
         intake.initialize(this, robotHardware);
-        hang.initialize(this, robotHardware);
+//        hang.initialize(this, robotHardware);
 
         // bulk cache reading
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -103,8 +103,9 @@ public class FullTeleOp extends OpMode {
     @Override
     public void start() {
         COLOR_TO_REJECT = (redAlliance ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
-        outtake.toStow();
+        outtake.toTransfer();
         intake.flipUp();
+        verticalSlides.stowBeforeTransfer();
     }
 
     @Override
@@ -150,30 +151,12 @@ public class FullTeleOp extends OpMode {
                     ));
                 }
             } else if (intake.chamberState != COLOR_TO_REJECT) {
-                    // full transfer sequence
-                    if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && horizontalSlides.slidesRetracted) {
-                        runningActions.add(new SequentialAction(
-                                new ParallelAction(
-                                        new InstantAction(() -> outtake.openClaw()),
-                                        new InstantAction(() -> outtake.toTransfer())
-                                ),
-                                new SleepAction(0.4), // TODO: play around with timings
-                                new InstantAction(() -> outtake.closeClawLoose()),
-                                new SleepAction(0.2),
-                                new InstantAction(() -> intake.dropDown()),
-                                new InstantAction(() -> verticalSlides.raiseToHighBucket()),
-                                new SleepAction(0.5),
-                                new InstantAction(() -> intake.flipUp()),
-                                new SleepAction(1),
-                                new InstantAction(() -> outtake.toScoreBucket())
-                        ));
-                    }
-                    else if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
-                        // spit out (into human player zone or for teammate bucket bot)
-                        runningActions.add(new SequentialAction(
-                                new InstantAction(() -> intake.reverse())
-                        ));
-                    }
+                if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
+                    // spit out (into human player zone or for teammate bucket bot)
+                    runningActions.add(new SequentialAction(
+                            new InstantAction(() -> intake.reverse())
+                    ));
+                }
             } else if (intake.chamberState == COLOR_TO_REJECT) { // this case shouldn't ever be reached; wrong color should have been rejecting whilst intaking
                 // reverse, then go back to neutral
                 runningActions.add(new SequentialAction(
@@ -193,7 +176,7 @@ public class FullTeleOp extends OpMode {
                     ));
                 }
             } else if (intake.chamberState != COLOR_TO_REJECT) {
-                // yay grabbed sample, can stow now
+                // yay grabbed correct color sample, can stow now
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> intake.flipUp()),
                         new InstantAction(() -> intake.neutral())
@@ -231,8 +214,8 @@ public class FullTeleOp extends OpMode {
                         new InstantAction(() -> outtake.openClaw()),
                         new SleepAction(0.2),
                         new ParallelAction(
-                                new InstantAction(() -> outtake.toStow()),
-                                new InstantAction(() -> verticalSlides.retract())
+                                new InstantAction(() -> outtake.toTransfer()),
+                                new InstantAction(() -> verticalSlides.stowBeforeTransfer())
                         )
                 ));
             }
@@ -240,18 +223,22 @@ public class FullTeleOp extends OpMode {
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && !sampleMode) {
                 // finish depositing clip and return to grab another
                 runningActions.add(new SequentialAction(
+                        new InstantAction(() -> verticalSlides.pullUpToScoreClip()),
+                        new SleepAction(0.35),
                         new InstantAction(() -> outtake.openClaw()),
-                        new SleepAction(0.3),
+                        new SleepAction(0.4),
                         new InstantAction(() -> outtake.toGrabClip()),
                         new InstantAction(() -> verticalSlides.retract())
                 ));
             } else if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && sampleMode) {
                 // finish depositing clip and return to stow
                 runningActions.add(new SequentialAction(
+                        new InstantAction(() -> verticalSlides.pullUpToScoreClip()),
+                        new SleepAction(0.35),
                         new InstantAction(() -> outtake.openClaw()),
-                        new SleepAction(0.3),
-                        new InstantAction(() -> outtake.toStow()),
-                        new InstantAction(() -> verticalSlides.retract())
+                        new SleepAction(0.4),
+                        new InstantAction(() -> outtake.toTransfer()),
+                        new InstantAction(() -> verticalSlides.stowBeforeTransfer())
                 ));
             }
         } else if (outtake.arm.armPos == Outtake.Arm.STATE.GRABBING_CLIP) {
@@ -259,12 +246,34 @@ public class FullTeleOp extends OpMode {
                 // grab clip and prep for scoring
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> outtake.closeClawTight()),
+                        new SleepAction(0.4),
                         new InstantAction(() -> outtake.toScoreClip()),
-                        new InstantAction(() -> verticalSlides.raiseToScoreClip())
+                        new InstantAction(() -> verticalSlides.raiseToPrepClip())
                 ));
             }
-        } else if (outtake.arm.armPos == Outtake.Arm.STATE.STOW && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
-            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
+        } else if (outtake.arm.armPos == Outtake.Arm.STATE.TRANSFER) {
+            // full transfer sequence
+            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && horizontalSlides.slidesRetracted && intake.wristFlippedUp && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                runningActions.add(new SequentialAction(
+                        new ParallelAction(
+                                new InstantAction(() -> outtake.openClaw()),
+                                new InstantAction(() -> outtake.toTransfer()),
+                                new InstantAction(() -> verticalSlides.stowBeforeTransfer())
+                        ),
+                        new SleepAction(0.2), // TODO: play around with timings
+                        new InstantAction(() -> verticalSlides.retract()),
+                        new SleepAction(0.4),
+                        new InstantAction(() -> outtake.closeClawLoose()),
+                        new SleepAction(0.2),
+                        new InstantAction(() -> intake.dropDown()),
+                        new InstantAction(() -> verticalSlides.raiseToHighBucket()),
+                        new SleepAction(0.3),
+                        new InstantAction(() -> intake.flipUp()),
+                        new SleepAction(0.5),
+                        new InstantAction(() -> outtake.toScoreBucket())
+                ));
+            }
+            else if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                 // flip over to grab clip
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> verticalSlides.retract()),
@@ -280,12 +289,12 @@ public class FullTeleOp extends OpMode {
                     new ParallelAction(
                             new InstantAction(() -> intake.flipUp()),
                             new InstantAction(() -> intake.neutral()),
-                            new InstantAction(()-> outtake.toStow()),
+                            new InstantAction(()-> outtake.toTransfer()),
                             new InstantAction(()-> outtake.openClaw())
                     ),
                     new SleepAction(0.7),
                     new ParallelAction(
-                            new InstantAction(() -> verticalSlides.retract()),
+                            new InstantAction(() -> verticalSlides.stowBeforeTransfer()),
                             new InstantAction(()-> horizontalSlides.retract())
                     )
             ));

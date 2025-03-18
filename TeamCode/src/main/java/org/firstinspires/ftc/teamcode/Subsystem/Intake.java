@@ -37,7 +37,7 @@ public class Intake {
     // motor constants
     public static double INTAKING_POWER = 0.6;
     public static double REVERSE_POWER = -0.6;
-    public static double NEUTRAL_POWER = 0.15;
+    public static double NEUTRAL_POWER = 0.2;
 
     // wrist constants // wrists synchronized :)
     public static double TRANSFER_POS = 0.04;

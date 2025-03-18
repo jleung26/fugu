@@ -27,11 +27,12 @@ public class VerticalSlides {
     public static int LOWER_LIMIT = -2;
 
     // encoder positions
-    public static int highBucketPos = 1000;
-    public static int lowBucketPos = 500;
+    public static int highBucketPos = 1100;
+    public static int lowBucketPos = 460;
+    public static int stowBeforeTransfer = 50;
     public static int retractedPos = 0;
-    public static int scoreClipPos = 400;
-//    public static int slamClipPos = 220;
+    public static int prepClipPos = 280;
+    public static int pullClipUpPos = 700;
 
     // declaring variables for later modification
     private volatile double target = 0;
@@ -83,7 +84,7 @@ public class VerticalSlides {
         } else if (opmode.gamepad1.a) {
             target = retractedPos;
         } else if (opmode.gamepad1.b) {
-            target = scoreClipPos;
+            target = prepClipPos;
         }
 
         int currentPos = leftSlideMotor.getCurrentPosition();
@@ -131,9 +132,10 @@ public class VerticalSlides {
     public void moveToPosition(int targetPos) {target = targetPos;}
     public void raiseToHighBucket() { moveToPosition(highBucketPos);}
     public void raiseToLowBucket()  { moveToPosition(lowBucketPos);}
-    public void raiseToScoreClip()   { moveToPosition(scoreClipPos);}
+    public void stowBeforeTransfer(){ moveToPosition(stowBeforeTransfer);}
+    public void raiseToPrepClip()   { moveToPosition(prepClipPos);}
     public void retract()           { moveToPosition(retractedPos);}
-//    public void slamToScoreClip()   { moveToPosition(slamClipPos);}
+    public void pullUpToScoreClip() { moveToPosition(pullClipUpPos);}
 
     private boolean isDifferent(double val1, double val2) {
         return Math.abs(val1 - val2) >= CACHING_THRESHOLD;

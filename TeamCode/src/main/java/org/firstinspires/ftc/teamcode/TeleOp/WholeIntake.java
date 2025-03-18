@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -114,58 +115,74 @@ public class WholeIntake extends OpMode {
 
         Intake.IntakeChamberState COLOR_TO_REJECT = (rejectBlue ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
 
+        // intake and transfer logic
         if (intake.intakeState == Intake.IntakeState.NEUTRAL) {
             if (intake.chamberState == Intake.IntakeChamberState.EMPTY) {
-                // button press
                 if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
+                    // start intaking
                     runningActions.add(new SequentialAction(
                             new InstantAction(() -> intake.dropDown()),
                             new InstantAction(() -> intake.intake())
                     ));
                 }
             } else if (intake.chamberState != COLOR_TO_REJECT) {
-                if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
+                // full transfer sequence
+                if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && horiSlides.slidesRetracted) {
+                    // transfer would be here
+                }
+                else if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
+                    // spit out (into human player zone or for teammate bucket bot)
                     runningActions.add(new SequentialAction(
-                            new InstantAction(() -> intake.reverse()),
-                            new SleepAction(0.3),
-                            new InstantAction(() -> intake.neutral())
+                            new InstantAction(() -> intake.reverse())
                     ));
                 }
-                // eventually, for spec, it will be spit out
-                // for sample mode, it will be transfer
-            } else if (intake.chamberState == COLOR_TO_REJECT) {
-
+            } else if (intake.chamberState == COLOR_TO_REJECT) { // this case shouldn't ever be reached; wrong color should have been rejecting whilst intaking
+                // reverse, then go back to neutral
                 runningActions.add(new SequentialAction(
-                         new InstantAction(() -> intake.reverse()),
-                         new SleepAction(0.2),
-                         new InstantAction(() -> intake.neutral())
-                 ));
+                        new InstantAction(() -> intake.reverse()),
+                        new SleepAction(0.2),
+                        new InstantAction(() -> intake.neutral())
+                ));
             }
         } else if (intake.intakeState == Intake.IntakeState.INTAKING) {
             if (intake.chamberState == Intake.IntakeChamberState.EMPTY) {
-                // keep going unless below button pressed
+                // keep trying to intake unless driver presses button
                 if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
+                    // flip up stop intaking
                     runningActions.add(new SequentialAction(
                             new InstantAction(() -> intake.flipUp()),
                             new InstantAction(() -> intake.neutral())
                     ));
                 }
             } else if (intake.chamberState != COLOR_TO_REJECT) {
+                // yay grabbed correct color sample, can stow now
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> intake.flipUp()),
                         new InstantAction(() -> intake.neutral())
                 ));
             } else if (intake.chamberState == COLOR_TO_REJECT && intake.prevChamberState == COLOR_TO_REJECT) {
+                // reverse and go back to intaking
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> intake.flipUp()),
-                        new InstantAction(() -> intake.reverse()),
                         new SleepAction(0.3),
+                        new ParallelAction( // this could be problematic
+                                new InstantAction(() -> intake.reverse()),
+                                new InstantAction(() -> intake.dropDown())
+                        )
+                ));
+            }
+        } else if (intake.intakeState == Intake.IntakeState.REVERSE) {
+            // TODO: if the following doesn't work, have to go back to timer based
+
+            // stop reversing when no more sample
+            if (intake.wristFlippedUp && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
+                runningActions.add( new InstantAction(() -> intake.neutral()) );
+            } else if (!intake.wristFlippedUp && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
+                runningActions.add(new SequentialAction(
                         new InstantAction(() -> intake.dropDown()),
                         new InstantAction(() -> intake.intake())
                 ));
             }
-        } else if (intake.intakeState == Intake.IntakeState.REVERSE) {
-            // nothing
         }
 
         telemetry.addData("reject Blue bool: ", rejectBlue);

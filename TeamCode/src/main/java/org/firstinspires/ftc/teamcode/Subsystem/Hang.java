@@ -24,7 +24,7 @@ public class Hang {
     public static double rightWheelyStowPos = 0.8661;
     public static double rightWheelyDeployPos = 0.147;
     public static double leftPtoStowPos = 0.9639;
-    public static double leftPtoDeployPos = 0.7833;
+    public static double leftPtoDeployPos = 0.7617;
     public static double rightPtoStowPos = 1;
     public static double rightPtoDeployPos = 0.8811;
 
@@ -128,8 +128,8 @@ public class Hang {
             Bl.setPower(-rightStick);
             Br.setPower(-rightStick);
         } else {
-            leftVertMotor.setPower(0);
-            rightVertMotor.setPower(0);
+            leftVertMotor.setPower(leftStick);
+            rightVertMotor.setPower(leftStick);
             Fl.setPower(-opmode.gamepad1.right_trigger);
             Fr.setPower(-opmode.gamepad1.right_trigger);
             Bl.setPower(-opmode.gamepad1.right_trigger);

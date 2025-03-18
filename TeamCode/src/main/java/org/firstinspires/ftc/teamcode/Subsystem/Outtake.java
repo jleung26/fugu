@@ -86,11 +86,11 @@ public class Outtake {
         }
 
         public Arm.STATE armPos = STATE.STOW;
-        public static double armStowPosition = 0;
-        public static double armTransferPosition = 0;
-        public static double armScoringBucketPosition = 0.508;
-        public static double armScoringClipPosition = 0;
-        public static double armGrabClipWallPosition = 0.1217;
+        public static double armStowPosition = 0.4317;
+        public static double armTransferPosition = 1;
+        public static double armScoringBucketPosition = 0.2206;
+        public static double armScoringClipPosition = 0.48;
+        public static double armGrabClipWallPosition = 0.0494;
         public static double armIncrement = 0.0005;
 
         public Arm() {}
@@ -137,11 +137,11 @@ public class Outtake {
     public static class Wrist {
         public Servo wrist;
         public boolean isWristTransferring = true;
-        public static double wristStowPosition = 0;
+        public static double wristStowPosition = 0.4078;
         public static double wristTransferPosition = 0;
-        public static double wristScoreBucketPosition = 0.73;
-        public static double wristScoreClipPosition = 0;
-        public static double wristGrabClipWallPosition = 1;
+        public static double wristScoreBucketPosition = 0.9;
+        public static double wristScoreClipPosition = 0.4317;
+        public static double wristGrabClipWallPosition = 0.9872;
         public static double wristIncrement = 0.0005;
 
         public Wrist() {}
@@ -185,9 +185,9 @@ public class Outtake {
     public static class Claw {
         public Servo claw;
         public boolean isClawOpen = true;
-        private final double clawTightClosedPosition = 0.1644;
-        private final double clawLooseClosePosition = 0.255;
-        private final double clawOpenPosition = 0.656;
+        private final double clawTightClosedPosition = 0.197;
+        private final double clawLooseClosePosition = 0.25;
+        private final double clawOpenPosition = 0.6339;
         private final double clawIncrement = 0.0003;
 
         public Claw() {}
