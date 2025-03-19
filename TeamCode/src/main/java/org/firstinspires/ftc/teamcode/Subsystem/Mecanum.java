@@ -20,7 +20,7 @@ public class Mecanum {
     public static double CACHING_THRESHOLD = 0.005;
     public static double SCALING_EXPONENT = 2.2;
 
-    private volatile boolean angleLockBool = false, slowModeBool = false;
+    public volatile boolean angleLockBool = false, slowModeBool = false;
 
     public static double Kp = 0.008;
     public static double Kd = 0;
@@ -43,17 +43,10 @@ public class Mecanum {
         pinpoint.initialize(opmode, robotHardware);
     }
 
-    public void operate() {
+    public void operateAngleLock() {
         pinpoint.operateTeleOp();
 
-        slowModeBool = opmode.gamepad1.left_trigger > 0.1;
-
-        if (angleLockBool) {
-            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), -PDTurning(targetAngle, pinpoint.relativeNormalizedHeading), slowModeBool);
-        }
-        else {
-            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, slowModeBool);
-        }
+        driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), -PDTurning(targetAngle, pinpoint.relativeNormalizedHeading), slowModeBool);
     }
 
     public void operateTesting() {
@@ -79,7 +72,7 @@ public class Mecanum {
     }
 
     public void operateSimple() {
-        driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, opmode.gamepad1.left_trigger > 0.1);
+        driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, slowModeBool);
     }
 
     public void driveRobotCentric(double x, double y, double rx, boolean slowmode) {

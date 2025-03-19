@@ -112,6 +112,7 @@ public class WholeIntake extends OpMode {
         intake.operateColorChecking();
         horiSlides.operate();
         drive.operateSimple();
+        drive.slowModeBool = !horiSlides.slidesRetracted;
 
         Intake.IntakeChamberState COLOR_TO_REJECT = (rejectBlue ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
 

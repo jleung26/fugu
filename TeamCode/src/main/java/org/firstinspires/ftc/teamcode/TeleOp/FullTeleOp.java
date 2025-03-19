@@ -133,12 +133,14 @@ public class FullTeleOp extends OpMode {
         runningActions = newActions;
 
         // loops
-        drive.operate();
+        drive.operateSimple();
         verticalSlides.operate();
         horizontalSlides.operate();
         intake.operateColorChecking();
-        // no constant loop for outtake
+
+        // updating booleans
         COLOR_TO_REJECT = (redAlliance ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
+        drive.slowModeBool = !horizontalSlides.slidesRetracted;
 
         // intake and transfer logic
         if (intake.intakeState == Intake.IntakeState.NEUTRAL) {
