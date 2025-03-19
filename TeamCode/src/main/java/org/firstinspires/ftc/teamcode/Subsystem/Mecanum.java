@@ -78,7 +78,7 @@ public class Mecanum {
     public void driveRobotCentric(double x, double y, double rx, boolean slowmode) {
         x = x * (slowmode ? SLOW_MODE_FACTOR: 1);
         y = y * (slowmode ? SLOW_MODE_FACTOR: 1);
-        rx = rx * (slowmode ? SLOW_MODE_FACTOR * 0.75 : 1);
+        rx = rx * (slowmode ? SLOW_MODE_FACTOR * 0.6 : 1);
         // calculating output
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
         double frontLeftPower = (y + x + rx) / denominator;
