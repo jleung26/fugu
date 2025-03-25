@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.Subsystem;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Util.PinpointManager;
@@ -28,7 +28,7 @@ public class Mecanum {
     // variables for later modification
     public double targetAngle = 0;
     // PID
-    private double error, lastError;
+    private double lastError;
     ElapsedTime timer = new ElapsedTime();
 
     public Mecanum() {}
@@ -43,32 +43,61 @@ public class Mecanum {
         pinpoint.initialize(opmode, robotHardware);
     }
 
-    public void operateAngleLock() {
-        pinpoint.operateTeleOp();
+    public void operateTeleOp() {
+        pinpoint.operateSimple();
 
-        driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), -PDTurning(targetAngle, pinpoint.relativeNormalizedHeading), slowModeBool);
+        if (angleLockBool) {
+            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), PDTurning(targetAngle, pinpoint.relativeNormalizedHeading), slowModeBool);
+        } else {
+            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, slowModeBool);
+        }
     }
 
     public void operateTesting() {
-        pinpoint.operateTeleOp();
+        pinpoint.operateSimple();
 
-        // for testing PD auto orienting
-        // auto rotate to angle with PID test
-        if (opmode.gamepad1.right_trigger > 0.1) {
-            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), -PDTurning(targetAngle, pinpoint.relativeNormalizedHeading), false);
-        }
-        else {
-            slowModeBool = opmode.gamepad1.left_trigger > 0.1;
-            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, slowModeBool);
-        }
+        slowModeBool = opmode.gamepad1.left_trigger > 0.1;
+        driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, slowModeBool);
+
+        // gyro reset
+        if (opmode.gamepad1.b) {pinpoint.softResetYaw();}
+
+        // sets target
+        if (opmode.gamepad1.a) {targetAngle = pinpoint.relativeNormalizedHeading;}
+
+        setZeroPowerBrake(opmode.gamepad1.left_trigger > 0.1);
 
         opmode.telemetry.addData("Current Scaling Exponent: input^", SCALING_EXPONENT);
-        opmode.telemetry.addData("current heading: ", pinpoint.relativeNormalizedHeading);
-        opmode.telemetry.addData("absolute heading: ", pinpoint.normalizedHeading);
+        opmode.telemetry.addData("rel normalized heading: ", pinpoint.relativeNormalizedHeading);
+        opmode.telemetry.addData("normalized heading: ", pinpoint.normalizedHeading);
         opmode.telemetry.addData("target heading: ", targetAngle);
         opmode.telemetry.addData("gyro offset: ", pinpoint.offset);
         opmode.telemetry.addData("PD calculated rx [-1,1]: ", PDTurning(targetAngle, pinpoint.relativeNormalizedHeading));
         opmode.telemetry.addData("normalized error: ", normalizeError(targetAngle - pinpoint.relativeNormalizedHeading));
+    }
+
+    public void operateTuningPD(TelemetryPacket packet) {
+        // changing Kp and Kd values should already update globally
+
+        // just get heading
+        pinpoint.operateSimple();
+
+
+        driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), PDTurning(targetAngle, pinpoint.relativeNormalizedHeading), false);
+
+        if (opmode.gamepad1.a) {
+            setTargetToCurrentHeading();
+        }
+
+        // not very necessary since running robot centric, but might as well include it
+        opmode.telemetry.addData("rel normalized heading: ", pinpoint.relativeNormalizedHeading);
+        opmode.telemetry.addData("gyro offset: ", pinpoint.offset);
+
+        // for graphing on dashboard
+        packet.put("normalized heading: ", pinpoint.normalizedHeading);
+        packet.put("target heading: ", targetAngle);
+        packet.put("PD calculated rx [-1,1]: ", getPDPower());
+        packet.put("normalized error:", normalizeError(targetAngle - pinpoint.relativeNormalizedHeading));
     }
 
     public void operateSimple() {
@@ -134,11 +163,13 @@ public class Mecanum {
 
     public double PDTurning(double targetHeading, double currentHeading) {
         // calculate the error
-        error = normalizeError(targetHeading - currentHeading);
+        double error = normalizeError(targetHeading - currentHeading);
 
         double derivative = (error - lastError) / timer.seconds();
 
-        double output = Math.max(-1, Math.min(1, (Kp * error) + (Kd * derivative)));
+        double output = (Kp * error) + (Kd * derivative);
+        output = Math.signum(output) * Math.sqrt(Math.abs(output));
+        output = Math.max(-1, Math.min(1, output));
         // square root PID, if robot is too fat and has too much inertia to fix small error
         // Jayden will diddle around with PID auto turning on his own time
         // FLOAT mode might make tuning very hard :noooo:, since it could depend on robot's strafe movement, and a lot on mass
@@ -163,8 +194,30 @@ public class Mecanum {
         return Math.signum(input) * Math.pow(Math.abs(input), SCALING_EXPONENT);
     }
 
-    public void setAngleLockTrue() { angleLockBool = true; }
-    public void setAngleLockFalse() { angleLockBool = true; }
-    public void setSlowModeTrue() { slowModeBool = true; }
-    public void setSlowModeFalse() { slowModeBool = false; }
+    public void setZeroPowerBrake(boolean brake) {
+        if (brake) {
+            Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        } else {
+            Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+            Fr.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+            Bl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+            Br.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        }
+     }
+
+    public void setTargetToCurrentHeading() {
+        this.targetAngle = pinpoint.relativeNormalizedHeading;
+    }
+
+    public double getPDPower() {
+        return PDTurning(targetAngle, pinpoint.relativeNormalizedHeading);
+    }
+
+//    public void setAngleLockTrue() { angleLockBool = true; }
+//    public void setAngleLockFalse() { angleLockBool = true; }
+//    public void setSlowModeTrue() { slowModeBool = true; }
+//    public void setSlowModeFalse() { slowModeBool = false; }
 }

@@ -6,9 +6,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 @Config
@@ -28,9 +26,9 @@ public class HorizontalSlides {
     public static double MAPPING_EXPONENT = 0.5;
 
     // encoder positions
-    public static int extendedPos = 1000;
-    public static int halfExtendedPos = 500;
-    public static int retractedPos = 0;
+    public static double extendedPos = 1000;
+    public static double halfExtendedPos = extendedPos * 0.8; // 80% of full extension
+    public static double retractedPos = 0;
 
     // declaring variables for later modification
     private volatile double target = 0;
@@ -70,6 +68,19 @@ public class HorizontalSlides {
         previousOutput = output;
     }
 
+    public void operateAuto() {
+        int currentPos = horiMotor.getCurrentPosition();
+        slidesRetracted = currentPos < RETRACTED_THRESHOLD;
+        output = controller.calculate(currentPos, target);
+        output = Math.max(-1, Math.min(1, output));
+
+        // includes power caching
+        if (isDifferent(output, previousOutput)) {
+            horiMotor.setPower(output);
+        }
+        previousOutput = output;
+    }
+
     public void operateTuning(TelemetryPacket packet) {
         controller.setPID(Kp, Ki, Kd);
 
@@ -90,7 +101,6 @@ public class HorizontalSlides {
             // manual control
         horiMotor.setPower(-opmode.gamepad1.left_stick_y);
         }
-
 
         // updates boolean
         slidesRetracted = currentPos < RETRACTED_THRESHOLD;
@@ -121,21 +131,16 @@ public class HorizontalSlides {
 
     }
 
-    public void moveToPosition(int targetPos) {
+    public void moveToPosition(double targetPos) {
         target = targetPos;
     }
-
     public void extend()        { moveToPosition(extendedPos); }
-    public void extendHalfway() { moveToPosition(halfExtendedPos); }
+    public void extendPartial() { moveToPosition(halfExtendedPos); }
     public void retract()       { moveToPosition(retractedPos); }
+    public void stepExtend()    { moveToPosition(target + (extendedPos * 0.02));}
 
-    public double telemetryMotorPos() { return horiMotor.getCurrentPosition(); }
-    public double telemetryTarget() { return target; }
-    public double telemetryOutput() { return output; }
-
-
-    public int mapToTarget(double input) {
-        return (int) Math.round(Math.pow(input, MAPPING_EXPONENT) * extendedPos);
+    public double mapToTarget(double input) {
+        return Math.round(Math.pow(input, MAPPING_EXPONENT) * extendedPos);
         // paste this into desmos to see graph: x^{0.4}\ \left\{0\le x\le1\right\}
         // making the mapping exponent smaller makes the graph steeper
     }

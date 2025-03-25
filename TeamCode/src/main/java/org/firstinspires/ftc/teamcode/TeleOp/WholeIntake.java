@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 import org.firstinspires.ftc.teamcode.Subsystem.Mecanum;
+import org.firstinspires.ftc.teamcode.Subsystem.Outtake;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 import java.util.ArrayList;
@@ -111,9 +112,15 @@ public class WholeIntake extends OpMode {
         // loops
         intake.operateColorChecking();
         horiSlides.operate();
-        drive.operateSimple();
-        drive.slowModeBool = !horiSlides.slidesRetracted;
+        drive.operateTeleOp();
 
+        // updating booleans
+        drive.slowModeBool = !horiSlides.slidesRetracted;
+        if (currentGamepad1.left_trigger > 0.1 && !(previousGamepad1.left_trigger > 0.1)) { // avoids setting every loop since it probably takes time
+            drive.setZeroPowerBrake(true);
+        } else if (currentGamepad1.left_trigger <= 0.1 && !(previousGamepad1.left_trigger <= 0.1)) {
+            drive.setZeroPowerBrake(false);
+        }
         Intake.IntakeChamberState COLOR_TO_REJECT = (rejectBlue ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
 
         // intake and transfer logic

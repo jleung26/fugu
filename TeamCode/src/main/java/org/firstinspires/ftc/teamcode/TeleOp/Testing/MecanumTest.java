@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.TeleOp.Testing;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -18,6 +21,8 @@ public class MecanumTest extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     private ElapsedTime elapsedtime;
     private List<LynxModule> allHubs;
+    private FtcDashboard dash = FtcDashboard.getInstance();
+    private MultipleTelemetry dashboardTelemetry = new MultipleTelemetry(telemetry, dash.getTelemetry());
 
     final Gamepad currentGamepad1 = new Gamepad();
     final Gamepad currentGamepad2 = new Gamepad();
@@ -46,28 +51,32 @@ public class MecanumTest extends OpMode {
             hub.clearBulkCache();
         }
 
-        // for rising edge detection
-        previousGamepad1.copy(currentGamepad1);
-        previousGamepad2.copy(currentGamepad2);
+        // TESTING SCALING
+//        // for rising edge detection
+//        previousGamepad1.copy(currentGamepad1);
+//        previousGamepad2.copy(currentGamepad2);
+//
+//        currentGamepad1.copy(gamepad1);
+//        currentGamepad2.copy(gamepad2);
+//
+//        // drive robot-centric default
+//        // left trigger - slowmode
+//        // right trigger - auto rotate to target
+//        // B- reset
+//        // A - set target
+//        drive.operateTesting();
 
-        currentGamepad1.copy(gamepad1);
-        currentGamepad2.copy(gamepad2);
 
-        // drive robot-centric default
-        // left trigger - slowmode
-        // right trigger - auto rotate to target
-        // B- reset
-        // A - set target
-        drive.operateTesting();
+        // PID TUNING
+        TelemetryPacket packet = new TelemetryPacket();
 
-        // gyro reset
-        if (gamepad1.b) {drive.pinpoint.softResetYaw();}
-
-        // sets target
-        if (gamepad1.a) {drive.targetAngle = drive.pinpoint.relativeNormalizedHeading;}
+        drive.operateTuningPD(packet);
 
         // loop time measuring
-        telemetry.addData("Loop Times", elapsedtime.milliseconds());
-        elapsedtime.reset();
+//        telemetry.addData("Loop Times", elapsedtime.milliseconds());
+//        elapsedtime.reset();
+
+        dash.sendTelemetryPacket(packet);
+        dashboardTelemetry.update();
     }
 }

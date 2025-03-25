@@ -83,8 +83,8 @@ public class Hang {
             leftVertMotor.setPower(leftStick);
             rightVertMotor.setPower(leftStick);
         } else if (Math.abs(rightStick) > 0.05) {
-            leftVertMotor.setPower(rightStick);
-            rightVertMotor.setPower(rightStick);
+//            leftVertMotor.setPower(rightStick);
+//            rightVertMotor.setPower(rightStick);
             Fl.setPower(-rightStick);
             Fr.setPower(-rightStick);
             Bl.setPower(-rightStick);
@@ -121,8 +121,8 @@ public class Hang {
             leftVertMotor.setPower(leftStick);
             rightVertMotor.setPower(leftStick);
         } else if (Math.abs(rightStick) > 0.05) {
-            leftVertMotor.setPower(rightStick);
-            rightVertMotor.setPower(rightStick);
+//            leftVertMotor.setPower(rightStick);
+//            rightVertMotor.setPower(rightStick);
             Fl.setPower(-rightStick);
             Fr.setPower(-rightStick);
             Bl.setPower(-rightStick);
@@ -148,6 +148,8 @@ public class Hang {
 //        rightVertMotor.setTargetPosition(0);
 //        leftVertMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //        rightVertMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        leftVertMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+//        rightVertMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 //        Fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        Fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        Bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -184,7 +186,7 @@ public class Hang {
     // sequence begins:
     // slides extend 1/2 and wheely goes
     // PTO engage
-    // all motors go
+    // drive motors go
     // swinging
     // slides extend tiny bit to transfer load to passive hooks
     // PTO disengage

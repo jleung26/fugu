@@ -22,7 +22,7 @@ public class PinpointManager { // pinpoint for use during teleop, pedro has its 
     double oldTime;
 
     // all of the following are in degrees
-    public double absoluteHeading, normalizedHeading, relativeNormalizedHeading, offset;
+    public volatile double absoluteHeading, normalizedHeading, relativeNormalizedHeading, offset;
 
     public PinpointManager() {}
 
@@ -70,7 +70,7 @@ public class PinpointManager { // pinpoint for use during teleop, pedro has its 
         telemetry.update();
     }
 
-    public void operateTeleOp() {
+    public void operateSimple() {
         odo.update(GoBildaPinpointDriver.readData.ONLY_UPDATE_HEADING);
 
         normalizedHeading = normalize(Math.toDegrees(odo.getHeading()));
@@ -87,13 +87,4 @@ public class PinpointManager { // pinpoint for use during teleop, pedro has its 
         return angle;
     }
 
-    public double getOffset() {
-        return offset;
-    }
-    public double getRelativeNormalizedHeading() {
-        return relativeNormalizedHeading;
-    }
-    public double getNormalizedHeading() {
-        return normalizedHeading;
-    }
 }

@@ -133,7 +133,7 @@ public class FullTeleOp extends OpMode {
         runningActions = newActions;
 
         // loops
-        drive.operateSimple();
+        drive.operateTeleOp();
         verticalSlides.operate();
         horizontalSlides.operate();
         intake.operateColorChecking();
@@ -141,6 +141,12 @@ public class FullTeleOp extends OpMode {
         // updating booleans
         COLOR_TO_REJECT = (redAlliance ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
         drive.slowModeBool = !horizontalSlides.slidesRetracted;
+        drive.angleLockBool = (outtake.arm.armPos == Outtake.Arm.STATE.GRABBING_CLIP) || (outtake.arm.armPos == Outtake.Arm.STATE.SCORING_CLIP);
+        if (currentGamepad1.left_trigger > 0.1 && !(previousGamepad1.left_trigger > 0.1)) { // avoids setting every loop since it probably takes time
+            drive.setZeroPowerBrake(true);
+        } else if (currentGamepad1.left_trigger <= 0.1 && !(previousGamepad1.left_trigger <= 0.1)) {
+            drive.setZeroPowerBrake(false);
+        }
 
         // intake and transfer logic
         if (intake.intakeState == Intake.IntakeState.NEUTRAL) {
@@ -309,12 +315,18 @@ public class FullTeleOp extends OpMode {
             sampleMode = !sampleMode;
         }
 
+        // set target for spec cycles, yaw never really needs to reset
+        if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
+            drive.setTargetToCurrentHeading();
+        }
+
+
         // hang logic (this is where it gets messy :NOOOOO:)
 
 
         // telemetry
         telemetry.addData("red alliance? ", redAlliance);
-        telemetry.addData("sample mode:  ", sampleMode);
+        telemetry.addData("sample mode: ", sampleMode);
         telemetry.addData("Loop Times", elapsedtime.milliseconds());
         elapsedtime.reset();
     }
