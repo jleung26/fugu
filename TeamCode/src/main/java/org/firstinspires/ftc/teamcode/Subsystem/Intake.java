@@ -133,6 +133,10 @@ public class Intake {
         setIntake(NEUTRAL_POWER);
         intakeState = IntakeState.NEUTRAL;
     }
+    public void fullStop() {
+        setIntake(0);
+        intakeState = IntakeState.NEUTRAL;
+    }
 
     // wrist methods
     public void incremental(Servo servo, int sign) {servo.setPosition(servo.getPosition() + sign * WRIST_TUNING_INCREMENT);}

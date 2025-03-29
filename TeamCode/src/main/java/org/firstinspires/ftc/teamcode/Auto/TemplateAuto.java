@@ -18,6 +18,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Subsystem.ExtendingOuttake;
 import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 import org.firstinspires.ftc.teamcode.Subsystem.Outtake;
@@ -37,7 +38,7 @@ public class TemplateAuto extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     VerticalSlides verticalSlides = new VerticalSlides();
     HorizontalSlides horizontalSlides = new HorizontalSlides();
-    Outtake outtake = new Outtake();
+    ExtendingOuttake outtake = new ExtendingOuttake();
     Intake intake = new Intake();
     Follower follower;
     Timer pathTimer, actionTimer, opmodeTimer;

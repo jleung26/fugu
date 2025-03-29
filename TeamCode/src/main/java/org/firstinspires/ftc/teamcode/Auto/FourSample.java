@@ -343,15 +343,16 @@ public class FourSample extends OpMode {
 
         // ready to go
         outtake.toStow();
+        outtake.closeClawLoose();
         intake.flipUp();
     }
 
     @Override
     public void init_loop() {
-        // very important to select for when eventually >4 sample or >5 spec
-        if (gamepad1.a || gamepad2.a) {
+        // very important to select for when eventually >4 sample
+        if (gamepad1.b || gamepad2.b) {
             redAlliance = true;
-        } else if (gamepad1.b || gamepad2.b) {
+        } else if (gamepad1.x || gamepad2.x) {
             redAlliance = false;
         }
 
@@ -367,6 +368,7 @@ public class FourSample extends OpMode {
 
     @Override
     public void loop() {
+        // action and bulk caching loops
         // clearing bulk cache
         for (LynxModule hub : allHubs) {
             hub.clearBulkCache();
