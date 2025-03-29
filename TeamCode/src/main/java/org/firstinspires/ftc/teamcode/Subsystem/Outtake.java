@@ -196,7 +196,7 @@ public class Outtake {
 this.claw = robotHardware.armClawServo;
         }
 
-        // Toggles the claw between open and closed positions
+        // Toggles the clawServo between open and closed positions
         public void toggleClaw() {
             if (isClawOpen) {
                 claw.setPosition(clawTightClosedPosition);

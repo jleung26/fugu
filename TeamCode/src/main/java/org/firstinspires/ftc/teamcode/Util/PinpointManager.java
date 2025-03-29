@@ -59,15 +59,15 @@ public class PinpointManager { // pinpoint for use during teleop, pedro has its 
         telemetry.addData("Pinpoint Frequency (Hz)", odo.getFrequency()); // pinpoint refresh rate
         telemetry.addData("REV Hub Frequency (Hz): ", frequency); // control hub refresh rate
 
-        Pose2D pos = odo.getPosition();
-        String data = String.format(Locale.US, "{X: %.3f mm, Y: %.3f mm, Heading: %.3f°}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
-        telemetry.addData("Position", data);
-
-        Pose2D vel = odo.getVelocity();
-        String velocity = String.format(Locale.US,"{XVel: %.3f, YVel: %.3f, HVel: %.3f}", vel.getX(DistanceUnit.MM), vel.getY(DistanceUnit.MM), vel.getHeading(AngleUnit.DEGREES));
-        telemetry.addData("Velocity", velocity);
-        telemetry.addData("Status", odo.getDeviceStatus());
-        telemetry.update();
+//        Pose2D pos = odo.getPosition();
+//        String data = String.format(Locale.US, "{X: %.3f mm, Y: %.3f mm, Heading: %.3f°}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
+//        telemetry.addData("Position", data);
+//
+//        Pose2D vel = odo.getVelocity();
+//        String velocity = String.format(Locale.US,"{XVel: %.3f, YVel: %.3f, HVel: %.3f}", vel.getX(DistanceUnit.MM), vel.getY(DistanceUnit.MM), vel.getHeading(AngleUnit.DEGREES));
+//        telemetry.addData("Velocity", velocity);
+//        telemetry.addData("Status", odo.getDeviceStatus());
+//        telemetry.update();
     }
 
     public void operateSimple() {

@@ -22,6 +22,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Subsystem.ExtendingOuttake;
 import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 import org.firstinspires.ftc.teamcode.Subsystem.Outtake;
@@ -41,7 +42,7 @@ public class FourSample extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     VerticalSlides verticalSlides = new VerticalSlides();
     HorizontalSlides horizontalSlides = new HorizontalSlides();
-    Outtake outtake = new Outtake();
+    ExtendingOuttake outtake = new ExtendingOuttake();
     Intake intake = new Intake();
     Follower follower;
     Timer pathTimer, actionTimer, opmodeTimer;
@@ -203,7 +204,7 @@ public class FourSample extends OpMode {
                 break;
             case 4:
                 /* ready to transfer */
-                if(outtake.arm.armPos == Outtake.Arm.STATE.TRANSFER && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
+                if(outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
                     /* Transfer and prep to score*/
                     transferAndScoreAction();
 
@@ -242,7 +243,7 @@ public class FourSample extends OpMode {
                 break;
             case 8:
                 /* ready to transfer */
-                if(outtake.arm.armPos == Outtake.Arm.STATE.TRANSFER && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
+                if(outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
                     /* Transfer and prep to score*/
                     transferAndScoreAction();
 
@@ -281,7 +282,7 @@ public class FourSample extends OpMode {
                 break;
             case 12:
                 /* ready to transfer */
-                if(outtake.arm.armPos == Outtake.Arm.STATE.TRANSFER && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
+                if(outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
                     /* Transfer and prep to score*/
                     transferAndScoreAction();
 
@@ -336,8 +337,7 @@ public class FourSample extends OpMode {
         allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) { hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL); }
 
-        Constants.setConstants(FConstants.class, LConstants.class);
-        follower = new Follower(hardwareMap);
+        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         follower.setStartingPose(startPose);
         buildPaths();
 
@@ -423,14 +423,14 @@ public class FourSample extends OpMode {
         runningActions.add(new SequentialAction(
                 new ParallelAction(
                         new InstantAction(() -> outtake.openClaw()),
-                        new InstantAction(() -> outtake.toTransfer()),
-                        new InstantAction(() -> verticalSlides.stowBeforeTransfer())
+                        new InstantAction(() -> outtake.toStow()),
+                        new InstantAction(() -> verticalSlides.retract())
                 ),
-                new SleepAction(0.2), // TODO: play around with timings
-                new InstantAction(() -> verticalSlides.retract()),
-                new SleepAction(0.4),
+                new InstantAction(() -> outtake.toTransfer()),
+                new SleepAction(0.2), // TODO: reflect timings from teleop
                 new InstantAction(() -> outtake.closeClawLoose()),
                 new SleepAction(0.2),
+                new InstantAction(() -> outtake.toStow()),
                 new InstantAction(() -> intake.dropDown()),
                 new InstantAction(() -> verticalSlides.raiseToHighBucket()),
                 new SleepAction(0.3),
@@ -446,8 +446,8 @@ public class FourSample extends OpMode {
                 new InstantAction(() -> outtake.openClaw()),
                 new SleepAction(0.2),
                 new ParallelAction(
-                        new InstantAction(() -> outtake.toTransfer()),
-                        new InstantAction(() -> verticalSlides.stowBeforeTransfer())
+                        new InstantAction(() -> outtake.toStow()),
+                        new InstantAction(() -> verticalSlides.retract())
                 )
         ));
     }
