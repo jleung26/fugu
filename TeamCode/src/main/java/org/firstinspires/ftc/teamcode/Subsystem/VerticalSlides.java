@@ -32,7 +32,7 @@ public class VerticalSlides {
     public static int stowBeforeTransfer = 30;
     public static int retractedPos = 0;
     public static int prepClipPos = 280;
-    public static int pullClipUpPos = 700;
+    public static int pickupClipPos = 300;
 
     // declaring variables for later modification
     private volatile double target = 0;
@@ -135,7 +135,7 @@ public class VerticalSlides {
     public void stowBeforeTransfer(){ moveToPosition(stowBeforeTransfer);}
     public void raiseToPrepClip()   { moveToPosition(prepClipPos);}
     public void retract()           { moveToPosition(retractedPos);}
-    public void pullUpToScoreClip() { moveToPosition(pullClipUpPos);}
+    public void raiseToPickupClip() { moveToPosition(pickupClipPos);}
 
     private boolean isDifferent(double val1, double val2) {
         return Math.abs(val1 - val2) >= CACHING_THRESHOLD;

@@ -27,6 +27,11 @@ public class FConstants {
         FollowerConstants.xMovement = 60.744384045;
         FollowerConstants.yMovement = 47.778439672;
 
+        // robot is 13.905 width and 12.469 height in pedro visualizer
+        // visualize back of bot: 19.9 width
+        // visualize intake reach: 64.1 width
+        // visualize spec deposit: 23.7 width
+
         FollowerConstants.forwardZeroPowerAcceleration = -34.3438991466;
         FollowerConstants.lateralZeroPowerAcceleration = -73.6468992726;
 

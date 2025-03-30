@@ -14,7 +14,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Subsystem.Hang;
 import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 import org.firstinspires.ftc.teamcode.Subsystem.Mecanum;
@@ -231,7 +230,7 @@ public class FullTeleOp extends OpMode {
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && !sampleMode) {
                 // finish depositing clip and return to grab another
                 runningActions.add(new SequentialAction(
-                        new InstantAction(() -> verticalSlides.pullUpToScoreClip()),
+                        new InstantAction(() -> verticalSlides.raiseToPickupClip()),
                         new SleepAction(0.35),
                         new InstantAction(() -> outtake.openClaw()),
                         new SleepAction(0.4),
@@ -241,7 +240,7 @@ public class FullTeleOp extends OpMode {
             } else if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && sampleMode) {
                 // finish depositing clip and return to stow
                 runningActions.add(new SequentialAction(
-                        new InstantAction(() -> verticalSlides.pullUpToScoreClip()),
+                        new InstantAction(() -> verticalSlides.raiseToPickupClip()),
                         new SleepAction(0.35),
                         new InstantAction(() -> outtake.openClaw()),
                         new SleepAction(0.4),

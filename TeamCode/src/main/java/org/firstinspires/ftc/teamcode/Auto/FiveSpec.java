@@ -12,10 +12,8 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
-import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
-import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -25,7 +23,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Subsystem.ExtendingOuttake;
 import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
-import org.firstinspires.ftc.teamcode.Subsystem.Outtake;
 import org.firstinspires.ftc.teamcode.Subsystem.VerticalSlides;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
@@ -78,56 +75,58 @@ public class FiveSpec extends OpMode {
      * Lets assume the Robot is facing the human player and we want to score in the bucket */
 
     /** Start Pose of Robot */
-    private final Pose startPose = new Pose(6, 66, Math.toRadians(0));
+    private final Pose startPose = new Pose(6.95, 65, Math.toRadians(0));
 
     /** Scoring Pose for Preloaded Spec */
     private final Pose score0Pose = new Pose(42, 72, Math.toRadians(0));
 
     /** Intermediate pose so robot doesn't bang into sub */
-    private final Pose prepIntake1Pose = new Pose(24, 66, Math.toRadians(290));
+    private final Pose intake1ControlPose = new Pose(24, 58, Math.toRadians(290));
 
     /** Intake First Sample from the Spike Mark */
-    private final Pose intake1Pose = new Pose(24, 60, Math.toRadians(303));
+    private final Pose intake1Pose = new Pose(24, 44, Math.toRadians(317));
 
     /** Spit out First Sample */
-    private final Pose eject1Pose = new Pose(24, 48, Math.toRadians(230));
+    private final Pose eject1Pose = new Pose(24, 42, Math.toRadians(230));
 
     /** Intake Second Sample from the Spike Mark */
-    private final Pose intake2Pose = new Pose(24, 48, Math.toRadians(303));
+    private final Pose intake2Pose = new Pose(24, 38, Math.toRadians(318));
 
     /** Spit out Second Sample */
-    private final Pose eject2Pose = new Pose(24, 36, Math.toRadians(230));
+    private final Pose eject2Pose = new Pose(24, 35, Math.toRadians(230));
 
     /** Intake Third Sample from the Spike Mark */
-    private final Pose intake3Pose = new Pose(24, 36, Math.toRadians(303));
+    private final Pose intake3Pose = new Pose(28, 26, Math.toRadians(310));
 
     /** Spit out Third Sample */
-    private final Pose eject3Pose = new Pose(0, 36, Math.toRadians(0));
+    private final Pose eject3Pose = new Pose(24, 33, Math.toRadians(230));
 
     /** Pick up from wall, reusable */
-    private final Pose pickupWallPose = new Pose(6, 30, Math.toRadians(0));
+    private final Pose pickupWallPose = new Pose(6.95, 35, Math.toRadians(0));
+
+    private final Pose pickupWall1ControlPose = new Pose(12, 35, Math.toRadians(0));
 
     /** Bezier Control Point, reusable  */ // using tangential heading interpolation maybe?
-    private final Pose scoreControlPose = new Pose(0, 0, Math.toRadians(0));
+    private final Pose scoreControlPose1 = new Pose(15, 34.5, Math.toRadians(999) /*heading unused*/);
 
-    private final Pose pickupWall1ControlPose = new Pose(0, 0, Math.toRadians(0));
+    private final Pose scoreIntermediatePose = new Pose(19.6, 37, Math.toRadians(30));
 
     // might use a second, third, fourth control point for pathing,
 
     /** Score 2nd sample (sample index 1) */
-    private final Pose score1Pose = new Pose(42, 70, Math.toRadians(0));
+    private final Pose score1Pose = new Pose(40, 62, Math.toRadians(30));
 
     /** Score 3rd sample (sample index 2) */
-    private final Pose score2Pose = new Pose(42, 68, Math.toRadians(0));
+    private final Pose score2Pose = new Pose(40, 62, Math.toRadians(30));
 
     /** Score 4th sample (sample index 3) */
-    private final Pose score3Pose = new Pose(42, 66, Math.toRadians(0));
+    private final Pose score3Pose = new Pose(40, 62, Math.toRadians(30));
 
     /** Score 5th sample (sample index 4) */
-    private final Pose score4Pose = new Pose(42, 64, Math.toRadians(0));
+    private final Pose score4Pose = new Pose(40, 62, Math.toRadians(30));
 
     /** Park Pose for our robot, after we do all of the scoring. */
-    private final Pose parkPose = new Pose(6, 30, Math.toRadians(0));
+    private final Pose parkPose = new Pose(6.95, 30, Math.toRadians(0));
 
     private int movingEjectAngleThreshold = 250;
 
@@ -166,21 +165,16 @@ public class FiveSpec extends OpMode {
         /* Here is an example for Constant Interpolation
         scorePreload.setConstantInterpolation(startPose.getHeading()); */
 
-        prepIntake1 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(score0Pose), new Point(prepIntake1Pose)))
-                .setLinearHeadingInterpolation(score0Pose.getHeading(), prepIntake1Pose.getHeading())
-                .build();
-
         /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         intake1 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(prepIntake1Pose), new Point(intake1Pose)))
-                .setLinearHeadingInterpolation(prepIntake1Pose.getHeading(), intake1Pose.getHeading()) // TODO: could try tangential tbh
+                .addPath(new BezierCurve(new Point(score0Pose), new Point(intake1ControlPose), new Point(intake1Pose)))
+                .setLinearHeadingInterpolation(score0Pose.getHeading(), intake1Pose.getHeading()) // TODO: could try tangential tbh
                 .build();
 
         eject1 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(intake1Pose), new Point(eject1Pose)))
                 .setLinearHeadingInterpolation(intake1Pose.getHeading(), eject1Pose.getHeading())
-                .setPathEndTimeoutConstraint(50)
+                .setPathEndTimeoutConstraint(0)
                 .build();
 
         intake2 = follower.pathBuilder()
@@ -191,7 +185,7 @@ public class FiveSpec extends OpMode {
         eject2 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(intake2Pose), new Point(eject2Pose)))
                 .setLinearHeadingInterpolation(intake2Pose.getHeading(), eject2Pose.getHeading())
-                .setPathEndTimeoutConstraint(50)
+                .setPathEndTimeoutConstraint(0)
                 .build();
 
         intake3 = follower.pathBuilder()
@@ -202,53 +196,79 @@ public class FiveSpec extends OpMode {
         eject3 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(intake3Pose), new Point(eject3Pose)))
                 .setLinearHeadingInterpolation(intake3Pose.getHeading(), eject3Pose.getHeading())
-                .setPathEndTimeoutConstraint(50)
+                .setPathEndTimeoutConstraint(0)
                 .build();
 
         grab1 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(eject3Pose), new Point(eject3Pose))) // veiled turnTo
+                .setLinearHeadingInterpolation(eject3Pose.getHeading(), eject3Pose.getHeading())
+                .setPathEndTimeoutConstraint(0)
                 .addPath(new BezierCurve(new Point(eject3Pose), new Point(pickupWall1ControlPose), new Point(pickupWallPose)))
-                .setTangentHeadingInterpolation()
-                .setReversed(true)
+                .setConstantHeadingInterpolation(pickupWallPose.getHeading())
                 .build();
 
         score1 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose),  new Point(score1Pose)))
-//                .setConstantHeadingInterpolation() // slower because majority strafing, but could be more controlled
+                .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose1), new Point(scoreIntermediatePose)))
                 .setTangentHeadingInterpolation()
+                .setReversed(false)
+                .setPathEndTimeoutConstraint(0)
+                .addPath(new BezierLine(new Point(scoreIntermediatePose), new Point(score1Pose)))
+                .setConstantHeadingInterpolation(score1Pose.getHeading())
+                .setPathEndTimeoutConstraint(0) // maybe this would help as a "looser" clause as mentioned below in switch statement?
                 .build();
 
         grab2 = follower.pathBuilder()
-                .addPath(new BezierCurve( new Point(score1Pose), new Point(scoreControlPose), new Point(pickupWallPose)))
-//                .setConstantHeadingInterpolation()
+                .addPath(new BezierLine(new Point(score1Pose), new Point(scoreIntermediatePose)))
+                .setConstantHeadingInterpolation(scoreIntermediatePose.getHeading())
+                .setPathEndTimeoutConstraint(0)
+                .addPath(new BezierCurve(new Point(scoreIntermediatePose), new Point(scoreControlPose1), new Point(pickupWallPose)))
                 .setTangentHeadingInterpolation()
                 .setReversed(true)
                 .build();
 
         score2 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose),  new Point(score2Pose)))
+                .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose1), new Point(scoreIntermediatePose)))
                 .setTangentHeadingInterpolation()
+                .setReversed(false)
+                .setPathEndTimeoutConstraint(0)
+                .addPath(new BezierLine(new Point(scoreIntermediatePose), new Point(score2Pose)))
+                .setConstantHeadingInterpolation(score2Pose.getHeading())
                 .build();
 
         grab3 = follower.pathBuilder()
-                .addPath(new BezierCurve( new Point(score2Pose), new Point(scoreControlPose), new Point(pickupWallPose)))
+                .addPath(new BezierLine(new Point(score2Pose), new Point(scoreIntermediatePose)))
+                .setConstantHeadingInterpolation(scoreIntermediatePose.getHeading())
+                .setPathEndTimeoutConstraint(0)
+                .addPath(new BezierCurve(new Point(scoreIntermediatePose), new Point(scoreControlPose1), new Point(pickupWallPose)))
                 .setTangentHeadingInterpolation()
                 .setReversed(true)
                 .build();
 
         score3 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose),  new Point(score3Pose)))
+                .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose1), new Point(scoreIntermediatePose)))
                 .setTangentHeadingInterpolation()
+                .setReversed(false)
+                .setPathEndTimeoutConstraint(0)
+                .addPath(new BezierLine(new Point(scoreIntermediatePose), new Point(score3Pose)))
+                .setConstantHeadingInterpolation(score3Pose.getHeading())
                 .build();
 
         grab4 = follower.pathBuilder()
-                .addPath(new BezierCurve( new Point(score3Pose), new Point(scoreControlPose), new Point(pickupWallPose)))
+                .addPath(new BezierLine(new Point(score1Pose), new Point(scoreIntermediatePose)))
+                .setConstantHeadingInterpolation(scoreIntermediatePose.getHeading())
+                .setPathEndTimeoutConstraint(0)
+                .addPath(new BezierCurve(new Point(scoreIntermediatePose), new Point(scoreControlPose1), new Point(pickupWallPose)))
                 .setTangentHeadingInterpolation()
                 .setReversed(true)
                 .build();
 
-        score3 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose),  new Point(score4Pose)))
+        score4 = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose1), new Point(scoreIntermediatePose)))
                 .setTangentHeadingInterpolation()
+                .setReversed(false)
+                .setPathEndTimeoutConstraint(0)
+                .addPath(new BezierLine(new Point(scoreIntermediatePose), new Point(score4Pose)))
+                .setConstantHeadingInterpolation(score4Pose.getHeading())
                 .build();
 
         park = follower.pathBuilder()
@@ -261,220 +281,213 @@ public class FiveSpec extends OpMode {
         switch (pathState) {
             case 0:
                 // drive up to bar
-                grabAndPrepClip();
+                grabAndPrepClipAction();
                 follower.followPath(score0);
                 setPathState(1);
                 break;
             case 1:
                 if(!follower.isBusy()) {
                     // score preload
-                    slamScoreClip();
+
                     setPathState(2);
                 }
                 break;
             case 2:
                 if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
-                    // get away from sub
-                    follower.followPath(prepIntake1, false);
-                    setPathState(2);
+                    // get away from sub, and get ready to grab first sample
+                    follower.followPath(intake1, true);
+                    setPathState(3);
                 }
                 break;
             case 3:
-                if (follower.getPose().getHeading() < Math.toRadians(330) && follower.getPose().getHeading() > Math.toRadians(270) && (follower.getPose().getX() < prepIntake1Pose.getX() + 4)) {
+                if (!follower.isBusy()) {
                     // ready to grab first sample
                     prepToIntakeAction();
-                    follower.followPath(intake1, true);
+                    extendIntakeAction();
                     setPathState(4);
                 }
                 break;
             case 4:
-                if (!follower.isBusy()) {
-                    // extend to grab
-                    extendIntakeAction(); // might not be necessary for this first sample tbh, since no chance of accidentally sweeping sample
-                    setPathState(5);
-                }
-                break;
-            case 5:
                 if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
                     // successfully grabbed, turn to eject
                     flipUpAction();
                     follower.followPath(eject1);
+                    setPathState(5);
+                }
+                break;
+            case 5:
+                if (follower.getPose().getHeading() < Math.toRadians(movingEjectAngleThreshold)) {
+                    // eject
+                    ejectAction();
                     setPathState(6);
                 }
                 break;
             case 6:
-                if (follower.getPose().getHeading() < Math.toRadians(movingEjectAngleThreshold)) {
-                    // eject
-                    ejectAction();
-                    setPathState(7);
-                }
-                break;
-            case 7:
                 if (intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                     // rinse and repeat, turn and get ready to grab
                     prepToIntakeAction();
                     follower.followPath(intake2, true);
+                    setPathState(7);
+                }
+                break;
+            case 7:
+                if (!follower.isBusy()) {
+                    extendIntakeAction();
                     setPathState(8);
                 }
                 break;
             case 8:
-                if (!follower.isBusy()) {
-                    extendIntakeAction();
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                    flipUpAction();
+                    follower.followPath(eject2);
                     setPathState(9);
                 }
                 break;
             case 9:
-                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-                    flipUpAction();
-                    follower.followPath(eject2);
+                if (follower.getPose().getHeading() < Math.toRadians(movingEjectAngleThreshold)) {
+                    ejectAction();
                     setPathState(10);
                 }
                 break;
             case 10:
-                if (follower.getPose().getHeading() < Math.toRadians(movingEjectAngleThreshold)) {
-                    ejectAction();
-                    setPathState(11);
-                }
-                break;
-            case 12:
                 if (intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                     prepToIntakeAction();
                     follower.followPath(intake3, true);
+                    setPathState(11);
+                }
+                break;
+            case 11:
+                if (!follower.isBusy()) {
+                    extendIntakeAction();
+                    setPathState(12);
+                }
+                break;
+            case 12:
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                    flipUpAction();
+                    runningActions.add(new InstantAction(() -> horizontalSlides.extendPartial()));
+                    follower.followPath(eject3);
                     setPathState(13);
                 }
                 break;
             case 13:
-                if (!follower.isBusy()) {
-                    extendIntakeAction();
-                    setPathState(13);
-                }
-                break;
-            case 14:
-                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-                    flipUpAction();
-                    follower.followPath(eject3);
-                    setPathState(15);
-                }
-                break;
-            case 15:
                 if (follower.getPose().getHeading() < Math.toRadians(movingEjectAngleThreshold)) {
                     ejectAction();
-                    setPathState(16);
+                    setPathState(14);
                 }
                 break;
-
-            case 16: // done with grabbing samples, now cycles
+            case 14: // done with grabbing samples, now cycles
                 if (intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                     // drive over and prep to grab
                     retractIntakeAction();
                     follower.setMaxPower(0.7);
                     follower.followPath(grab1, true);
-                    setPathState(17);
+                    setPathState(15);
                 }
                 break;
-            case 17:
+            case 15:
                 if (!follower.isBusy()) {
                     // at pose, now grab clip
-                    grabAndPrepClip();
-                    setPathState(18);
+                    grabAndPrepClipAction();
+                    setPathState(16);
                 }
                 break;
-            case 18:
+            case 16:
                 if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
                     // grabbed, drive to score
                     follower.setMaxPower(1);
                     follower.followPath(score1, true);
-                    setPathState(19);
+                    setPathState(17);
                 }
                 break;
-            case 19:
-                if(!follower.isBusy()) {
-                    // slam score once at pose
-                    slamScoreClip();
-                    setPathState(2);
+            case 17:
+                if(!follower.isBusy()) { // might use a different, more loose clause here
+                    // let go to score once at pose, and shoved on
+                    finishScoringClipAction();
+                    setPathState(18);
                 }
                 break;
-            case 20:
+            case 18:
                 if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
                     // drive to grab another once done with slam
                     follower.setMaxPower(0.8); // slower so human player can react
                     follower.followPath(grab2, true);
+                    setPathState(19);
+                }
+                break;
+            case 19:
+                if (!follower.isBusy()) {
+                    // at pose, grab clip, rinse and repeat
+                    grabAndPrepClipAction();
+                    setPathState(20);
+                }
+                break;
+            case 20:
+                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+                    follower.setMaxPower(1);
+                    follower.followPath(score2, true);
                     setPathState(21);
                 }
                 break;
             case 21:
-                if (!follower.isBusy()) {
-                    // at pose, grab clip, rinse and repeat
-                    grabAndPrepClip();
+                if(!follower.isBusy()) {
+                    finishScoringClipAction();
                     setPathState(22);
                 }
                 break;
             case 22:
-                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
-                    follower.setMaxPower(1);
-                    follower.followPath(score2, true);
+                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+                    follower.setMaxPower(0.8);
+                    follower.followPath(grab3, true);
                     setPathState(23);
                 }
                 break;
             case 23:
-                if(!follower.isBusy()) {
-                    slamScoreClip();
+                if (!follower.isBusy()) {
+                    grabAndPrepClipAction();
                     setPathState(24);
                 }
                 break;
             case 24:
-                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
-                    follower.setMaxPower(0.8);
-                    follower.followPath(grab3, true);
+                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+                    follower.setMaxPower(1);
+                    follower.followPath(score3, true);
                     setPathState(25);
                 }
                 break;
             case 25:
-                if (!follower.isBusy()) {
-                    grabAndPrepClip();
+                if(!follower.isBusy()) {
+                    finishScoringClipAction();
                     setPathState(26);
                 }
                 break;
             case 26:
-                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
-                    follower.setMaxPower(1);
-                    follower.followPath(score3, true);
+                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+                    follower.setMaxPower(0.8);
+                    follower.followPath(grab4, true);
                     setPathState(27);
                 }
                 break;
             case 27:
-                if(!follower.isBusy()) {
-                    slamScoreClip();
+                if (!follower.isBusy()) {
+                    grabAndPrepClipAction();
                     setPathState(28);
                 }
                 break;
             case 28:
-                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
-                    follower.setMaxPower(0.8);
-                    follower.followPath(grab4, true);
+                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+                    follower.setMaxPower(1);
+                    follower.followPath(score3, true);
                     setPathState(29);
                 }
                 break;
             case 29:
-                if (!follower.isBusy()) {
-                    grabAndPrepClip();
+                if(!follower.isBusy()) {
+                    finishScoringClipAction();
                     setPathState(30);
                 }
                 break;
             case 30:
-                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
-                    follower.setMaxPower(1);
-                    follower.followPath(score3, true);
-                    setPathState(31);
-                }
-                break;
-            case 31:
-                if(!follower.isBusy()) {
-                    slamScoreClip();
-                    setPathState(32);
-                }
-                break;
-            case 32:
                 if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
                     // huzzah we done, park
                     // please let this is within the 30 seconds, I'm programming completely blind with no pedro visualizer
@@ -582,7 +595,7 @@ public class FiveSpec extends OpMode {
 
 
     // Abstraction Action Methods
-    public void grabAndPrepClip() {
+    public void grabAndPrepClipAction() {
         runningActions.add(new SequentialAction(
                 new InstantAction(() -> outtake.closeClawTight()),
                 new SleepAction(0.3),
@@ -591,14 +604,12 @@ public class FiveSpec extends OpMode {
         ));
     }
 
-    public void slamScoreClip() {
+    public void finishScoringClipAction() {
         runningActions.add(new SequentialAction(
-                new InstantAction(() -> outtake.toScoreClip()),
-                new SleepAction(0.35),
                 new InstantAction(() -> outtake.openClaw()),
-                new SleepAction(0.3),
+                new SleepAction(0.2),
                 new InstantAction(() -> outtake.toGrabClip()),
-                new InstantAction(() -> verticalSlides.retract())
+                new InstantAction(() -> verticalSlides.raiseToPickupClip())
         ));
     }
 

@@ -84,23 +84,23 @@ public class FourSample extends OpMode {
     private final Pose startPose = new Pose(6, 111, Math.toRadians(270));
 
     /** Bucket Scoring Pose */
-    private final Pose scorePose = new Pose(14, 129, Math.toRadians(330));
+    private final Pose scorePose = new Pose(16, 132, Math.toRadians(340));
 
     /** First Sample from the Spike Mark */
-    private final Pose pickup1Pose = new Pose(16, 125, Math.toRadians(330));
+    private final Pose pickup1Pose = new Pose(16, 132, Math.toRadians(340));
 
     /** Second Sample from the Spike Mark */
-    private final Pose pickup2Pose = new Pose(16, 130, Math.toRadians(340));
+    private final Pose pickup2Pose = new Pose(16, 132, Math.toRadians(0));
 
     /** Third Sample from the Spike Mark */
-    private final Pose pickup3Pose = new Pose(16, 135, Math.toRadians(0));
+    private final Pose pickup3Pose = new Pose(25, 120, Math.toRadians(50));
 
     /** Park Pose for our robot, after we do all of the scoring. */
     private final Pose parkPose = new Pose(62, 98, Math.toRadians(270));
 
     /** Park Control Pose for our robot, this is used to manipulate the bezier curve that we will create for the parking.
      * The Robot will not go to this pose, it is used as control point for our bezier curve. */
-    private final Pose parkControlPose = new Pose(62, 98, Math.toRadians(0));
+    private final Pose parkControlPose = new Pose(64, 110, Math.toRadians(999)/* heading unused*/);
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
     private Path scorePreload, park;
