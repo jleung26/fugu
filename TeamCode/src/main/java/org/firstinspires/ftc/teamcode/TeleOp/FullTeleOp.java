@@ -269,10 +269,10 @@ public class FullTeleOp extends OpMode {
                         ),
                         new SleepAction(0.2), // TODO: play around with timings
                         new InstantAction(() -> verticalSlides.retract()),
+                        new InstantAction(() -> intake.dropDown()),
                         new SleepAction(0.4),
                         new InstantAction(() -> outtake.closeClawLoose()),
                         new SleepAction(0.2),
-                        new InstantAction(() -> intake.dropDown()),
                         new InstantAction(() -> verticalSlides.raiseToHighBucket()),
                         new SleepAction(0.3),
                         new InstantAction(() -> intake.flipUp()),
