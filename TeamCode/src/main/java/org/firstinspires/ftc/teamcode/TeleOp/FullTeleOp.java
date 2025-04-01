@@ -140,7 +140,7 @@ public class FullTeleOp extends OpMode {
         // updating booleans
         COLOR_TO_REJECT = (redAlliance ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
         drive.slowModeBool = !horizontalSlides.slidesRetracted;
-        drive.angleLockBool = (outtake.arm.armPos == Outtake.Arm.STATE.GRABBING_CLIP) || (outtake.arm.armPos == Outtake.Arm.STATE.SCORING_CLIP);
+//        drive.angleLockBool = (outtake.arm.armPos == Outtake.Arm.STATE.GRABBING_CLIP) || (outtake.arm.armPos == Outtake.Arm.STATE.SCORING_CLIP);
         if (currentGamepad1.left_trigger > 0.1 && !(previousGamepad1.left_trigger > 0.1)) { // avoids setting every loop since it probably takes time
             drive.setZeroPowerBrake(true);
         } else if (currentGamepad1.left_trigger <= 0.1 && !(previousGamepad1.left_trigger <= 0.1)) {
@@ -219,7 +219,7 @@ public class FullTeleOp extends OpMode {
                 // deposit in bucket, then retract all
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> outtake.openClaw()),
-                        new SleepAction(0.2),
+                        new SleepAction(0.25),
                         new ParallelAction(
                                 new InstantAction(() -> outtake.toTransfer()),
                                 new InstantAction(() -> verticalSlides.stowBeforeTransfer())
@@ -262,21 +262,22 @@ public class FullTeleOp extends OpMode {
             // full transfer sequence
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && horizontalSlides.slidesRetracted && intake.wristFlippedUp && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
                 runningActions.add(new SequentialAction(
-                        new ParallelAction(
-                                new InstantAction(() -> outtake.openClaw()),
-                                new InstantAction(() -> outtake.toTransfer()),
-                                new InstantAction(() -> verticalSlides.stowBeforeTransfer())
-                        ),
+//                        new ParallelAction(
+//                                new InstantAction(() -> outtake.openClaw()),
+//                                new InstantAction(() -> outtake.toTransfer()),
+//                                new InstantAction(() -> verticalSlides.stowBeforeTransfer())
+//                        ),
+                        new InstantAction(() -> intake.dropDown()),
                         new SleepAction(0.2), // TODO: play around with timings
                         new InstantAction(() -> verticalSlides.retract()),
-                        new InstantAction(() -> intake.dropDown()),
-                        new SleepAction(0.4),
+                        new SleepAction(0.5),
                         new InstantAction(() -> outtake.closeClawLoose()),
                         new SleepAction(0.2),
-                        new InstantAction(() -> verticalSlides.raiseToHighBucket()),
-                        new SleepAction(0.3),
+                        new SleepAction(0.1),
+                        new InstantAction(() -> verticalSlides.raiseToLowBucket()),
+                        new SleepAction(0.4),
                         new InstantAction(() -> intake.flipUp()),
-                        new SleepAction(0.5),
+                        new SleepAction(0.3),
                         new InstantAction(() -> outtake.toScoreBucket())
                 ));
             }

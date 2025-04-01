@@ -101,7 +101,7 @@ public class Hang {
         if (opmode.gamepad1.a) {
             leftWheely.setPosition(leftWheelyDeployPos);
             rightWheely.setPosition(rightWheelyDeployPos);
-        } else if (opmode.gamepad1.b) {
+        } else if (opmode.gamepad1.y) {
             leftWheely.setPosition(leftWheelyStowPos);
             rightWheely.setPosition(rightWheelyStowPos);
         }
@@ -109,7 +109,7 @@ public class Hang {
         if (opmode.gamepad1.dpad_down) {
             leftPto.setPosition(leftPtoDeployPos);
             rightPto.setPosition(rightPtoDeployPos);
-        } else if (opmode.gamepad1.dpad_left) {
+        } else if (opmode.gamepad1.dpad_up) {
             leftPto.setPosition(leftPtoStowPos);
             rightPto.setPosition(rightPtoStowPos);
         }

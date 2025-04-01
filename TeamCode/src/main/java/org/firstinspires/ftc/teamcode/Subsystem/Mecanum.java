@@ -22,8 +22,8 @@ public class Mecanum {
 
     public volatile boolean angleLockBool = false, slowModeBool = false;
 
-    public static double Kp = 0.008;
-    public static double Kd = 0;
+    public static double Kp = 0.0007;
+    public static double Kd = 0.0001;
 
     // variables for later modification
     public double targetAngle = 0;
@@ -163,12 +163,12 @@ public class Mecanum {
 
     public double PDTurning(double targetHeading, double currentHeading) {
         // calculate the error
-        double error = normalizeError(targetHeading - currentHeading);
+        double error = normalizeError(currentHeading - targetHeading);
 
         double derivative = (error - lastError) / timer.seconds();
 
         double output = (Kp * error) + (Kd * derivative);
-        output = Math.signum(output) * Math.sqrt(Math.abs(output));
+        output = Math.signum(output) * Math.pow(Math.abs(output), 0.65);
         output = Math.max(-1, Math.min(1, output));
         // square root PID, if robot is too fat and has too much inertia to fix small error
         // Jayden will diddle around with PID auto turning on his own time

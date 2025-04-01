@@ -37,11 +37,12 @@ public class Intake {
     // motor constants
     public static double INTAKING_POWER = 0.6;
     public static double REVERSE_POWER = -0.6;
-    public static double NEUTRAL_POWER = 0.1;
+    public static double NEUTRAL_POWER = 0.2;
 
     // wrist constants // wrists synchronized :)
     public static double TRANSFER_POS = 0.04;
-    public static double DROP_DOWN_POS = 0.423; // TODO: retune with hori slides mostly extended, since slides have some slight sag
+    public static double DROP_DOWN_POS = 0.33; // TODO: retune with hori slides mostly extended, since slides have some slight sag
+    public static double PARTIAL_DROPDOWN_POS = 0.24;
     public static double WRIST_TUNING_INCREMENT = 0.001;
 
     // sensor constants
@@ -142,6 +143,7 @@ public class Intake {
     public void incremental(Servo servo, int sign) {servo.setPosition(servo.getPosition() + sign * WRIST_TUNING_INCREMENT);}
     public void dropDown() { leftWrist.setPosition(DROP_DOWN_POS); rightWrist.setPosition(DROP_DOWN_POS); wristFlippedUp = false;}
     public void flipUp() { leftWrist.setPosition(TRANSFER_POS); rightWrist.setPosition(TRANSFER_POS); wristFlippedUp = true;}
+    public void partialDropDown() {leftWrist.setPosition(PARTIAL_DROPDOWN_POS); rightWrist.setPosition(PARTIAL_DROPDOWN_POS); wristFlippedUp = false;}
 
     public IntakeChamberState getPieceColor() {
         if (colorSensor.getDistance(DistanceUnit.INCH) < DETECTION_THRESHOLD) {

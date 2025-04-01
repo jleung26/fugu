@@ -80,16 +80,16 @@ public class FourSampleDraft extends OpMode {
     // use 42" limit in visualizer, might have to input 84" bot lol
 
     /** Start Pose of our robot */
-    private final Pose startPose = new Pose(6, 111, Math.toRadians(270));
+    private final Pose startPose = new Pose(6.25, 111, Math.toRadians(270));
 
     /** Bucket Scoring Pose */
-    private final Pose scorePose = new Pose(16, 132, Math.toRadians(340));
+    private final Pose scorePose = new Pose(12, 132, Math.toRadians(315));
 
     /** First Sample from the Spike Mark */
-    private final Pose pickup1Pose = new Pose(16, 132, Math.toRadians(340));
+    private final Pose pickup1Pose = new Pose(13, 132, Math.toRadians(335));
 
     /** Second Sample from the Spike Mark */
-    private final Pose pickup2Pose = new Pose(16, 132, Math.toRadians(0));
+    private final Pose pickup2Pose = new Pose(12, 132, Math.toRadians(0));
 
     /** Third Sample from the Spike Mark */
     private final Pose pickup3Pose = new Pose(25, 120, Math.toRadians(50));
@@ -118,13 +118,12 @@ public class FourSampleDraft extends OpMode {
         /* This is our grabPickup1 PathChain. Straight line. */
         grabPickup1 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(scorePose), new Point(pickup1Pose)))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
+                .setConstantHeadingInterpolation(pickup1Pose.getHeading())
                 .build();
 
         scorePickup1 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(pickup1Pose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
-                .setPathEndTimeoutConstraint(600) // TODO: asdfa
                 .build();
 
         grabPickup2 = follower.pathBuilder()
@@ -174,10 +173,12 @@ public class FourSampleDraft extends OpMode {
 
                     // extend to prep for picking up sample
                     prepToIntakeAction();
-
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are grabbing the sample */
+                    setPathState(990);
+                }
+                break;
+            case 990:
+                if (pathTimer.getElapsedTimeSeconds() >= 0.5) { // delay
                     follower.followPath(grabPickup1,true);
-
                     setPathState(2);
                 }
                 break;
@@ -208,6 +209,11 @@ public class FourSampleDraft extends OpMode {
                     /* Transfer and prep to score*/
                     transferAndScoreAction();
 
+                    setPathState(5);
+                }
+                break;
+            case 991:
+                if (pathTimer.getElapsedTimeSeconds() >= 0.5) {
                     setPathState(5);
                 }
                 break;
@@ -247,6 +253,11 @@ public class FourSampleDraft extends OpMode {
                     /* Transfer and prep to score*/
                     transferAndScoreAction();
 
+                    setPathState(9);
+                }
+                break;
+            case 992:
+                if (pathTimer.getElapsedTimeSeconds() >= 0.5) {
                     setPathState(9);
                 }
                 break;
@@ -399,6 +410,7 @@ public class FourSampleDraft extends OpMode {
         telemetry.addData("isBusy? ", follower.isBusy());
         telemetry.addData("pinpoint cooked? ", follower.isLocalizationNAN());
         telemetry.addData("robot stuck? ", follower.isRobotStuck());
+        telemetry.addData("path timer seconds", pathTimer.getElapsedTimeSeconds());
 
         telemetry.addLine("\n Pose");
         telemetry.addData("x: ", follower.getPose().getX());
@@ -406,15 +418,14 @@ public class FourSampleDraft extends OpMode {
         telemetry.addData("heading: ", follower.getPose().getHeading());
 
         telemetry.addData("\n Loop Times: ", elapsedtime.milliseconds());
+        elapsedtime.reset();
     }
 
     // Abstracted Action Methods
     public void allToScoreAction() {
         // prep to score
         runningActions.add(new SequentialAction(
-                new InstantAction(() -> verticalSlides.raiseToHighBucket()),
-                new SleepAction(0.3),
-                new InstantAction(() -> intake.flipUp()),
+                new InstantAction(() -> verticalSlides.raiseToLowBucket()),
                 new SleepAction(0.5),
                 new InstantAction(() -> outtake.toScoreBucket())
         ));
@@ -423,21 +434,16 @@ public class FourSampleDraft extends OpMode {
     public void transferAndScoreAction() {
         // full transfer and prep to score sequence
         runningActions.add(new SequentialAction(
-                new ParallelAction(
-                        new InstantAction(() -> outtake.openClaw()),
-                        new InstantAction(() -> outtake.toStow()),
-                        new InstantAction(() -> verticalSlides.retract())
-                ),
-                new InstantAction(() -> outtake.toTransfer()),
-                new SleepAction(0.2), // TODO: reflect timings from teleop
+                new InstantAction(() -> verticalSlides.retract()),
+                new SleepAction(0.5),
                 new InstantAction(() -> outtake.closeClawLoose()),
                 new SleepAction(0.2),
-                new InstantAction(() -> outtake.toStow()),
                 new InstantAction(() -> intake.dropDown()),
-                new InstantAction(() -> verticalSlides.raiseToHighBucket()),
-                new SleepAction(0.3),
+                new SleepAction(0.1),
+                new InstantAction(() -> verticalSlides.raiseToLowBucket()),
+                new SleepAction(0.4),
                 new InstantAction(() -> intake.flipUp()),
-                new SleepAction(0.5),
+                new SleepAction(0.3),
                 new InstantAction(() -> outtake.toScoreBucket())
         ));
     }
@@ -447,7 +453,7 @@ public class FourSampleDraft extends OpMode {
         runningActions.add(new SequentialAction(
                 // might need delay here
                 new InstantAction(() -> outtake.openClaw()),
-                new SleepAction(0.2),
+                new SleepAction(0.25),
                 new ParallelAction(
                         new InstantAction(() -> outtake.toStow()),
                         new InstantAction(() -> verticalSlides.retract())
