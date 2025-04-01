@@ -33,7 +33,7 @@
 //import pedroPathing.constants.LConstants;
 //
 //
-//@Autonomous(name = "5 Spec", group = "Z")
+//@Autonomous(name = "5 Spec", group = "A")
 //public class FiveSpec extends OpMode {
 //    // declaring subsystems
 //    RobotHardware robotHardware = new RobotHardware();
