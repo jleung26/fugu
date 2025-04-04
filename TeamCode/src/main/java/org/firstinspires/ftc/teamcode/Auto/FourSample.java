@@ -204,7 +204,7 @@
 //                break;
 //            case 4:
 //                /* ready to transfer */
-//                if(outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
+//                if(outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
 //                    /* Transfer and prep to score*/
 //                    transferAndScoreAction();
 //
@@ -243,7 +243,7 @@
 //                break;
 //            case 8:
 //                /* ready to transfer */
-//                if(outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
+//                if(outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
 //                    /* Transfer and prep to score*/
 //                    transferAndScoreAction();
 //
@@ -282,7 +282,7 @@
 //                break;
 //            case 12:
 //                /* ready to transfer */
-//                if(outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
+//                if(outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
 //                    /* Transfer and prep to score*/
 //                    transferAndScoreAction();
 //

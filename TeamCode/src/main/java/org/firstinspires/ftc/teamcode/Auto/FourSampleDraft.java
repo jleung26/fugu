@@ -15,7 +15,6 @@ import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.Path;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
-import com.pedropathing.util.Constants;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -24,7 +23,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
-import org.firstinspires.ftc.teamcode.Subsystem.Outtake;
+import org.firstinspires.ftc.teamcode.Subsystem.ExtendingOuttake;
 import org.firstinspires.ftc.teamcode.Subsystem.VerticalSlides;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
@@ -41,7 +40,7 @@ public class FourSampleDraft extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     VerticalSlides verticalSlides = new VerticalSlides();
     HorizontalSlides horizontalSlides = new HorizontalSlides();
-    Outtake outtake = new Outtake();
+    ExtendingOuttake outtake = new ExtendingOuttake();
     Intake intake = new Intake();
     Follower follower;
     Timer pathTimer, actionTimer, opmodeTimer;
@@ -205,7 +204,7 @@ public class FourSampleDraft extends OpMode {
                 break;
             case 4:
                 /* ready to transfer */
-                if(outtake.arm.armPos == Outtake.Arm.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
+                if(outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
                     /* Transfer and prep to score*/
                     transferAndScoreAction();
 
@@ -249,7 +248,7 @@ public class FourSampleDraft extends OpMode {
                 break;
             case 8:
                 /* ready to transfer */
-                if(outtake.arm.armPos == Outtake.Arm.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
+                if(outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
                     /* Transfer and prep to score*/
                     transferAndScoreAction();
 
@@ -293,7 +292,7 @@ public class FourSampleDraft extends OpMode {
                 break;
             case 12:
                 /* ready to transfer */
-                if(outtake.arm.armPos == Outtake.Arm.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
+                if(outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.STOW && horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
                     /* Transfer and prep to score*/
                     transferAndScoreAction();
 

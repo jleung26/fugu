@@ -8,14 +8,14 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Subsystem.Outtake;
+import org.firstinspires.ftc.teamcode.Subsystem.ExtendingOuttake;
 import org.firstinspires.ftc.teamcode.Subsystem.VerticalSlides;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 @TeleOp(group = "Testing")
 public class OuttakeTest extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
-    private Outtake outtake = new Outtake();
+    private ExtendingOuttake outtake = new ExtendingOuttake();
 
     @Override
     public void init() {

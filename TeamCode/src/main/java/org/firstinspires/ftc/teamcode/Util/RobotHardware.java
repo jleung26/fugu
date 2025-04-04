@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class RobotHardware {
     public DcMotorEx Fl, Fr, Bl, Br, leftVertMotor, rightVertMotor, horiMotor, intakeMotor;
 
-    public Servo leftIntakeWristServo, rightIntakeWristServo, leftWheelyServo, rightWheelyServo, leftPtoServo, rightPtoServo, armAngleServo, armPitchServo, armClawServo;
+    public Servo leftIntakeWristServo, rightIntakeWristServo, leftWheelyServo, rightWheelyServo, leftPtoServo, rightPtoServo, armClawServo;
     public Servo rightArmPitchServo, leftArmPitchServo, armExtenderServo;
 
     public GoBildaPinpointDriver odo;
@@ -46,11 +46,9 @@ public class RobotHardware {
             left PTO - CHUB 4
             right PTO - CHUB 5
 
-            arm wrist - EHUB 3
-            arm arm - EHUB 4
-            // arm armR - EHUB 3 (replace wrist)
-            // arm armL - EHUB 4 (replace arm arm)
-            // arm extender - EHUB 1 (new)
+            arm armR - EHUB 3 (replace wrist)
+            arm armL - EHUB 4 (replace arm arm)
+            arm extender - EHUB 1 (new)
             arm clawServo - EHUB 5
 
             left wheely - EHUB 2
@@ -78,11 +76,9 @@ public class RobotHardware {
         leftPtoServo = opmode.hardwareMap.get(Servo.class, "leftPTO");
         rightPtoServo = opmode.hardwareMap.get(Servo.class, "rightPTO");
 
-        armAngleServo = opmode.hardwareMap.get(Servo.class, "armAngle");
-        armPitchServo = opmode.hardwareMap.get(Servo.class, "armPitch");
-//        leftArmPitchServo = opmode.hardwareMap.get(Servo.class, "armPitchL"); // replaces two prev
-//        rightArmPitchServo = opmode.hardwareMap.get(Servo.class, "armPitchR"); // replaces two prev
-//        armExtenderServo = opmode.hardwareMap.get(Servo.class, "armExtender"); // new
+        leftArmPitchServo = opmode.hardwareMap.get(Servo.class, "armPitchL"); // replaces two prev
+        rightArmPitchServo = opmode.hardwareMap.get(Servo.class, "armPitchR"); // replaces two prev
+        armExtenderServo = opmode.hardwareMap.get(Servo.class, "armExtender"); // new
         armClawServo = opmode.hardwareMap.get(Servo.class, "armClaw");
 
         Fl.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);

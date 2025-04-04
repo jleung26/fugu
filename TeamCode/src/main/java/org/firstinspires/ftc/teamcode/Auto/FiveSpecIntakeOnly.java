@@ -20,9 +20,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Subsystem.ExtendingOuttake;
 import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
-import org.firstinspires.ftc.teamcode.Subsystem.Outtake;
 import org.firstinspires.ftc.teamcode.Subsystem.VerticalSlides;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
@@ -39,7 +39,7 @@ public class FiveSpecIntakeOnly extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     VerticalSlides verticalSlides = new VerticalSlides();
     HorizontalSlides horizontalSlides = new HorizontalSlides();
-    Outtake outtake = new Outtake();
+    ExtendingOuttake outtake = new ExtendingOuttake();
     Intake intake = new Intake();
     Follower follower;
     Timer pathTimer, actionTimer, opmodeTimer;
@@ -386,7 +386,7 @@ public class FiveSpecIntakeOnly extends OpMode {
 //                }
 //                break;
 //            case 16:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
                     // grabbed, drive to score
                     follower.setMaxPower(1);
                     follower.followPath(score1, true);
@@ -401,7 +401,7 @@ public class FiveSpecIntakeOnly extends OpMode {
 //                }
 //                break;
 //            case 18:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
                     // drive to grab another once done with slam
                     follower.setMaxPower(0.8); // slower so human player can react
                     follower.followPath(grab2, true);
@@ -416,7 +416,7 @@ public class FiveSpecIntakeOnly extends OpMode {
 //                }
 //                break;
 //            case 20:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
                     follower.setMaxPower(1);
                     follower.followPath(score2, true);
                     setPathState(21);
@@ -429,7 +429,7 @@ public class FiveSpecIntakeOnly extends OpMode {
 //                }
 //                break;
 //            case 22:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
                     follower.setMaxPower(0.8);
                     follower.followPath(grab3, true);
                     setPathState(23);
@@ -442,7 +442,7 @@ public class FiveSpecIntakeOnly extends OpMode {
 //                }
 //                break;
 //            case 24:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
                     follower.setMaxPower(1);
                     follower.followPath(score3, true);
                     setPathState(25);
@@ -455,7 +455,7 @@ public class FiveSpecIntakeOnly extends OpMode {
 //                }
 //                break;
 //            case 26:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
                     follower.setMaxPower(0.8);
                     follower.followPath(grab4, true);
                     setPathState(27);
@@ -468,7 +468,7 @@ public class FiveSpecIntakeOnly extends OpMode {
 //                }
 //                break;
 //            case 28:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
                     follower.setMaxPower(1);
                     follower.followPath(score3, true);
                     setPathState(29);
@@ -481,7 +481,7 @@ public class FiveSpecIntakeOnly extends OpMode {
 //                }
 //                break;
 //            case 30:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
                     // huzzah we done, park
                     // please let this is within the 30 seconds, I'm programming completely blind with no pedro visualizer
                     follower.followPath(park, true);

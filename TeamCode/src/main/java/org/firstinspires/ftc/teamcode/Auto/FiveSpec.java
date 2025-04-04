@@ -293,7 +293,7 @@
 //                }
 //                break;
 //            case 2:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
 //                    // get away from sub, and get ready to grab first sample
 //                    follower.followPath(intake1, true);
 //                    setPathState(3);
@@ -393,7 +393,7 @@
 //                }
 //                break;
 //            case 16:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
 //                    // grabbed, drive to score
 //                    follower.setMaxPower(1);
 //                    follower.followPath(score1, true);
@@ -408,7 +408,7 @@
 //                }
 //                break;
 //            case 18:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
 //                    // drive to grab another once done with slam
 //                    follower.setMaxPower(0.8); // slower so human player can react
 //                    follower.followPath(grab2, true);
@@ -423,7 +423,7 @@
 //                }
 //                break;
 //            case 20:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
 //                    follower.setMaxPower(1);
 //                    follower.followPath(score2, true);
 //                    setPathState(21);
@@ -436,7 +436,7 @@
 //                }
 //                break;
 //            case 22:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
 //                    follower.setMaxPower(0.8);
 //                    follower.followPath(grab3, true);
 //                    setPathState(23);
@@ -449,7 +449,7 @@
 //                }
 //                break;
 //            case 24:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
 //                    follower.setMaxPower(1);
 //                    follower.followPath(score3, true);
 //                    setPathState(25);
@@ -462,7 +462,7 @@
 //                }
 //                break;
 //            case 26:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
 //                    follower.setMaxPower(0.8);
 //                    follower.followPath(grab4, true);
 //                    setPathState(27);
@@ -475,7 +475,7 @@
 //                }
 //                break;
 //            case 28:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
 //                    follower.setMaxPower(1);
 //                    follower.followPath(score3, true);
 //                    setPathState(29);
@@ -488,7 +488,7 @@
 //                }
 //                break;
 //            case 30:
-//                if (outtake.armPitch.armPos == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
 //                    // huzzah we done, park
 //                    // please let this is within the 30 seconds, I'm programming completely blind with no pedro visualizer
 //                    follower.followPath(park, true);

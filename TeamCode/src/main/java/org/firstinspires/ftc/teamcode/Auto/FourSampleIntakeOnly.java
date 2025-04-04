@@ -25,7 +25,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
-import org.firstinspires.ftc.teamcode.Subsystem.Outtake;
+import org.firstinspires.ftc.teamcode.Subsystem.ExtendingOuttake;
 import org.firstinspires.ftc.teamcode.Subsystem.VerticalSlides;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
@@ -42,7 +42,7 @@ public class FourSampleIntakeOnly extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     VerticalSlides verticalSlides = new VerticalSlides();
     HorizontalSlides horizontalSlides = new HorizontalSlides();
-    Outtake outtake = new Outtake();
+    ExtendingOuttake outtake = new ExtendingOuttake();
     Intake intake = new Intake();
     Follower follower;
     Timer pathTimer, actionTimer, opmodeTimer;
