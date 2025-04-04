@@ -254,16 +254,16 @@ public class FullTeleOpCopy extends OpMode {
             // full transfer sequence
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && horizontalSlides.slidesRetracted && intake.wristFlippedUp && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
                 runningActions.add(new SequentialAction(
+                        new InstantAction(() -> intake.setIntake(0.5)), // push sample all the way in, kinda jank, maybe not necessary
                         new InstantAction(() -> outtake.toTransfer()),
                         new SleepAction(0.2), // TODO: play around with timings
-                        new InstantAction(() -> outtake.closeClawLoose()),
+                        new InstantAction(() -> outtake.closeClawTight()),
                         new SleepAction(0.2),
-                        new InstantAction(() -> intake.partialDropDown()),
-                        new SleepAction(0.1),
                         new InstantAction(() -> outtake.toStow()),
+                        new SleepAction(0.1),
+                        new InstantAction(() -> intake.setIntake(0)),
                         new InstantAction(() -> verticalSlides.raiseToHighBucket()),
                         new SleepAction(0.3),
-                        new InstantAction(() -> intake.flipUp()),
                         new InstantAction(() -> outtake.toVert()),
                         new SleepAction(0.5), // TODO: tune this based on extension speed 0.3+0.5, probably only change 0.5
                         new InstantAction(() -> outtake.toScoreBucket())

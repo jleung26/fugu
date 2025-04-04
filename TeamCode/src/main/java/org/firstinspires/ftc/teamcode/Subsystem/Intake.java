@@ -120,10 +120,9 @@ public class Intake {
     }
 
     // intake method
-    private void setIntake(double power) {intakeMotor.setPower(power);}
+    public void setIntake(double power) {intakeMotor.setPower(power);}
     public void intake() {
         setIntake(INTAKING_POWER);
-//        dropDown(); separate for now, because idk how we'll use with actions
         intakeState = IntakeState.INTAKING;
     }
     public void reverse() {

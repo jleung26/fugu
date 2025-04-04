@@ -29,7 +29,6 @@ public class ExtendingOuttake {
         if (opmode.gamepad1.left_bumper) { claw.incremental(-1); } //open hopefully?
         else if (opmode.gamepad1.right_bumper) { claw.incremental(1); }
 
-        armExtend.incremental(getSign(-opmode.gamepad1.left_stick_y));
         if (opmode.gamepad1.a) { armExtend.incremental(1); }
         else if (opmode.gamepad1.y) { armExtend.incremental(-1); } // extend hopefully?
 
@@ -131,7 +130,7 @@ public class ExtendingOuttake {
         private final double extenderRetractedPosition = 0;
         private final double extenderPartiallyExtendedPosition = 0;
         private final double extenderFullyExtendedPosition = 0;
-        private final double increment = 0.0005;
+        private final double increment = 0.001;
 
         public ArmExtend() {}
 

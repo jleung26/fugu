@@ -100,6 +100,7 @@ public class RobotHardware {
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftIntakeWristServo.setDirection(Servo.Direction.REVERSE);
+        leftArmPitchServo.setDirection(Servo.Direction.REVERSE);
         rightPtoServo.setDirection(Servo.Direction.REVERSE);
         leftWheelyServo.setDirection(Servo.Direction.REVERSE);
 
