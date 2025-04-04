@@ -40,9 +40,9 @@ public class Intake {
     public static double NEUTRAL_POWER = 0.2;
 
     // wrist constants // wrists synchronized :)
-    public static double TRANSFER_POS = 0.04;
-    public static double DROP_DOWN_POS = 0.33; // TODO: retune with hori slides mostly extended, since slides have some slight sag
-    public static double PARTIAL_DROPDOWN_POS = 0.24;
+    public static double TRANSFER_POS = 0.087;
+    public static double DROP_DOWN_POS = 0.345;
+    public static double PARTIAL_DROPDOWN_POS = 0.217;
     public static double WRIST_TUNING_INCREMENT = 0.001;
 
     // sensor constants

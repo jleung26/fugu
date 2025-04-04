@@ -104,6 +104,17 @@ public class Mecanum {
         driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, slowModeBool);
     }
 
+    public void operateHang() {
+        if (Math.abs(opmode.gamepad2.left_stick_y) > 0.1) {
+            Fl.setPower(-opmode.gamepad2.left_stick_y);
+            Fr.setPower(-opmode.gamepad2.left_stick_y);
+            Bl.setPower(-opmode.gamepad2.left_stick_y);
+            Br.setPower(-opmode.gamepad2.left_stick_y);
+        } else {
+            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, false);
+        }
+    }
+
     public void driveRobotCentric(double x, double y, double rx, boolean slowmode) {
         x = x * (slowmode ? SLOW_MODE_FACTOR: 1);
         y = y * (slowmode ? SLOW_MODE_FACTOR: 1);

@@ -27,7 +27,7 @@ public class HorizontalSlides {
 
     // encoder positions
     public static double extendedPos = 1000;
-    public static double halfExtendedPos = extendedPos * 0.8; // 80% of full extension
+    public static double halfExtendedPos = 600; // 50% of full extension
     public static double retractedPos = 0;
 
     // declaring variables for later modification

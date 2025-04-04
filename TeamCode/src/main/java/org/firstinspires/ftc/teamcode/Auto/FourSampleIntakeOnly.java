@@ -81,28 +81,24 @@ public class FourSampleIntakeOnly extends OpMode {
     // use 42" limit in visualizer, might have to input 84" bot lol
 
     /** Start Pose of our robot */
-    private final Pose startPose = new Pose(6.25, 111, Math.toRadians(270));
+    private final Pose startPose = new Pose(6.25, 115, Math.toRadians(270)); // TODO: tune
 
     /** Bucket Scoring Pose */
-    private final Pose scorePose = new Pose(11, 133, Math.toRadians(315));
+    private final Pose scorePose = new Pose(12, 132, Math.toRadians(315)); // TODO: tune
 
     /** First Sample from the Spike Mark */
-    private final Pose pickup1Pose = new Pose(15, 132, Math.toRadians(340));
+    private final Pose pickup1Pose = new Pose(15, 123, Math.toRadians(0)); // TODO: tune
 
     /** Second Sample from the Spike Mark */
-    private final Pose pickup2Pose = new Pose(13, 132, Math.toRadians(0));
+    private final Pose pickup2Pose = new Pose(15, 133, Math.toRadians(0)); // tuned
 
     /** Third Sample from the Spike Mark */
-    private final Pose pickup3Pose = new Pose(25, 120, Math.toRadians(50));
-                                                // 18, 126, Math.toRadians(32)
-                                                // 21, 122, Math.toRadians(40)
+    private final Pose pickup3Pose = new Pose(25, 120, Math.toRadians(55)); // tuned
 
     /** Park Pose for our robot, after we do all of the scoring. */
-    private final Pose parkPose = new Pose(62, 98, Math.toRadians(270));
+    private final Pose parkPose = new Pose(62, 98, Math.toRadians(270)); // tuned
 
-    /** Park Control Pose for our robot, this is used to manipulate the bezier curve that we will create for the parking.
-     * The Robot will not go to this pose, it is used as control point for our bezier curve. */
-    private final Pose parkControlPose = new Pose(64, 110, Math.toRadians(999)/* heading unused*/);
+    private final Pose parkControlPose = new Pose(64, 110, Math.toRadians(999)/* heading unused*/); // done
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
     private Path scorePreload, park;
@@ -122,14 +118,13 @@ public class FourSampleIntakeOnly extends OpMode {
         grabPickup1 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(scorePose), new Point(pickup1Pose)))
                 .setConstantHeadingInterpolation(pickup1Pose.getHeading())
-                // if above no work, might try below
-//                .setPathEndTimeoutConstraint(0)
-//                .addPath(new BezierPoint(pickup1Pose))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
                 .build();
 
         scorePickup1 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(pickup1Pose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
+                // TODO: maybe constant heading here?
                 .build();
 
         grabPickup2 = follower.pathBuilder()
@@ -195,6 +190,14 @@ public class FourSampleIntakeOnly extends OpMode {
                     // drive up to scoring
                     follower.followPath(scorePickup1,true);
                     setPathState(4);
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.5) { // intake's emptiness already assumed
+                    setPathState(991);
+                } else if (pathTimer.getElapsedTimeSeconds() > 1) { // Empty and less than 3 already assumed
+                    runningActions.add(new SequentialAction(
+                            new InstantAction(() -> intake.flipUp()),
+                            new SleepAction(0.5),
+                            new InstantAction(() -> intake.dropDown())
+                    ));
                 }
                 break;
             case 4:
@@ -240,18 +243,14 @@ public class FourSampleIntakeOnly extends OpMode {
                 break;
             case 992:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() >= 0.5 && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
-                    prepToIntakeAction();
-
                     follower.followPath(grabPickup3,true);
                     setPathState(10);
                 }
                 break;
             case 10:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
-                if(!follower.isBusy()) {
-                    /* Grab Sample */
+                if (!follower.isBusy()) {
+                    prepToIntakeAction();
                     runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
-
                     setPathState(11);
                 }
                 break;
