@@ -27,12 +27,11 @@ public class VerticalSlides {
     public static int LOWER_LIMIT = -2;
 
     // encoder positions
-    public static int highBucketPos = 1100;
-    public static int lowBucketPos = 480;
-    public static int stowBeforeTransfer = 20;
+    public static int highBucketPos = 950;
+    public static int lowBucketPos = 320;
     public static int retractedPos = 0;
-    public static int prepClipPos = 280;
-    public static int pickupClipPos = 300;
+    public static int prepClipPos = 575;
+    public static int pickupClipPos = 0;
 
     // declaring variables for later modification
     private volatile double target = 0;
@@ -132,7 +131,6 @@ public class VerticalSlides {
     public void moveToPosition(int targetPos) {target = targetPos;}
     public void raiseToHighBucket() { moveToPosition(highBucketPos);}
     public void raiseToLowBucket()  { moveToPosition(lowBucketPos);}
-    public void stowBeforeTransfer(){ moveToPosition(stowBeforeTransfer);}
     public void raiseToPrepClip()   { moveToPosition(prepClipPos);}
     public void retract()           { moveToPosition(retractedPos);}
     public void raiseToPickupClip() { moveToPosition(pickupClipPos);}

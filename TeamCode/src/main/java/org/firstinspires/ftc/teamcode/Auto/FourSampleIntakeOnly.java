@@ -87,7 +87,7 @@ public class FourSampleIntakeOnly extends OpMode {
     private final Pose scorePose = new Pose(12, 132, Math.toRadians(315)); // TODO: tune
 
     /** First Sample from the Spike Mark */
-    private final Pose pickup1Pose = new Pose(15, 123, Math.toRadians(0)); // TODO: tune
+    private final Pose pickup1Pose = new Pose(15, 128, Math.toRadians(0)); // TODO: tune
 
     /** Second Sample from the Spike Mark */
     private final Pose pickup2Pose = new Pose(15, 133, Math.toRadians(0)); // tuned
@@ -98,19 +98,19 @@ public class FourSampleIntakeOnly extends OpMode {
     /** Park Pose for our robot, after we do all of the scoring. */
     private final Pose parkPose = new Pose(62, 98, Math.toRadians(270)); // tuned
 
-    private final Pose parkControlPose = new Pose(64, 110, Math.toRadians(999)/* heading unused*/); // done
+    private final Pose parkControlPose = new Pose(68, 110, Math.toRadians(999)/* heading unused*/); // done
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
-    private Path scorePreload, park;
-    private PathChain grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3;
+    private PathChain scorePreload, grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, park;
 
 
     public void buildPaths() {
 
         /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
-        scorePreload = new Path(new BezierLine(new Point(startPose), new Point(scorePose)));
-        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading());
-
+        scorePreload = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(startPose), new Point(scorePose)))
+                .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
+                .build();
         /* Here is an example for Constant Interpolation
         scorePreload.setConstantInterpolation(startPose.getHeading()); */
 
@@ -148,8 +148,10 @@ public class FourSampleIntakeOnly extends OpMode {
                 .build();
 
         /* This is our park path. We are using a BezierCurve with 3 points, which is a curved line that is curved based off of the control point */
-        park = new Path(new BezierCurve(new Point(scorePose), /* Control Point */ new Point(parkControlPose), new Point(parkPose)));
-        park.setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading());
+        park = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(scorePose), /* Control Point */ new Point(parkControlPose), new Point(parkPose)))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading())
+                .build();
     }
 
     public void autonomousPathUpdate() {
@@ -192,12 +194,6 @@ public class FourSampleIntakeOnly extends OpMode {
                     setPathState(4);
                 } else if (pathTimer.getElapsedTimeSeconds() > 2.5) { // intake's emptiness already assumed
                     setPathState(991);
-                } else if (pathTimer.getElapsedTimeSeconds() > 1) { // Empty and less than 3 already assumed
-                    runningActions.add(new SequentialAction(
-                            new InstantAction(() -> intake.flipUp()),
-                            new SleepAction(0.5),
-                            new InstantAction(() -> intake.dropDown())
-                    ));
                 }
                 break;
             case 4:

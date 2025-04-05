@@ -65,13 +65,12 @@ public class ExtendingOuttake {
         }
 
         public ArmPitch.STATE armState = STATE.STOW;
-        private final double armStowPosition = 0.4317;
-        private final double armTransferPosition = 1;
-        private final double armScoringBucketPosition = 0.2206;
-        private final double armScoringClipPosition = 0.48;
-        private final double armGrabClipWallPosition = 0.0494;
-//        public static double armPrepClipPosition = 0;
-        private final double armVertPosition = 0;
+        private final double armStowPosition = 0.025;
+        private final double armTransferPosition = 0.025;
+        private final double armScoringBucketPosition = 0.6;
+        private final double armScoringClipPosition = 0.17;
+        private final double armGrabClipWallPosition = 0.89;
+        private final double armVertPosition = 0.521;
         private final double armIncrement = 0.0005;
 
 
@@ -121,15 +120,12 @@ public class ExtendingOuttake {
 
     public static class ArmExtend {
         public Servo extenderServo;
-        public enum STATE {
-            RETRACTED,
-            PARTIALLY_EXTENDED,
-            FULLY_EXTENDED
-        }
-        ArmExtend.STATE extenderState = STATE.RETRACTED;
-        private final double extenderRetractedPosition = 0;
-        private final double extenderPartiallyExtendedPosition = 0;
-        private final double extenderFullyExtendedPosition = 0;
+        public boolean isExtenderTransferring = true;
+        private final double extenderStowPosition = 0.363;
+        private final double extenderTransferPosition = 0.78;
+        private final double extenderScoreBucketPosition = 0.98;
+        private final double extenderScoreClipPosition = 0.95;
+        private final double extenderGrabClipWallPosition = 0.1944;
         private final double increment = 0.001;
 
         public ArmExtend() {}
@@ -139,17 +135,25 @@ public class ExtendingOuttake {
         }
 
         // Set positions
-        public void extend() {
-            extenderServo.setPosition(extenderFullyExtendedPosition);
-            extenderState = STATE.FULLY_EXTENDED;
+        public void extendToTransfer() {
+            extenderServo.setPosition(extenderTransferPosition);
+            isExtenderTransferring = true;
         }
-        public void extendPartial() {
-            extenderServo.setPosition(extenderPartiallyExtendedPosition);
-            extenderState = STATE.PARTIALLY_EXTENDED;
+        public void extendToStow() {
+            extenderServo.setPosition(extenderStowPosition);;
+            isExtenderTransferring = true;
         }
-        public void retract() {
-            extenderServo.setPosition(extenderRetractedPosition);
-            extenderState = STATE.RETRACTED;
+        public void extendToScoreBucket() {
+            extenderServo.setPosition(extenderScoreBucketPosition);
+            isExtenderTransferring = false;
+        }
+        public void extendToScoreClip() {
+            extenderServo.setPosition(extenderScoreClipPosition);
+            isExtenderTransferring = false;
+        }
+        public void extendToGrabClip() {
+            extenderServo.setPosition(extenderGrabClipWallPosition);
+            isExtenderTransferring = false;
         }
 
         // Incremental extension
@@ -161,9 +165,9 @@ public class ExtendingOuttake {
     public static class Claw {
         public Servo clawServo;
         public boolean isClawOpen = true;
-        private final double clawTightClosedPosition = 0.197;
-        private final double clawLooseClosePosition = 0.25;
-        private final double clawOpenPosition = 0.6339;
+        private final double clawTightClosedPosition = 0.2;
+        private final double clawLooseClosePosition = 0.22;
+        private final double clawOpenPosition = 0.66;
         private final double clawIncrement = 0.0003;
 
         public Claw() {}
@@ -208,27 +212,27 @@ public class ExtendingOuttake {
 
     // combined actions
     public void toTransfer() {
-        armExtend.extend();
+        armExtend.extendToTransfer();
         armPitch.setArmTransfer();
     }
     public void toStow() {
-        armExtend.retract();
+        armExtend.extendToStow();
         armPitch.setArmStow();
     }
     public void toScoreBucket() {
-        armExtend.extend();
+        armExtend.extendToScoreBucket();
         armPitch.setArmScoreBucket();
     }
     public void toScoreClip() {
-        armExtend.extend();
+        armExtend.extendToScoreClip();
         armPitch.setArmScoreClip();
     }
     public void toGrabClip() {
-        armExtend.retract();
+        armExtend.extendToGrabClip();
         armPitch.setArmGrabClip();
     }
     public void toVert() {
-        armExtend.retract();
+        armExtend.extendToGrabClip();
         armPitch.setArmVert();
     } // to vertical (claw facing straight up) "neutral" position (only really intermediate for bucket scoring)
 
@@ -236,7 +240,7 @@ public class ExtendingOuttake {
     public void closeClawLoose() { claw.closeLoose(); }
     public void openClaw()       { claw.open(); }
 
-    public void retractExtender() {armExtend.retract();} // just for scoring clips
+    public void retractExtender() {armExtend.extendToStow();} // just for scoring clips
 
 
     // simple util function
