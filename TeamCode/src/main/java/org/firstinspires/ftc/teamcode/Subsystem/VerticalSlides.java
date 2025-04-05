@@ -9,11 +9,13 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
+import org.firstinspires.ftc.teamcode.Util.TrapezoidalMotionProfiler;
 
 @Config
 public class VerticalSlides {
     OpMode opmode;
     private PIDController controller;
+    private TrapezoidalMotionProfiler profiled_controller;
     private DcMotorEx leftSlideMotor, rightSlideMotor;
 
     // constants
@@ -51,6 +53,8 @@ public class VerticalSlides {
 
         controller = new PIDController(Kp, Ki, Kd);
 
+        profiled_controller = new TrapezoidalMotionProfiler(10, 5, leftSlideMotor.getCurrentPosition(), leftSlideMotor.getVelocity(), controller);
+
         if (resetEncoders) {
             leftSlideMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
             rightSlideMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -63,7 +67,8 @@ public class VerticalSlides {
     public void operate() {
         int currentPos = leftSlideMotor.getCurrentPosition();
         slidesRetracted = currentPos < RETRACTED_THRESHOLD;
-        output = controller.calculate(currentPos, target);
+//        output = controller.calculate(currentPos, target);
+        output = profiled_controller.calculateProfiledPID(currentPos, target);
         output = (target < currentPos ? -1 : 1) * Math.sqrt(Math.abs(output)) + (slidesRetracted && target < RETRACTED_THRESHOLD ? 0: Kg);
         output = Math.max(-1, Math.min(1, output));
 
@@ -77,6 +82,8 @@ public class VerticalSlides {
 
     public void operateTuning(TelemetryPacket packet) {
         controller.setPID(Kp, Ki, Kd);
+
+        profiled_controller = new TrapezoidalMotionProfiler(10, 5, leftSlideMotor.getCurrentPosition(), leftSlideMotor.getVelocity(), controller);
 
         if (opmode.gamepad1.y) {
             target = highBucketPos;
@@ -92,7 +99,8 @@ public class VerticalSlides {
         slidePower = -opmode.gamepad1.left_stick_y;
         usePID = opmode.gamepad1.left_trigger > 0.1;
         if (usePID) {
-            output = controller.calculate(currentPos, target);
+//            output = controller.calculate(currentPos, target);
+            output = profiled_controller.calculateProfiledPID(currentPos, target);
             output = (target < currentPos ? -1 : 1) * Math.sqrt(Math.abs(output)) + (slidesRetracted && target < RETRACTED_THRESHOLD ? 0: Kg);
             leftSlideMotor.setPower(output);
             rightSlideMotor.setPower(output);
@@ -101,7 +109,6 @@ public class VerticalSlides {
             leftSlideMotor.setPower(slidePower);
             rightSlideMotor.setPower(slidePower);
         }
-
 
         // updates boolean
         opmode.telemetry.addData("current pos: ", currentPos);
