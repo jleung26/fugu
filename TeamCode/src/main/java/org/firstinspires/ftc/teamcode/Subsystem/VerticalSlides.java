@@ -15,14 +15,14 @@ import org.firstinspires.ftc.teamcode.Util.TrapezoidalMotionProfiler;
 public class VerticalSlides {
     OpMode opmode;
     private PIDController controller;
-    private TrapezoidalMotionProfiler profiled_controller;
+//    private TrapezoidalMotionProfiler profiled_controller;
     private DcMotorEx leftSlideMotor, rightSlideMotor;
 
     // constants
-    public static double Kp = 0.0075;
+    public static double Kp = 0.03;
     public static double Ki = 0;
     public static double Kd = 0.0001;
-    public static double Kg = 0.33;
+    public static double Kg = 0.5;
     public static double CACHING_THRESHOLD = 0.005;
     public static double RETRACTED_THRESHOLD = 35;
     public static int UPPER_LIMIT = 1080; // this is for 1150s
@@ -30,9 +30,9 @@ public class VerticalSlides {
 
     // encoder positions
     public static int highBucketPos = 950;
-    public static int lowBucketPos = 320;
+    public static int lowBucketPos = 320; // NOT CURRENT
     public static int retractedPos = 0;
-    public static int prepClipPos = 575;
+    public static int prepClipPos = 625;
     public static int pickupClipPos = 0;
 
     // declaring variables for later modification
@@ -54,7 +54,7 @@ public class VerticalSlides {
 
         controller = new PIDController(Kp, Ki, Kd);
 
-        profiled_controller = new TrapezoidalMotionProfiler(10, 5, leftSlideMotor.getCurrentPosition(), leftSlideMotor.getVelocity(), controller);
+//        profiled_controller = new TrapezoidalMotionProfiler(10, 5, leftSlideMotor.getCurrentPosition(), leftSlideMotor.getVelocity(), controller);
 
         if (resetEncoders) {
             leftSlideMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -69,8 +69,8 @@ public class VerticalSlides {
         int currentPos = leftSlideMotor.getCurrentPosition();
         slidesRetracted = currentPos < RETRACTED_THRESHOLD;
         atTarget = Math.abs(currentPos - target) < 40;
-//        output = controller.calculate(currentPos, target);
-        output = profiled_controller.calculateProfiledPID(currentPos, target);
+        output = controller.calculate(currentPos, target);
+//        output = profiled_controller.cal`culateProfiledPID(currentPos, target);
         output = (target < currentPos ? -1 : 1) * Math.sqrt(Math.abs(output)) + (slidesRetracted && target < RETRACTED_THRESHOLD ? 0: Kg);
         output = Math.max(-1, Math.min(1, output));
 
@@ -101,8 +101,8 @@ public class VerticalSlides {
         slidePower = -opmode.gamepad1.left_stick_y;
         usePID = opmode.gamepad1.left_trigger > 0.1;
         if (usePID) {
-//            output = controller.calculate(currentPos, target);
-            output = profiled_controller.calculateProfiledPID(currentPos, target);
+            output = controller.calculate(currentPos, target);
+//            output = profiled_controller.calculateProfiledPID(currentPos, target);
             output = (target < currentPos ? -1 : 1) * Math.sqrt(Math.abs(output)) + (slidesRetracted && target < RETRACTED_THRESHOLD ? 0: Kg);
             leftSlideMotor.setPower(output);
             rightSlideMotor.setPower(output);
