@@ -47,9 +47,9 @@ public class Mecanum {
         pinpoint.operateSimple();
 
         if (angleLockBool) {
-            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), PDTurning(targetAngle, pinpoint.relativeNormalizedHeading), slowModeBool);
+            driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, PDTurning(targetAngle, pinpoint.relativeNormalizedHeading), slowModeBool);
         } else {
-            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, slowModeBool);
+            driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, opmode.gamepad1.right_stick_x, slowModeBool);
         }
     }
 
@@ -57,7 +57,7 @@ public class Mecanum {
         pinpoint.operateSimple();
 
         slowModeBool = opmode.gamepad1.left_trigger > 0.1;
-        driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, slowModeBool);
+        driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, opmode.gamepad1.right_stick_x, slowModeBool);
 
         // gyro reset
         if (opmode.gamepad1.b) {pinpoint.softResetYaw();}
@@ -101,7 +101,7 @@ public class Mecanum {
     }
 
     public void operateSimple() {
-        driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, slowModeBool);
+        driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, opmode.gamepad1.right_stick_x, slowModeBool);
     }
 
     public void operateHang() {
@@ -111,7 +111,7 @@ public class Mecanum {
             Bl.setPower(-opmode.gamepad2.left_stick_y);
             Br.setPower(-opmode.gamepad2.left_stick_y);
         } else {
-            driveRobotCentric(scaleJoystick(opmode.gamepad1.left_stick_x), scaleJoystick(-opmode.gamepad1.left_stick_y), opmode.gamepad1.right_stick_x, false);
+            driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, opmode.gamepad1.right_stick_x, false);
         }
     }
 

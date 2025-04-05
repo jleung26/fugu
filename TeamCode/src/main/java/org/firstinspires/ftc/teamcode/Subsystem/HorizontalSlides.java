@@ -20,7 +20,7 @@ public class HorizontalSlides {
     public static double Ki = 0;
     public static double Kd = 0.00001;
     public static double CACHING_THRESHOLD = 0.005;
-    public static double RETRACTED_THRESHOLD = 10;
+    public static double RETRACTED_THRESHOLD = 50;
     public static int UPPER_LIMIT = 1100; // this is for 1150s
     public static int LOWER_LIMIT = -2;
     public static double MAPPING_EXPONENT = 0.5;

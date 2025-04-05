@@ -246,8 +246,11 @@ public class FullTeleOpCopy extends OpMode {
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> outtake.closeClawTight()),
                         new SleepAction(0.3),
-                        new InstantAction(() -> outtake.toScoreClip()),
-                        new InstantAction(() -> verticalSlides.raiseToPrepClip())
+                        new InstantAction(() -> verticalSlides.raiseToPrepClip()),
+                        new SleepAction(0.25),
+                        new InstantAction(() -> outtake.armPitch.setArmScoreClip()), // decompose into two movements to add delay
+                        new SleepAction(0.4),
+                        new InstantAction(() -> outtake.armExtend.extendToScoreClip())
                 ));
             }
         } else if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.STOW) {

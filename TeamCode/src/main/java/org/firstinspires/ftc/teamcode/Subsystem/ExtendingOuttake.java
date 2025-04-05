@@ -68,7 +68,7 @@ public class ExtendingOuttake {
         private final double armStowPosition = 0.025;
         private final double armTransferPosition = 0.025;
         private final double armScoringBucketPosition = 0.6;
-        private final double armScoringClipPosition = 0.17;
+        private final double armScoringClipPosition = 0.2;
         private final double armGrabClipWallPosition = 0.89;
         private final double armVertPosition = 0.521;
         private final double armIncrement = 0.0005;
@@ -122,7 +122,7 @@ public class ExtendingOuttake {
         public Servo extenderServo;
         public boolean isExtenderTransferring = true;
         private final double extenderStowPosition = 0.363;
-        private final double extenderTransferPosition = 0.78;
+        private final double extenderTransferPosition = 0.76;
         private final double extenderScoreBucketPosition = 0.98;
         private final double extenderScoreClipPosition = 0.95;
         private final double extenderGrabClipWallPosition = 0.1944;

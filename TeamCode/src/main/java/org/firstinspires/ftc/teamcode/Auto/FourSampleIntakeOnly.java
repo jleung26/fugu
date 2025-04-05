@@ -81,13 +81,18 @@ public class FourSampleIntakeOnly extends OpMode {
     // use 42" limit in visualizer, might have to input 84" bot lol
 
     /** Start Pose of our robot */
-    private final Pose startPose = new Pose(6.25, 115, Math.toRadians(270)); // TODO: tune
+    private final Pose startPose = new Pose(6.25, 115, Math.toRadians(270));
+                                    // X: bot against wall
+                                    // Y: along closest edge of tile to bucket, just before covering the foam connecting teeth
+                                    // back of bot towards bucket
 
     /** Bucket Scoring Pose */
-    private final Pose scorePose = new Pose(12, 132, Math.toRadians(315)); // TODO: tune
+    private final Pose scorePose = new Pose(12, 132, Math.toRadians(315)); // TODO: tuned, but can make more optimal
 
     /** First Sample from the Spike Mark */
-    private final Pose pickup1Pose = new Pose(15, 128, Math.toRadians(0)); // TODO: tune
+    private final Pose pickup1Pose = new Pose(15, 128, Math.toRadians(0)); // TODO: tuned, but can make more optimal
+                                                                                      // TODO: (e.g. with less movement from score, and turning instead) if need to save some time
+    // old, very consistent pose, switch back if unable to tune new pos: 15, 128, Math.toRadians(0)
 
     /** Second Sample from the Spike Mark */
     private final Pose pickup2Pose = new Pose(15, 133, Math.toRadians(0)); // tuned
