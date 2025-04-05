@@ -33,7 +33,7 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "5 Spec Intake and Pathing Only", group = "A")
+@Autonomous(name = "5 Spec Intake Only", group = "A")
 public class FiveSpecIntakeOnly extends OpMode {
     // declaring subsystems
     RobotHardware robotHardware = new RobotHardware();
@@ -141,34 +141,15 @@ public class FiveSpecIntakeOnly extends OpMode {
      * It is necessary to do this so that all the paths are built before the auto starts. **/
     public void buildPaths() {
 
-        /* There are two major types of paths components: BezierCurves and BezierLines.
-         *    * BezierCurves are curved, and require >= 3 points. There are the start and end points, and the control points.
-         *    - Control points manipulate the curve between the start and end points.
-         *    - A good visualizer for this is [this](https://pedro-path-generator.vercel.app/).
-         *    * BezierLines are straight, and require 2 points. There are the start and end points.
-         * Paths have can have heading interpolation: Constant, Linear, or Tangential
-         *    * Linear heading interpolation:
-         *    - Pedro will slowly change the heading of the robot from the startHeading to the endHeading over the course of the entire path.
-         *    * Constant Heading Interpolation:
-         *    - Pedro will maintain one heading throughout the entire path.
-         *    * Tangential Heading Interpolation:
-         *    - Pedro will follows the angle of the path such that the robot is always driving forward when it follows the path.
-         * PathChains hold Path(s) within it and are able to hold their end point, meaning that they will holdPoint until another path is followed.
-         * Here is a explanation of the difference between Paths and PathChains <https://pedropathing.com/commonissues/pathtopathchain.html> */
 
-        /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         score0 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(startPose), new Point(score0Pose)))
                 .setLinearHeadingInterpolation(startPose.getHeading(), score0Pose.getHeading())
                 .build();
 
-        /* Here is an example for Constant Interpolation
-        scorePreload.setConstantInterpolation(startPose.getHeading()); */
-
-        /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
         intake1 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(score0Pose), new Point(intake1ControlPose), new Point(intake1Pose)))
-                .setLinearHeadingInterpolation(score0Pose.getHeading(), intake1Pose.getHeading()) // TODO: could try tangential tbh
+                .setLinearHeadingInterpolation(score0Pose.getHeading(), intake1Pose.getHeading()) // TODO: could try tangential
                 .build();
 
         eject1 = follower.pathBuilder()
@@ -281,7 +262,6 @@ public class FiveSpecIntakeOnly extends OpMode {
         switch (pathState) {
             case 0:
                 // drive up to bar
-//                grabAndPrepClipAction();
                 follower.followPath(score0);
                 setPathState(1);
                 break;
@@ -395,7 +375,7 @@ public class FiveSpecIntakeOnly extends OpMode {
                 break;
             case 17:
                 if(!follower.isBusy()) { // might use a different, more loose clause here
-                    // let go to score once at pose, and shoved on
+                    // let go to score once at pose and shoved on (assumed, uncheckable)
 //                    finishScoringClipAction();
 //                    setPathState(18);
 //                }
@@ -483,7 +463,6 @@ public class FiveSpecIntakeOnly extends OpMode {
 //            case 30:
 //                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
                     // huzzah we done, park
-                    // please let this is within the 30 seconds, I'm programming completely blind with no pedro visualizer
                     follower.followPath(park, true);
                     setPathState(-1);
                 }

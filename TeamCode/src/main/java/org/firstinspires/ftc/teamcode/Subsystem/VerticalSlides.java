@@ -41,6 +41,7 @@ public class VerticalSlides {
     private volatile double output = 0;
     private volatile double previousOutput = 0;
     public volatile boolean slidesRetracted = true;
+    public volatile boolean atTarget = true;
     public volatile boolean usePID = true;
 
     public VerticalSlides() {}
@@ -67,6 +68,7 @@ public class VerticalSlides {
     public void operate() {
         int currentPos = leftSlideMotor.getCurrentPosition();
         slidesRetracted = currentPos < RETRACTED_THRESHOLD;
+        atTarget = Math.abs(currentPos - target) < 40;
 //        output = controller.calculate(currentPos, target);
         output = profiled_controller.calculateProfiledPID(currentPos, target);
         output = (target < currentPos ? -1 : 1) * Math.sqrt(Math.abs(output)) + (slidesRetracted && target < RETRACTED_THRESHOLD ? 0: Kg);
@@ -83,7 +85,7 @@ public class VerticalSlides {
     public void operateTuning(TelemetryPacket packet) {
         controller.setPID(Kp, Ki, Kd);
 
-        profiled_controller = new TrapezoidalMotionProfiler(10, 5, leftSlideMotor.getCurrentPosition(), leftSlideMotor.getVelocity(), controller);
+
 
         if (opmode.gamepad1.y) {
             target = highBucketPos;

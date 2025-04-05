@@ -31,7 +31,7 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "Template Auto", group = "Z")
+@Autonomous(name = "Template Auto", group = "T")
 public class TemplateAuto extends OpMode {
     // declaring subsystems
     RobotHardware robotHardware = new RobotHardware();
