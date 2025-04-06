@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Util;
 
 import com.pedropathing.localization.GoBildaPinpointDriver;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -17,6 +18,8 @@ public class RobotHardware {
     public Servo rightArmPitchServo, leftArmPitchServo, armExtenderServo;
 
     public GoBildaPinpointDriver odo;
+
+    public RevBlinkinLedDriver blinkinLedDriver;
 
     public RevColorSensorV3 intakeColorSensor;
 
@@ -57,6 +60,7 @@ public class RobotHardware {
          */
         odo = opmode.hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         intakeColorSensor = opmode.hardwareMap.get(RevColorSensorV3.class, "color");
+        blinkinLedDriver = opmode.hardwareMap.get(RevBlinkinLedDriver.class, "blinkin"); // TODO: wire up, add to config
 
         Fl = opmode.hardwareMap.get(DcMotorEx.class, "Fl");
         Fr = opmode.hardwareMap.get(DcMotorEx.class, "Fr");

@@ -67,7 +67,7 @@ public class ExtendingOuttake {
         public ArmPitch.STATE armState = STATE.STOW;
         private final double armStowPosition = 0.025;
         private final double armTransferPosition = 0.025;
-        private final double armScoringBucketPosition = 0.6;
+        private final double armScoringBucketPosition = 0.7;
         private final double armScoringClipPosition = 0.2;
         private final double armGrabClipWallPosition = 0.89;
         private final double armVertPosition = 0.521;

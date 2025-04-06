@@ -29,7 +29,7 @@ public class VerticalSlides {
     public static int LOWER_LIMIT = -2;
 
     // encoder positions
-    public static int highBucketPos = 950;
+    public static int highBucketPos = 970;
     public static int lowBucketPos = 320; // NOT CURRENT
     public static int retractedPos = 0;
     public static int prepClipPos = 625;

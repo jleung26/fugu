@@ -33,7 +33,7 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "5 Spec Final", group = "A")
+@Autonomous(name = "5 Spec Final", group = "A", preselectTeleOp = "Full TeleOp FINAL")
 public class FiveSpec extends OpMode {
     // declaring subsystems
     RobotHardware robotHardware = new RobotHardware();

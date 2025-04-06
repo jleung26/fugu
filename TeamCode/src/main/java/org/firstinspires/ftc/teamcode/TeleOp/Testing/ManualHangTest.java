@@ -27,6 +27,11 @@ public class ManualHangTest extends OpMode {
     }
 
     @Override
+    public void start() {
+        hang.setHangState(0);
+    }
+
+    @Override
     public void loop() {
         previousGamepad1.copy(currentGamepad1);
         previousGamepad2.copy(currentGamepad2);
@@ -38,8 +43,8 @@ public class ManualHangTest extends OpMode {
         // failed wheely tilt, reset button
         if (currentGamepad2.b && !previousGamepad2.b) {
             //undo wheely
+            hang.setHangState(-1);
         }
-        hang.setHangState(0);
         mecanum.operateHang();
 
 //        hang.operateSetPos();

@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 import org.firstinspires.ftc.teamcode.Subsystem.Mecanum;
 import org.firstinspires.ftc.teamcode.Subsystem.ExtendingOuttake;
 import org.firstinspires.ftc.teamcode.Subsystem.VerticalSlides;
+import org.firstinspires.ftc.teamcode.Util.LEDManager;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class FullTeleOpCopy extends OpMode {
     HorizontalSlides horizontalSlides = new HorizontalSlides();
     ExtendingOuttake outtake = new ExtendingOuttake();
     Intake intake = new Intake();
+    LEDManager blinkinLED = new LEDManager();
 //    Hang hang = new Hang();
 
     // booleans
@@ -41,7 +43,6 @@ public class FullTeleOpCopy extends OpMode {
     boolean redAlliance = true;
     boolean sampleMode = true;
     Intake.IntakeChamberState COLOR_TO_REJECT;
-
 
     // Action stuff
     private FtcDashboard dash = FtcDashboard.getInstance();
@@ -72,6 +73,7 @@ public class FullTeleOpCopy extends OpMode {
         horizontalSlides.initialize(this, robotHardware, false);
         outtake.initialize(this, robotHardware);
         intake.initialize(this, robotHardware);
+        blinkinLED.initialize(this, robotHardware);
 //        hang.initialize(this, robotHardware);
 
         // bulk cache reading
@@ -133,10 +135,13 @@ public class FullTeleOpCopy extends OpMode {
         runningActions = newActions;
 
         /// loops
-        drive.operateTeleOp();
-        verticalSlides.operate();
+        if (true) { // TODO: once hang ready to implement, hang state here
+            drive.operateTeleOp();
+            verticalSlides.operate();
+        }
         horizontalSlides.operate();
         intake.operateColorChecking();
+        blinkinLED.operate(intake.chamberState);
 
         /// updating booleans
         COLOR_TO_REJECT = (redAlliance ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
@@ -267,9 +272,9 @@ public class FullTeleOpCopy extends OpMode {
                         new SleepAction(0.1),
                         new InstantAction(() -> intake.setIntake(0)),
                         new InstantAction(() -> verticalSlides.raiseToHighBucket()),
-                        new SleepAction(0.3),
+                        new SleepAction(0.2),
                         new InstantAction(() -> outtake.toVert()),
-                        new SleepAction(0.5), // TODO: tune this based on extension speed 0.3+0.5, probably only change 0.5
+                        new SleepAction(0.6), // TODO: tune this based on extension speed 0.3+0.5, probably only change 0.5
                         new InstantAction(() -> outtake.toScoreBucket())
                 ));
             }

@@ -160,12 +160,16 @@ public class Hang {
 
     public void operate(Gamepad currentGamepad1, Gamepad currentGamepad2, Gamepad previousGamepad1, Gamepad previousGamepad2) {
         updateSequenceState(currentGamepad1,currentGamepad2, previousGamepad1, previousGamepad2);
-
+        // drive loop separate file: Mecanum.java line 107
         opmode.telemetry.addData("hangState: ", hangState);
     }
 
     public void updateSequenceState(Gamepad currentGamepad1, Gamepad currentGamepad2, Gamepad previousGamepad1, Gamepad previousGamepad2) {
         switch (hangState) {
+            case -1:
+                // reset if driver failed wheely
+                stowWheely();
+                setHangState(0);
             case 0: /// set motor modes, arm pos, and start wheely (the servos strain a lot, so move quickly)
                 if (currentGamepad2.a && !previousGamepad2.a) {
                     // motors all in modes
