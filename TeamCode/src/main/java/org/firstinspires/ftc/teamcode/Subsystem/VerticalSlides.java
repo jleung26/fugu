@@ -19,12 +19,12 @@ public class VerticalSlides {
     private DcMotorEx leftSlideMotor, rightSlideMotor;
 
     // constants
-    public static double Kp = 0.03;
+    public static double Kp = 0.0075;
     public static double Ki = 0;
     public static double Kd = 0.0001;
-    public static double Kg = 0.5;
+    public static double Kg = 0.33;
     public static double CACHING_THRESHOLD = 0.005;
-    public static double RETRACTED_THRESHOLD = 35;
+    public static double RETRACTED_THRESHOLD = 50;
     public static int UPPER_LIMIT = 1080; // this is for 1150s
     public static int LOWER_LIMIT = -2;
 

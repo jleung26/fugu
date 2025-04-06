@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Subsystem;
 
-import android.graphics.Color;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -10,8 +8,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
-
-import java.util.Locale;
 
 @Config
 public class Intake {
@@ -31,13 +27,13 @@ public class Intake {
     public enum IntakeState {
         INTAKING,
         REVERSE,
-        NEUTRAL
+        IDLE
     }
 
     // motor constants
     public static double INTAKING_POWER = 0.6;
     public static double REVERSE_POWER = -0.6;
-    public static double NEUTRAL_POWER = 0.12;
+    public static double IDLE_POWER = 0.1;
 
     // wrist constants // wrists synchronized :)
     public static double TRANSFER_POS = 0.087;
@@ -51,7 +47,7 @@ public class Intake {
     // constantly updating states
     public volatile IntakeChamberState chamberState = IntakeChamberState.EMPTY;
     public volatile IntakeChamberState prevChamberState = IntakeChamberState.EMPTY;
-    public volatile IntakeState intakeState = IntakeState.NEUTRAL;
+    public volatile IntakeState intakeState = IntakeState.IDLE;
     public volatile boolean wristFlippedUp = true;
 
     public void initialize(OpMode opmode, RobotHardware robotHardware) {
@@ -76,7 +72,7 @@ public class Intake {
         if (opmode.gamepad1.a) {
             intake();
         } else if (opmode.gamepad1.b) {
-            neutral();
+            idle();
         } else if (opmode.gamepad1.y) {
             reverse();
         }
@@ -108,8 +104,8 @@ public class Intake {
 //        } else if (chamberState != IntakeChamberState.EMPTY) {
 //            if (chamberState == (rejectBlue ? IntakeChamberState.BLUE : IntakeChamberState.RED) && intakeState != IntakeState.REVERSE) {
 //                reverse();
-//            } else if ((chamberState == (rejectBlue ? IntakeChamberState.RED : IntakeChamberState.BLUE) || chamberState == IntakeChamberState.YELLOW) && intakeState != IntakeState.NEUTRAL) {
-//                neutral();
+//            } else if ((chamberState == (rejectBlue ? IntakeChamberState.RED : IntakeChamberState.BLUE) || chamberState == IntakeChamberState.YELLOW) && intakeState != IntakeState.IDLE) {
+//                idle();
 //            }
 //        }
 
@@ -129,13 +125,13 @@ public class Intake {
         setIntake(REVERSE_POWER);
         intakeState = IntakeState.REVERSE;
     }
-    public void neutral() {
-        setIntake(NEUTRAL_POWER);
-        intakeState = IntakeState.NEUTRAL;
+    public void idle() {
+        setIntake(IDLE_POWER);
+        intakeState = IntakeState.IDLE;
     }
     public void fullStop() {
         setIntake(0);
-        intakeState = IntakeState.NEUTRAL;
+        intakeState = IntakeState.IDLE;
     }
 
     // wrist methods

@@ -464,7 +464,7 @@ public class FourSample extends OpMode {
         runningActions.add(new SequentialAction(
                 new InstantAction(() -> horizontalSlides.retract()),
                 new InstantAction(() -> intake.flipUp()),
-                new InstantAction(() -> intake.neutral())
+                new InstantAction(() -> intake.idle())
         ));
     }
 

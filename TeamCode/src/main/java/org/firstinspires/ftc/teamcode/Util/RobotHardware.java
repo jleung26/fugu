@@ -92,6 +92,7 @@ public class RobotHardware {
         leftVertMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         rightVertMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         horiMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         leftVertMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         rightVertMotor.setDirection(DcMotorSimple.Direction.FORWARD);

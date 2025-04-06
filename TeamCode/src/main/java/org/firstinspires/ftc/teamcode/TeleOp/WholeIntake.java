@@ -123,7 +123,7 @@ public class WholeIntake extends OpMode {
         Intake.IntakeChamberState COLOR_TO_REJECT = (rejectBlue ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
 
         // intake and transfer logic
-        if (intake.intakeState == Intake.IntakeState.NEUTRAL) {
+        if (intake.intakeState == Intake.IntakeState.IDLE) {
             if (intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                 if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
                     // start intaking
@@ -144,11 +144,11 @@ public class WholeIntake extends OpMode {
                     ));
                 }
             } else if (intake.chamberState == COLOR_TO_REJECT) { // this case shouldn't ever be reached; wrong color should have been rejecting whilst intaking
-                // reverse, then go back to neutral
+                // reverse, then go back to idle
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> intake.reverse()),
                         new SleepAction(0.2),
-                        new InstantAction(() -> intake.neutral())
+                        new InstantAction(() -> intake.idle())
                 ));
             }
         } else if (intake.intakeState == Intake.IntakeState.INTAKING) {
@@ -158,14 +158,14 @@ public class WholeIntake extends OpMode {
                     // flip up stop intaking
                     runningActions.add(new SequentialAction(
                             new InstantAction(() -> intake.flipUp()),
-                            new InstantAction(() -> intake.neutral())
+                            new InstantAction(() -> intake.idle())
                     ));
                 }
             } else if (intake.chamberState != COLOR_TO_REJECT) {
                 // yay grabbed correct color sample, can stow now
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> intake.flipUp()),
-                        new InstantAction(() -> intake.neutral())
+                        new InstantAction(() -> intake.idle())
                 ));
             } else if (intake.chamberState == COLOR_TO_REJECT && intake.prevChamberState == COLOR_TO_REJECT) {
                 // reverse and go back to intaking
@@ -183,7 +183,7 @@ public class WholeIntake extends OpMode {
 
             // stop reversing when no more sample
             if (intake.wristFlippedUp && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
-                runningActions.add( new InstantAction(() -> intake.neutral()) );
+                runningActions.add( new InstantAction(() -> intake.idle()) );
             } else if (!intake.wristFlippedUp && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> intake.dropDown()),

@@ -7,7 +7,6 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
@@ -588,7 +587,7 @@ public class FiveSpecIntakeOnly extends OpMode {
     public void flipUpAction() {
         runningActions.add(new ParallelAction(
                 new InstantAction(() -> intake.flipUp()),
-                new InstantAction(() -> intake.neutral())
+                new InstantAction(() -> intake.idle())
         ));
     }
 

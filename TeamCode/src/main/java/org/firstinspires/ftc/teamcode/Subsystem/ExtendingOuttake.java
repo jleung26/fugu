@@ -234,7 +234,7 @@ public class ExtendingOuttake {
     public void toVert() {
         armExtend.extendToGrabClip();
         armPitch.setArmVert();
-    } // to vertical (claw facing straight up) "neutral" position (only really intermediate for bucket scoring)
+    } // to vertical (claw facing straight up) "idle" position (only really intermediate for bucket scoring)
 
     public void closeClawTight() { claw.closeTight(); }
     public void closeClawLoose() { claw.closeLoose(); }

@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 import java.util.ArrayList;
 import java.util.List;
 
-@TeleOp(group = "A")
+@TeleOp(name = "Full TeleOp FINAL", group = "A")
 public class FullTeleOpCopy extends OpMode {
     // subsystems
     RobotHardware robotHardware = new RobotHardware();
@@ -149,7 +149,7 @@ public class FullTeleOpCopy extends OpMode {
         }
 
         /// intake and transfer logic
-        if (intake.intakeState == Intake.IntakeState.NEUTRAL) {
+        if (intake.intakeState == Intake.IntakeState.IDLE) {
             if (intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                 if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
                     // start intaking
@@ -173,14 +173,15 @@ public class FullTeleOpCopy extends OpMode {
                     // flip up stop intaking
                     runningActions.add(new SequentialAction(
                             new InstantAction(() -> intake.flipUp()),
-                            new InstantAction(() -> intake.neutral())
+                            new InstantAction(() -> intake.idle())
                     ));
                 }
             } else if (intake.chamberState != COLOR_TO_REJECT) {
                 // yay grabbed correct color sample, can stow now
+                gamepad1.rumble(150); /// rumble
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> intake.flipUp()),
-                        new InstantAction(() -> intake.neutral())
+                        new InstantAction(() -> intake.idle())
                 ));
             } else if (intake.chamberState == COLOR_TO_REJECT && intake.prevChamberState == COLOR_TO_REJECT) {
                 // reverse and go back to intaking
@@ -196,7 +197,7 @@ public class FullTeleOpCopy extends OpMode {
         } else if (intake.intakeState == Intake.IntakeState.REVERSE) {
             // stop reversing when no more sample
             if (intake.wristFlippedUp && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
-                runningActions.add( new InstantAction(() -> intake.neutral()) );
+                runningActions.add( new InstantAction(() -> intake.idle()) );
             } else if (!intake.wristFlippedUp && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> intake.dropDown()),
@@ -274,6 +275,7 @@ public class FullTeleOpCopy extends OpMode {
             }
             else if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                 // flip over to grab clip
+                drive.setTargetToCurrentHeading(); // change angle lock
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> verticalSlides.retract()),
                         new InstantAction(() -> outtake.openClaw()),
@@ -287,7 +289,7 @@ public class FullTeleOpCopy extends OpMode {
             runningActions.add(new SequentialAction(
                     new ParallelAction(
                             new InstantAction(() -> intake.flipUp()),
-                            new InstantAction(() -> intake.neutral()),
+                            new InstantAction(() -> intake.idle()),
                             new InstantAction(()-> outtake.toStow()),
                             new InstantAction(()-> outtake.openClaw())
                     ),

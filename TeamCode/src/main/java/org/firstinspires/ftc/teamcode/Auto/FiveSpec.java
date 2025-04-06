@@ -607,7 +607,7 @@ public class FiveSpec extends OpMode {
     public void flipUpAction() {
         runningActions.add(new ParallelAction(
                 new InstantAction(() -> intake.flipUp()),
-                new InstantAction(() -> intake.neutral()),
+                new InstantAction(() -> intake.idle()),
                 new InstantAction(() -> horizontalSlides.extendPartial())
         ));
     }
