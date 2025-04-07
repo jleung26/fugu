@@ -23,7 +23,7 @@ public class HorizontalSlides {
     public static double RETRACTED_THRESHOLD = 50;
     public static int UPPER_LIMIT = 1100; // this is for 1150s
     public static int LOWER_LIMIT = -2;
-    public static double MAPPING_EXPONENT = 0.5;
+    public static double MAPPING_EXPONENT = 0.5; // TODO: tune w
 
     // encoder positions
     public static double extendedPos = 1000;

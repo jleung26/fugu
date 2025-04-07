@@ -106,7 +106,6 @@ public class RobotHardware {
         rightPtoServo.setDirection(Servo.Direction.REVERSE);
         leftWheelyServo.setDirection(Servo.Direction.REVERSE);
 
-        // TODO: offsets, directions (not actually necessary)
         odo.setOffsets(-55.984, -89.815);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.FORWARD);

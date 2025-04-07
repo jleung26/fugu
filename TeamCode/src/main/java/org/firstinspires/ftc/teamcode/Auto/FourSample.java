@@ -177,7 +177,6 @@ public class FourSample extends OpMode {
                 }
                 break;
             case 2:
-                // TODO: follower gets stuck here usually, maybe just a goofy pathing thing
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
                 if(!follower.isBusy()) {
                     /* Grab Sample */
@@ -206,7 +205,7 @@ public class FourSample extends OpMode {
                 }
                 break;
             case 1000:
-                if (!follower.isBusy() && verticalSlides.atTarget && outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_BUCKET) {
+                if (!follower.isBusy() && verticalSlides.atTarget) {
                     depositSampleAction();
                     setPathState(991);
                 }
@@ -302,8 +301,6 @@ public class FourSample extends OpMode {
                 if(!follower.isBusy()) {
                     /** Level 1 Ascent */
                     // TODO: find a pose where the arm won't be out of servo range after teleop start
-                    //       or if we're feeling frisky, we try grabbing another sample to-go for teleop
-                    //       if we're feeling crazy, we try a 5/6 sample auto
 
                     /* Set the state to a case we won't use or define, so it just stops running an new paths */
                     setPathState(-1);
@@ -427,22 +424,22 @@ public class FourSample extends OpMode {
                 new InstantAction(() -> intake.setIntake(0.4)), // push sample all the way in, kinda jank, maybe not necessary
                 new InstantAction(() -> outtake.toTransfer()),
                 new SleepAction(0.2), // TODO: play around with timings
-                new InstantAction(() -> outtake.closeClawLoose()), // TODO: might switch back to tight claw
+                new InstantAction(() -> outtake.closeClawTight()),
                 new SleepAction(0.3),
                 new InstantAction(() -> outtake.toStow()),
                 new SleepAction(0.1),
                 new InstantAction(() -> intake.setIntake(0)),
                 new InstantAction(() -> verticalSlides.raiseToHighBucket()),
                 new SleepAction(0.3),
-                new InstantAction(() -> outtake.toVert()),
-                new SleepAction(0.5), // TODO: tune this based on extension speed 0.3+0.5, probably only to lower 0.5
-                new InstantAction(() -> outtake.toScoreBucket())
+                new InstantAction(() -> outtake.toVert())
         ));
     }
 
     public void depositSampleAction() {
         // deposit in bucket, then retract all
         runningActions.add(new SequentialAction(
+                new InstantAction(() -> outtake.toScoreBucket()),
+                new SleepAction(0.3), // TODO: tune this based on extension speed 0.3+0.5, probably only to lower 0.5
                 new InstantAction(() -> outtake.openClaw()),
                 new SleepAction(0.2),
                 new ParallelAction(

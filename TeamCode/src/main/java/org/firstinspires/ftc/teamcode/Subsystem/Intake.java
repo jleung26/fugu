@@ -97,17 +97,6 @@ public class Intake {
     public void operateColorChecking() {
         prevChamberState = chamberState;
         chamberState = getPieceColor();
-//        // if empty, start intaking (only once instead of once every loop)
-//        if (chamberState == IntakeChamberState.EMPTY && intakeState != IntakeState.INTAKING) {
-//            intake();
-//            // if chamber full, check color and reverse once, and another statement will eventually set back to intaking
-//        } else if (chamberState != IntakeChamberState.EMPTY) {
-//            if (chamberState == (rejectBlue ? IntakeChamberState.BLUE : IntakeChamberState.RED) && intakeState != IntakeState.REVERSE) {
-//                reverse();
-//            } else if ((chamberState == (rejectBlue ? IntakeChamberState.RED : IntakeChamberState.BLUE) || chamberState == IntakeChamberState.YELLOW) && intakeState != IntakeState.IDLE) {
-//                idle();
-//            }
-//        }
 
         opmode.telemetry.addData("chamber color enum: ", chamberState);
 //        opmode.telemetry.addData("intake state enum: ", intakeState);
