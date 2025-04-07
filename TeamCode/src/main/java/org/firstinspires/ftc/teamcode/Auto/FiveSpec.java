@@ -380,7 +380,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 16:
-                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP || !verticalSlides.slidesRetracted) {
                     // grabbed, drive to score
                     follower.setMaxPower(1);
                     follower.followPath(score1, true);
@@ -410,7 +410,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 20:
-                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP || !verticalSlides.slidesRetracted) {
                     follower.setMaxPower(1);
                     follower.followPath(score2, true);
                     setPathState(21);
@@ -436,7 +436,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 24:
-                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP || !verticalSlides.slidesRetracted) {
                     follower.setMaxPower(1);
                     follower.followPath(score3, true);
                     setPathState(25);
@@ -462,7 +462,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 28:
-                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
+                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP || !verticalSlides.slidesRetracted) {
                     follower.setMaxPower(1);
                     follower.followPath(score3, true);
                     setPathState(29);

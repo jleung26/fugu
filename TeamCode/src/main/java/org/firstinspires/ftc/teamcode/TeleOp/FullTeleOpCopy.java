@@ -217,11 +217,10 @@ public class FullTeleOpCopy extends OpMode {
                 // deposit in bucket, then retract all
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> outtake.openClaw()),
-                        new SleepAction(0.2),
-                        new ParallelAction(
-                                new InstantAction(() -> outtake.toStow()),
-                                new InstantAction(() -> verticalSlides.retract())
-                        )
+                        new SleepAction(0.3),
+                        new InstantAction(() -> outtake.toStow()),
+                        new SleepAction(1),
+                        new InstantAction(() -> verticalSlides.retract())
                 ));
             }
         } else if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
@@ -255,7 +254,7 @@ public class FullTeleOpCopy extends OpMode {
                         new InstantAction(() -> verticalSlides.raiseToPrepClip()),
                         new SleepAction(0.25),
                         new InstantAction(() -> outtake.armPitch.setArmScoreClip()), // decompose into two movements to add delay
-                        new SleepAction(0.4),
+                        new SleepAction(0.4), // TODO: tune delay
                         new InstantAction(() -> outtake.armExtend.extendToScoreClip())
                 ));
             }
