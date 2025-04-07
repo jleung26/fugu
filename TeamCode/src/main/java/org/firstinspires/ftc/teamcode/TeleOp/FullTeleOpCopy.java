@@ -180,7 +180,7 @@ public class FullTeleOpCopy extends OpMode {
                 }
             } else if (intake.chamberState != COLOR_TO_REJECT) {
                 // yay grabbed correct color sample, can stow now
-                gamepad1.rumble(150); /// rumble
+                gamepad1.rumble(500); /// rumble
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> intake.flipUp()),
                         new InstantAction(() -> intake.idle())
