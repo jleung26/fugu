@@ -26,8 +26,8 @@ public class HorizontalSlides {
     public static double MAPPING_EXPONENT = 0.7; // TODO: tune
 
     // encoder positions
-    public static double extendedPos = 1000;
-    public static double halfExtendedPos = 600; // 50% of full extension
+    public static double extendedPos = 880;
+    public static double halfExtendedPos = 440; // 50% of full extension
     public static double retractedPos = 0;
 
     // declaring variables for later modification
