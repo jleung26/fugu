@@ -122,7 +122,7 @@ public class ExtendingOuttake {
         public Servo extenderServo;
         public boolean isExtenderTransferring = true;
         private final double extenderStowPosition = 0.363;
-        private final double extenderTransferPosition = 0.8;
+        private final double extenderTransferPosition = 0.87;
         private final double extenderScoreBucketPosition = 0.98;
         private final double extenderScoreClipPosition = 0.95;
         private final double extenderGrabClipWallPosition = 0.3378;

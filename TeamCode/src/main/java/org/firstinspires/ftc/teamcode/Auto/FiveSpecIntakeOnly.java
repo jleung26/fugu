@@ -77,25 +77,25 @@ public class FiveSpecIntakeOnly extends OpMode {
     private final Pose startPose = new Pose(6.95, 65, Math.toRadians(0));
 
     /** Scoring Pose for Preloaded Spec */
-    private final Pose score0Pose = new Pose(42, 72, Math.toRadians(0));
+    private final Pose score0Pose = new Pose(36, 72, Math.toRadians(0));
 
     /** Intermediate pose so robot doesn't bang into sub */
     private final Pose intake1ControlPose = new Pose(24, 58, Math.toRadians(290));
 
     /** Intake First Sample from the Spike Mark */
-    private final Pose intake1Pose = new Pose(24, 44, Math.toRadians(317));
+    private final Pose intake1Pose = new Pose(24, 46, Math.toRadians(317));
 
     /** Spit out First Sample */
     private final Pose eject1Pose = new Pose(24, 42, Math.toRadians(230));
 
     /** Intake Second Sample from the Spike Mark */
-    private final Pose intake2Pose = new Pose(24, 38, Math.toRadians(318));
+    private final Pose intake2Pose = new Pose(24, 36, Math.toRadians(318));
 
     /** Spit out Second Sample */
     private final Pose eject2Pose = new Pose(24, 35, Math.toRadians(230));
 
     /** Intake Third Sample from the Spike Mark */
-    private final Pose intake3Pose = new Pose(28, 26, Math.toRadians(310));
+    private final Pose intake3Pose = new Pose(28, 30, Math.toRadians(305));
 
     /** Spit out Third Sample */
     private final Pose eject3Pose = new Pose(24, 33, Math.toRadians(230));
@@ -154,7 +154,6 @@ public class FiveSpecIntakeOnly extends OpMode {
         eject1 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(intake1Pose), new Point(eject1Pose)))
                 .setLinearHeadingInterpolation(intake1Pose.getHeading(), eject1Pose.getHeading())
-                .setPathEndTimeoutConstraint(0)
                 .build();
 
         intake2 = follower.pathBuilder()
@@ -165,7 +164,6 @@ public class FiveSpecIntakeOnly extends OpMode {
         eject2 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(intake2Pose), new Point(eject2Pose)))
                 .setLinearHeadingInterpolation(intake2Pose.getHeading(), eject2Pose.getHeading())
-                .setPathEndTimeoutConstraint(0)
                 .build();
 
         intake3 = follower.pathBuilder()
@@ -176,7 +174,6 @@ public class FiveSpecIntakeOnly extends OpMode {
         eject3 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(intake3Pose), new Point(eject3Pose)))
                 .setLinearHeadingInterpolation(intake3Pose.getHeading(), eject3Pose.getHeading())
-                .setPathEndTimeoutConstraint(0)
                 .build();
 
         grab1 = follower.pathBuilder()
