@@ -190,11 +190,9 @@ public class SubIntakeTest extends OpMode {
             case 0:
                 subIntakeAction();
                 if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-                    retractIntakeAction();
-                    follower.followPath(scoreFrom1, true);
                     setPathState(13);
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > 1) {
+                else if (pathTimer.getElapsedTimeSeconds() > 2) {
                     retractIntakeAction();
                     follower.followPath(sub2, true);
                     setPathState(2);
@@ -204,11 +202,9 @@ public class SubIntakeTest extends OpMode {
                 if (!follower.isBusy()) {
                     subIntakeAction();
                     if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-                        retractIntakeAction();
-                        follower.followPath(scoreFrom2, true);
-                        setPathState(13);
+                        setPathState(14);
                     }
-                    else if (pathTimer.getElapsedTimeSeconds() > 1) {
+                    else if (pathTimer.getElapsedTimeSeconds() > 2) {
                         retractIntakeAction();
                         follower.followPath(sub3, true);
                         setPathState(3);
@@ -219,11 +215,9 @@ public class SubIntakeTest extends OpMode {
                 if (!follower.isBusy()) {
                     subIntakeAction();
                     if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-                        retractIntakeAction();
-                        follower.followPath(scoreFrom3, true);
-                        setPathState(13);
+                        setPathState(15);
                     }
-                    else if (pathTimer.getElapsedTimeSeconds() > 1) {
+                    else if (pathTimer.getElapsedTimeSeconds() > 2) {
                         retractIntakeAction();
                         follower.followPath(repeatSub, true);
                         setPathState(1);
@@ -231,14 +225,25 @@ public class SubIntakeTest extends OpMode {
                 }
                 break;
             case 13:
+                retractIntakeAction();
+                follower.followPath(scoreFrom1);
                 if(!follower.isBusy()) {
-                    /** Level 1 Ascent */
-                    // TODO: find a pose where the arm won't be out of servo range after teleop start
-
-                    /* Set the state to a case we won't use or define, so it just stops running an new paths */
                     setPathState(-1);
                 }
                 break;
+            case 14:
+                retractIntakeAction();
+                follower.followPath(scoreFrom2);
+                if (!follower.isBusy()) {
+                    setPathState(-1);
+                }
+                break;
+            case 15:
+                retractIntakeAction();
+                follower.followPath(scoreFrom3);
+                if (!follower.isBusy()) {
+                    setPathState(-1);
+                }
         }
     }
 
