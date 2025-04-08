@@ -190,57 +190,58 @@ public class SubIntakeTest extends OpMode {
             case 0:
                 subIntakeAction();
                 if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                    retractIntakeAction();
                     setPathState(13);
                 }
                 else if (pathTimer.getElapsedTimeSeconds() > 2) {
                     retractIntakeAction();
-                    follower.followPath(sub2, true);
                     setPathState(2);
                 }
                 break;
             case 2:
-                if (!follower.isBusy()) {
-                    subIntakeAction();
-                    if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-                        setPathState(14);
-                    }
-                    else if (pathTimer.getElapsedTimeSeconds() > 2) {
-                        retractIntakeAction();
-                        follower.followPath(sub3, true);
-                        setPathState(3);
-                    }
-                }
-                break;
+                follower.followPath(sub2, true);
+                setPathState(3);
             case 3:
                 if (!follower.isBusy()) {
                     subIntakeAction();
                     if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-                        setPathState(15);
+                        retractIntakeAction();
+                        setPathState(14);
                     }
                     else if (pathTimer.getElapsedTimeSeconds() > 2) {
                         retractIntakeAction();
-                        follower.followPath(repeatSub, true);
-                        setPathState(1);
+                        setPathState(4);
+                    }
+                }
+                break;
+            case 4:
+                follower.followPath(sub3, true);
+                setPathState(5);
+            case 5:
+                if (!follower.isBusy()) {
+                    subIntakeAction();
+                    if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                        retractIntakeAction();
+                        setPathState(15);
+                    }
+                    else if (pathTimer.getElapsedTimeSeconds() > 2) {
+                        setPathState(-1);
                     }
                 }
                 break;
             case 13:
-                retractIntakeAction();
-                follower.followPath(scoreFrom1);
-                if(!follower.isBusy()) {
-                    setPathState(-1);
-                }
+                follower.followPath(scoreFrom1, true);
+                setPathState(16);
                 break;
             case 14:
-                retractIntakeAction();
-                follower.followPath(scoreFrom2);
-                if (!follower.isBusy()) {
-                    setPathState(-1);
-                }
+                follower.followPath(scoreFrom2, true);
+                setPathState(16);
                 break;
             case 15:
-                retractIntakeAction();
-                follower.followPath(scoreFrom3);
+                follower.followPath(scoreFrom3, true);
+                setPathState(16);
+                break;
+            case 16:
                 if (!follower.isBusy()) {
                     setPathState(-1);
                 }
@@ -392,7 +393,6 @@ public class SubIntakeTest extends OpMode {
                 new InstantAction(() -> horizontalSlides.extendPartial()),
                 new InstantAction(() -> intake.dropDown()),
                 new InstantAction(() -> intake.intake()),
-                new SleepAction(0.5),
                 new InstantAction(() -> horizontalSlides.extend())
         ));
     }

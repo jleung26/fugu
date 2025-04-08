@@ -75,25 +75,25 @@ public class FiveSpec extends OpMode {
     private final Pose intake1ControlPose = new Pose(24, 58, Math.toRadians(290));
 
     /** Intake First Sample from the Spike Mark */
-    private final Pose intake1Pose = new Pose(24, 46, Math.toRadians(317));
+    private final Pose intake1Pose = new Pose(26, 44, Math.toRadians(317));
 
     /** Spit out First Sample */
-    private final Pose eject1Pose = new Pose(24, 42, Math.toRadians(240));
+    private final Pose eject1Pose = new Pose(24, 42, Math.toRadians(230));
 
     /** Intake Second Sample from the Spike Mark */
     private final Pose intake2Pose = new Pose(24, 36, Math.toRadians(318));
 
     /** Spit out Second Sample */
-    private final Pose eject2Pose = new Pose(24, 35, Math.toRadians(240));
+    private final Pose eject2Pose = new Pose(24, 35, Math.toRadians(230));
 
     /** Intake Third Sample from the Spike Mark */
-    private final Pose intake3Pose = new Pose(28, 30, Math.toRadians(305));
+    private final Pose intake3Pose = new Pose(24, 26, Math.toRadians(314));
 
     /** Spit out Third Sample */
-    private final Pose eject3Pose = new Pose(24, 33, Math.toRadians(240));
+    private final Pose eject3Pose = new Pose(24, 33, Math.toRadians(230));
 
     /** Pick up from wall, reusable */
-    private final Pose pickupWallPose = new Pose(6.95, 35, Math.toRadians(0));
+    private final Pose pickupWallPose = new Pose(9, 35, Math.toRadians(0));
 
     private final Pose pickupWall1ControlPose = new Pose(12, 35, Math.toRadians(0));
 
@@ -105,16 +105,16 @@ public class FiveSpec extends OpMode {
     // might use a second, third, fourth control point for pathing,
 
     /** Score 2nd sample (sample index 1) */
-    private final Pose score1Pose = new Pose(40, 62, Math.toRadians(0));
+    private final Pose score1Pose = new Pose(38, 66, Math.toRadians(0));
 
     /** Score 3rd sample (sample index 2) */
-    private final Pose score2Pose = new Pose(40, 62, Math.toRadians(0));
+    private final Pose score2Pose = new Pose(38, 66, Math.toRadians(0));
 
     /** Score 4th sample (sample index 3) */
-    private final Pose score3Pose = new Pose(40, 62, Math.toRadians(0));
+    private final Pose score3Pose = new Pose(38, 66, Math.toRadians(0));
 
     /** Score 5th sample (sample index 4) */
-    private final Pose score4Pose = new Pose(40, 62, Math.toRadians(0));
+    private final Pose score4Pose = new Pose(38, 66, Math.toRadians(0));
 
     /** Park Pose for our robot, after we do all of the scoring. */
     private final Pose parkPose = new Pose(6.95, 30, Math.toRadians(0));
@@ -187,62 +187,50 @@ public class FiveSpec extends OpMode {
                 .build();
 
         score1 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose1), new Point(scoreIntermediatePose)))
-                .setLinearHeadingInterpolation(pickupWallPose.getHeading(), scoreControlPose1.getHeading())
-                .setPathEndTimeoutConstraint(0)
-                .addPath(new BezierLine(new Point(scoreIntermediatePose), new Point(score1Pose)))
-                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), score1Pose.getHeading())
+                .addPath(new BezierLine(new Point(pickupWallPose), new Point(score1Pose)))
+                .setConstantHeadingInterpolation(score1Pose.getHeading())
                 .build();
 
         grab2 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(score1Pose), new Point(scoreIntermediatePose)))
-                .setLinearHeadingInterpolation(score1Pose.getHeading(), scoreIntermediatePose.getHeading())
+                .setConstantHeadingInterpolation(scoreIntermediatePose.getHeading())
                 .setPathEndTimeoutConstraint(0)
                 .addPath(new BezierCurve(new Point(scoreIntermediatePose), new Point(scoreControlPose1), new Point(pickupWallPose)))
-                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), pickupWallPose.getHeading())
+                .setTangentHeadingInterpolation()
                 .setReversed(true)
                 .build();
 
         score2 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose1), new Point(scoreIntermediatePose)))
-                .setLinearHeadingInterpolation(pickupWallPose.getHeading(), scoreControlPose1.getHeading())
-                .setPathEndTimeoutConstraint(0)
-                .addPath(new BezierLine(new Point(scoreIntermediatePose), new Point(score2Pose)))
-                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), score2Pose.getHeading())
+                .addPath(new BezierLine(new Point(pickupWallPose), new Point(score2Pose)))
+                .setConstantHeadingInterpolation(score2Pose.getHeading())
                 .build();
 
         grab3 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(score2Pose), new Point(scoreIntermediatePose)))
-                .setLinearHeadingInterpolation(score2Pose.getHeading(), scoreIntermediatePose.getHeading())
+                .setConstantHeadingInterpolation(scoreIntermediatePose.getHeading())
                 .setPathEndTimeoutConstraint(0)
                 .addPath(new BezierCurve(new Point(scoreIntermediatePose), new Point(scoreControlPose1), new Point(pickupWallPose)))
-                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), pickupWallPose.getHeading())
+                .setTangentHeadingInterpolation()
                 .setReversed(true)
                 .build();
 
         score3 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose1), new Point(scoreIntermediatePose)))
-                .setLinearHeadingInterpolation(pickupWallPose.getHeading(), scoreControlPose1.getHeading())
-                .setPathEndTimeoutConstraint(0)
-                .addPath(new BezierLine(new Point(scoreIntermediatePose), new Point(score3Pose)))
-                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), score3Pose.getHeading())
+                .addPath(new BezierLine(new Point(pickupWallPose), new Point(score3Pose)))
+                .setConstantHeadingInterpolation(score3Pose.getHeading())
                 .build();
 
         grab4 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(score3Pose), new Point(scoreIntermediatePose)))
-                .setLinearHeadingInterpolation(score3Pose.getHeading(), scoreIntermediatePose.getHeading())
+                .addPath(new BezierLine(new Point(score1Pose), new Point(scoreIntermediatePose)))
+                .setConstantHeadingInterpolation(scoreIntermediatePose.getHeading())
                 .setPathEndTimeoutConstraint(0)
                 .addPath(new BezierCurve(new Point(scoreIntermediatePose), new Point(scoreControlPose1), new Point(pickupWallPose)))
-                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), pickupWallPose.getHeading())
+                .setTangentHeadingInterpolation()
                 .setReversed(true)
                 .build();
 
         score4 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose1), new Point(scoreIntermediatePose)))
-                .setLinearHeadingInterpolation(pickupWallPose.getHeading(), scoreControlPose1.getHeading())
-                .setPathEndTimeoutConstraint(0)
-                .addPath(new BezierLine(new Point(scoreIntermediatePose), new Point(score4Pose)))
-                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), score4Pose.getHeading())
+                .addPath(new BezierLine(new Point(pickupWallPose), new Point(score4Pose)))
+                .setConstantHeadingInterpolation(score4Pose.getHeading())
                 .build();
 
         park = follower.pathBuilder()
@@ -360,7 +348,6 @@ public class FiveSpec extends OpMode {
                 if (intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                     // drive over and prep to grab
                     retractIntakeAction();
-                    follower.setMaxPower(0.7);
                     follower.followPath(grab1, true);
                     setPathState(15);
                 }
@@ -375,7 +362,6 @@ public class FiveSpec extends OpMode {
             case 16:
                 if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP || !verticalSlides.slidesRetracted) {
                     // grabbed, drive to score
-                    follower.setMaxPower(1);
                     follower.followPath(score1, true);
                     setPathState(17);
                 }
@@ -390,7 +376,6 @@ public class FiveSpec extends OpMode {
             case 18:
                 if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
                     // drive to grab another once done with slam
-                    follower.setMaxPower(0.8); // slower so human player can react
                     follower.followPath(grab2, true);
                     setPathState(19);
                 }
@@ -404,7 +389,6 @@ public class FiveSpec extends OpMode {
                 break;
             case 20:
                 if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP || !verticalSlides.slidesRetracted) {
-                    follower.setMaxPower(1);
                     follower.followPath(score2, true);
                     setPathState(21);
                 }
@@ -417,7 +401,6 @@ public class FiveSpec extends OpMode {
                 break;
             case 22:
                 if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
-                    follower.setMaxPower(0.8);
                     follower.followPath(grab3, true);
                     setPathState(23);
                 }
@@ -430,7 +413,6 @@ public class FiveSpec extends OpMode {
                 break;
             case 24:
                 if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP || !verticalSlides.slidesRetracted) {
-                    follower.setMaxPower(1);
                     follower.followPath(score3, true);
                     setPathState(25);
                 }
@@ -443,7 +425,6 @@ public class FiveSpec extends OpMode {
                 break;
             case 26:
                 if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
-                    follower.setMaxPower(0.8);
                     follower.followPath(grab4, true);
                     setPathState(27);
                 }
@@ -456,7 +437,6 @@ public class FiveSpec extends OpMode {
                 break;
             case 28:
                 if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP || !verticalSlides.slidesRetracted) {
-                    follower.setMaxPower(1);
                     follower.followPath(score3, true);
                     setPathState(29);
                 }
@@ -506,7 +486,7 @@ public class FiveSpec extends OpMode {
 
         // ready to go
         outtake.closeClawTight();
-        outtake.toGrabClip();
+        outtake.toStow();
         intake.flipUp();
     }
 

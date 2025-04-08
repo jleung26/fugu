@@ -95,7 +95,7 @@ public class FiveSpecIntakeOnly extends OpMode {
     private final Pose eject2Pose = new Pose(24, 35, Math.toRadians(230));
 
     /** Intake Third Sample from the Spike Mark */
-    private final Pose intake3Pose = new Pose(24, 26, Math.toRadians(318));
+    private final Pose intake3Pose = new Pose(24, 26, Math.toRadians(310));
 
     /** Spit out Third Sample */
     private final Pose eject3Pose = new Pose(24, 33, Math.toRadians(230));
@@ -367,7 +367,6 @@ public class FiveSpecIntakeOnly extends OpMode {
                 if (intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                     // drive over and prep to grab
                     retractIntakeAction();
-                    follower.setMaxPower(0.7);
                     follower.followPath(grab1, true);
                     setPathState(15);
                 }
@@ -397,7 +396,6 @@ public class FiveSpecIntakeOnly extends OpMode {
 //            case 18:
 //                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
                     // drive to grab another once done with slam
-                    follower.setMaxPower(0.8); // slower so human player can react
                     follower.followPath(grab2, true);
                     setPathState(19);
                 }
@@ -411,7 +409,6 @@ public class FiveSpecIntakeOnly extends OpMode {
 //                break;
 //            case 20:
 //                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
-                    follower.setMaxPower(1);
                     follower.followPath(score2, true);
                     setPathState(21);
                 }
@@ -424,7 +421,6 @@ public class FiveSpecIntakeOnly extends OpMode {
 //                break;
 //            case 22:
 //                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
-                    follower.setMaxPower(0.8);
                     follower.followPath(grab3, true);
                     setPathState(23);
                 }
@@ -437,7 +433,6 @@ public class FiveSpecIntakeOnly extends OpMode {
 //                break;
 //            case 24:
 //                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
-                    follower.setMaxPower(1);
                     follower.followPath(score3, true);
                     setPathState(25);
                 }
@@ -450,7 +445,6 @@ public class FiveSpecIntakeOnly extends OpMode {
 //                break;
 //            case 26:
 //                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
-                    follower.setMaxPower(0.8);
                     follower.followPath(grab4, true);
                     setPathState(27);
                 }
@@ -463,7 +457,6 @@ public class FiveSpecIntakeOnly extends OpMode {
 //                break;
 //            case 28:
 //                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
-                    follower.setMaxPower(1);
                     follower.followPath(score3, true);
                     setPathState(29);
                 }
