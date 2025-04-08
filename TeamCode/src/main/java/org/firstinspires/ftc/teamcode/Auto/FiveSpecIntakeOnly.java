@@ -139,8 +139,6 @@ public class FiveSpecIntakeOnly extends OpMode {
     /** Build the paths for the auto (adds, for example, constant/linear headings while doing paths)
      * It is necessary to do this so that all the paths are built before the auto starts. **/
     public void buildPaths() {
-
-
         score0 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(startPose), new Point(score0Pose)))
                 .setLinearHeadingInterpolation(startPose.getHeading(), score0Pose.getHeading())
@@ -177,11 +175,11 @@ public class FiveSpecIntakeOnly extends OpMode {
                 .build();
 
         grab1 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(eject3Pose), new Point(eject3Pose))) // veiled turnTo
-                .setLinearHeadingInterpolation(eject3Pose.getHeading(), eject3Pose.getHeading())
-                .setPathEndTimeoutConstraint(0)
+//                .addPath(new BezierLine(new Point(eject3Pose), new Point(eject3Pose))) // veiled turnTo
+//                .setLinearHeadingInterpolation(eject3Pose.getHeading(), eject3Pose.getHeading())
+//                .setPathEndTimeoutConstraint(0)
                 .addPath(new BezierCurve(new Point(eject3Pose), new Point(pickupWall1ControlPose), new Point(pickupWallPose)))
-                .setConstantHeadingInterpolation(pickupWallPose.getHeading())
+                .setLinearHeadingInterpolation(eject3Pose.getHeading(), pickupWallPose.getHeading())
                 .build();
 
         score1 = follower.pathBuilder()
