@@ -216,9 +216,7 @@ public class FourSample extends OpMode {
 
                     follower.followPath(grabPickup2,true);
                     setPathState(5);
-                } else if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-                    setPathState(4); // try transfer again
-                }
+                } 
                 break;
             case 5:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
