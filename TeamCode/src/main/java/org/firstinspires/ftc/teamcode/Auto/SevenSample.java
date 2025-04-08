@@ -33,8 +33,8 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "4 Sample Final", group = "A", preselectTeleOp = "Full TeleOp FINAL")
-public class FourSample extends OpMode {
+@Autonomous(name = "7 Sample Draft", group = "A", preselectTeleOp = "Full TeleOp FINAL")
+public class SevenSample extends OpMode {
     // declaring subsystems
     RobotHardware robotHardware = new RobotHardware();
     VerticalSlides verticalSlides = new VerticalSlides();
@@ -84,18 +84,34 @@ public class FourSample extends OpMode {
     // back of bot towards bucket
 
     /** Bucket Scoring Pose */
-    private final Pose scorePose = new Pose(13, 130, Math.toRadians(315)); // TODO: tuned, but can make more optimal
+    private final Pose scorePose = new Pose(15, 129, Math.toRadians(315)); // TODO: tuned, but can make more optimal
 
     /** First Sample from the Spike Mark */
-    private final Pose pickup1Pose = new Pose(19, 126, Math.toRadians(0)); // TODO: tuned, but can make more optimal
+    private final Pose pickup1Pose = new Pose(16, 128, Math.toRadians(0)); // TODO: tuned, but can make more optimal
     // TODO: (e.g. with less movement from score, and turning instead) if need to save some time
     // old, very consistent pose, switch back if unable to tune new pos: 15, 128, Math.toRadians(0)
 
     /** Second Sample from the Spike Mark */
-    private final Pose pickup2Pose = new Pose(18, 132, Math.toRadians(0)); // tuned
+    private final Pose pickup2Pose = new Pose(16, 133, Math.toRadians(0)); // tuned
 
     /** Third Sample from the Spike Mark */
-    private final Pose pickup3Pose = new Pose(27, 122, Math.toRadians(55)); // tuned
+    private final Pose pickup3Pose = new Pose(25, 120, Math.toRadians(55)); // tuned
+
+    private final Pose grabFromSub1Pose = new Pose(62, 98, Math.toRadians(270));
+
+    private final Pose grabFromSub1BackupPose = new Pose(60, 98, Math.toRadians(260));
+
+    private final Pose wiggleInSub1Pose = new Pose(64, 100, Math.toRadians(270));
+
+    private final Pose wiggleInSub2Pose = new Pose(60, 98, Math.toRadians(270));
+
+    private final Pose grabFromSub2Pose = new Pose(62, 98, Math.toRadians(270));
+
+    private final Pose grabFromSub2BackupPose = new Pose(64, 100, Math.toRadians(300));
+
+    private final Pose grabFromSub3Pose = new Pose(62, 98, Math.toRadians(270));
+
+    private final Pose getGrabFromSub3BackupPose = new Pose(64, 100, Math.toRadians(315));
 
     /** Park Pose for our robot, after we do all of the scoring. */
     private final Pose parkPose = new Pose(62, 98, Math.toRadians(270)); // tuned
@@ -103,7 +119,7 @@ public class FourSample extends OpMode {
     private final Pose parkControlPose = new Pose(68, 110, Math.toRadians(999)/* heading unused*/); // done
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
-    private PathChain scorePreload, grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, park;
+    private PathChain scorePreload, grabPickup1, grabPickup2, grabPickup3, grabSubPickup4, grabSubPickup5, grabSubPickup6, scorePickup1, scorePickup2, scorePickup3, park;
 
 
     public void buildPaths() {
@@ -164,14 +180,14 @@ public class FourSample extends OpMode {
                 setPathState(1);
                 break;
             case 1:
-                if(!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if(!follower.isBusy() && !verticalSlides.atTarget) {
                     depositSampleAction();
                     prepToIntakeAction();
                     setPathState(990);
                 }
                 break;
             case 990:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.4) { // delay
+                if (pathTimer.getElapsedTimeSeconds() >= 1) { // delay
                     follower.followPath(grabPickup1,true);
                     setPathState(2);
                 }
@@ -205,18 +221,18 @@ public class FourSample extends OpMode {
                 }
                 break;
             case 1000:
-                if (!follower.isBusy()  && verticalSlides.getCurrentPos() > 800) {
+                if (!follower.isBusy() && verticalSlides.atTarget) {
                     depositSampleAction();
                     setPathState(991);
                 }
                 break;
             case 991:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) {
+                if (pathTimer.getElapsedTimeSeconds() >= 0.5 && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                     prepToIntakeAction();
 
                     follower.followPath(grabPickup2,true);
                     setPathState(5);
-                } 
+                }
                 break;
             case 5:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
@@ -246,13 +262,13 @@ public class FourSample extends OpMode {
                 }
                 break;
             case 1001:
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if (!follower.isBusy() && verticalSlides.atTarget && outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_BUCKET) {
                     depositSampleAction();
                     setPathState(992);
                 }
                 break;
             case 992:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) {
+                if (pathTimer.getElapsedTimeSeconds() >= 0.5 && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                     follower.followPath(grabPickup3,true);
                     setPathState(10);
                 }
@@ -284,13 +300,13 @@ public class FourSample extends OpMode {
                 }
                 break;
             case 1002:
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if (!follower.isBusy() && verticalSlides.atTarget && outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_BUCKET) {
                     depositSampleAction();
                     setPathState(993);
                 }
                 break;
             case 993:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) { // delay
+                if (pathTimer.getElapsedTimeSeconds() >= 0.5 && intake.chamberState == Intake.IntakeChamberState.EMPTY) { // delay
                     follower.followPath(park,true);
                     setPathState(13);
                 }
@@ -393,7 +409,6 @@ public class FourSample extends OpMode {
         telemetry.addData("pinpoint cooked? ", follower.isLocalizationNAN());
         telemetry.addData("robot stuck? ", follower.isRobotStuck());
         telemetry.addData("path timer seconds", pathTimer.getElapsedTimeSeconds());
-        telemetry.addData("current vert pos",  verticalSlides.getCurrentPos());
 
         telemetry.addLine("\n Pose");
         telemetry.addData("x: ", follower.getPose().getX());
@@ -453,6 +468,13 @@ public class FourSample extends OpMode {
                 new InstantAction(() -> horizontalSlides.extendPartial()),
                 new InstantAction(() -> intake.dropDown()),
                 new InstantAction(() -> intake.intake())
+        ));
+    }
+
+    public void prepToIntakeSubAction() {
+        runningActions.add(new SequentialAction(
+                new InstantAction(() -> horizontalSlides.extendBarely()),
+                new InstantAction(() -> intake.partialDropDown())
         ));
     }
 

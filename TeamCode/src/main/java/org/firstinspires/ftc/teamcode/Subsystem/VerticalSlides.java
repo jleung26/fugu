@@ -40,6 +40,7 @@ public class VerticalSlides {
     private volatile double slidePower;
     private volatile double output = 0;
     private volatile double previousOutput = 0;
+    private volatile int currentPos = 0;
     public volatile boolean slidesRetracted = true;
     public volatile boolean atTarget = true;
     public volatile boolean usePID = true;
@@ -66,11 +67,11 @@ public class VerticalSlides {
     }
 
     public void operate() {
-        int currentPos = leftSlideMotor.getCurrentPosition();
+        currentPos = leftSlideMotor.getCurrentPosition();
         slidesRetracted = currentPos < RETRACTED_THRESHOLD;
         atTarget = Math.abs(currentPos - target) < 80;
         output = controller.calculate(currentPos, target);
-//        output = profiled_controller.cal`culateProfiledPID(currentPos, target);
+//        output = profiled_controller.calculateProfiledPID(currentPos, target);
         output = (target < currentPos ? -1 : 1) * Math.sqrt(Math.abs(output)) + (slidesRetracted && target < RETRACTED_THRESHOLD ? 0: Kg);
         output = Math.max(-1, Math.min(1, output));
 
@@ -93,7 +94,7 @@ public class VerticalSlides {
             target = prepClipPos;
         }
 
-        int currentPos = leftSlideMotor.getCurrentPosition();
+        currentPos = leftSlideMotor.getCurrentPosition();
         slidesRetracted = currentPos < RETRACTED_THRESHOLD;
 
         slidePower = -opmode.gamepad1.left_stick_y;
@@ -141,6 +142,8 @@ public class VerticalSlides {
     public void raiseToPrepClip()   { moveToPosition(prepClipPos);}
     public void retract()           { moveToPosition(retractedPos);}
     public void raiseToPickupClip() { moveToPosition(pickupClipPos);}
+
+    public double getCurrentPos() { return currentPos;}
 
     private boolean isDifferent(double val1, double val2) {
         return Math.abs(val1 - val2) >= CACHING_THRESHOLD;

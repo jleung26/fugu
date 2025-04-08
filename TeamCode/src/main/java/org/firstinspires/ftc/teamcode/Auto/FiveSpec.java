@@ -78,19 +78,19 @@ public class FiveSpec extends OpMode {
     private final Pose intake1Pose = new Pose(24, 46, Math.toRadians(317));
 
     /** Spit out First Sample */
-    private final Pose eject1Pose = new Pose(24, 42, Math.toRadians(230));
+    private final Pose eject1Pose = new Pose(24, 42, Math.toRadians(240));
 
     /** Intake Second Sample from the Spike Mark */
     private final Pose intake2Pose = new Pose(24, 36, Math.toRadians(318));
 
     /** Spit out Second Sample */
-    private final Pose eject2Pose = new Pose(24, 35, Math.toRadians(230));
+    private final Pose eject2Pose = new Pose(24, 35, Math.toRadians(240));
 
     /** Intake Third Sample from the Spike Mark */
     private final Pose intake3Pose = new Pose(28, 30, Math.toRadians(305));
 
     /** Spit out Third Sample */
-    private final Pose eject3Pose = new Pose(24, 33, Math.toRadians(230));
+    private final Pose eject3Pose = new Pose(24, 33, Math.toRadians(240));
 
     /** Pick up from wall, reusable */
     private final Pose pickupWallPose = new Pose(6.95, 35, Math.toRadians(0));
@@ -100,21 +100,21 @@ public class FiveSpec extends OpMode {
     /** Bezier Control Point, reusable  */ // using tangential heading interpolation maybe?
     private final Pose scoreControlPose1 = new Pose(15, 34.5, Math.toRadians(999) /*heading unused*/);
 
-    private final Pose scoreIntermediatePose = new Pose(19.6, 37, Math.toRadians(30));
+    private final Pose scoreIntermediatePose = new Pose(19.6, 37, Math.toRadians(0));
 
     // might use a second, third, fourth control point for pathing,
 
     /** Score 2nd sample (sample index 1) */
-    private final Pose score1Pose = new Pose(40, 62, Math.toRadians(30));
+    private final Pose score1Pose = new Pose(40, 62, Math.toRadians(0));
 
     /** Score 3rd sample (sample index 2) */
-    private final Pose score2Pose = new Pose(40, 62, Math.toRadians(30));
+    private final Pose score2Pose = new Pose(40, 62, Math.toRadians(0));
 
     /** Score 4th sample (sample index 3) */
-    private final Pose score3Pose = new Pose(40, 62, Math.toRadians(30));
+    private final Pose score3Pose = new Pose(40, 62, Math.toRadians(0));
 
     /** Score 5th sample (sample index 4) */
-    private final Pose score4Pose = new Pose(40, 62, Math.toRadians(30));
+    private final Pose score4Pose = new Pose(40, 62, Math.toRadians(0));
 
     /** Park Pose for our robot, after we do all of the scoring. */
     private final Pose parkPose = new Pose(6.95, 30, Math.toRadians(0));
@@ -188,66 +188,61 @@ public class FiveSpec extends OpMode {
 
         score1 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose1), new Point(scoreIntermediatePose)))
-                .setTangentHeadingInterpolation()
-                .setReversed(false)
+                .setLinearHeadingInterpolation(pickupWallPose.getHeading(), scoreControlPose1.getHeading())
                 .setPathEndTimeoutConstraint(0)
                 .addPath(new BezierLine(new Point(scoreIntermediatePose), new Point(score1Pose)))
-                .setConstantHeadingInterpolation(score1Pose.getHeading())
-                .setPathEndTimeoutConstraint(0) // maybe this would help as a "looser" clause as mentioned below in switch statement?
+                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), score1Pose.getHeading())
                 .build();
 
         grab2 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(score1Pose), new Point(scoreIntermediatePose)))
-                .setConstantHeadingInterpolation(scoreIntermediatePose.getHeading())
+                .setLinearHeadingInterpolation(score1Pose.getHeading(), scoreIntermediatePose.getHeading())
                 .setPathEndTimeoutConstraint(0)
                 .addPath(new BezierCurve(new Point(scoreIntermediatePose), new Point(scoreControlPose1), new Point(pickupWallPose)))
-                .setTangentHeadingInterpolation()
+                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), pickupWallPose.getHeading())
                 .setReversed(true)
                 .build();
 
         score2 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose1), new Point(scoreIntermediatePose)))
-                .setTangentHeadingInterpolation()
-                .setReversed(false)
+                .setLinearHeadingInterpolation(pickupWallPose.getHeading(), scoreControlPose1.getHeading())
                 .setPathEndTimeoutConstraint(0)
                 .addPath(new BezierLine(new Point(scoreIntermediatePose), new Point(score2Pose)))
-                .setConstantHeadingInterpolation(score2Pose.getHeading())
+                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), score2Pose.getHeading())
                 .build();
 
         grab3 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(score2Pose), new Point(scoreIntermediatePose)))
-                .setConstantHeadingInterpolation(scoreIntermediatePose.getHeading())
+                .setLinearHeadingInterpolation(score2Pose.getHeading(), scoreIntermediatePose.getHeading())
                 .setPathEndTimeoutConstraint(0)
                 .addPath(new BezierCurve(new Point(scoreIntermediatePose), new Point(scoreControlPose1), new Point(pickupWallPose)))
-                .setTangentHeadingInterpolation()
+                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), pickupWallPose.getHeading())
                 .setReversed(true)
                 .build();
 
         score3 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose1), new Point(scoreIntermediatePose)))
-                .setTangentHeadingInterpolation()
-                .setReversed(false)
+                .setLinearHeadingInterpolation(pickupWallPose.getHeading(), scoreControlPose1.getHeading())
                 .setPathEndTimeoutConstraint(0)
                 .addPath(new BezierLine(new Point(scoreIntermediatePose), new Point(score3Pose)))
-                .setConstantHeadingInterpolation(score3Pose.getHeading())
+                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), score3Pose.getHeading())
                 .build();
 
         grab4 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(score1Pose), new Point(scoreIntermediatePose)))
-                .setConstantHeadingInterpolation(scoreIntermediatePose.getHeading())
+                .addPath(new BezierLine(new Point(score3Pose), new Point(scoreIntermediatePose)))
+                .setLinearHeadingInterpolation(score3Pose.getHeading(), scoreIntermediatePose.getHeading())
                 .setPathEndTimeoutConstraint(0)
                 .addPath(new BezierCurve(new Point(scoreIntermediatePose), new Point(scoreControlPose1), new Point(pickupWallPose)))
-                .setTangentHeadingInterpolation()
+                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), pickupWallPose.getHeading())
                 .setReversed(true)
                 .build();
 
         score4 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(pickupWallPose), new Point(scoreControlPose1), new Point(scoreIntermediatePose)))
-                .setTangentHeadingInterpolation()
-                .setReversed(false)
+                .setLinearHeadingInterpolation(pickupWallPose.getHeading(), scoreControlPose1.getHeading())
                 .setPathEndTimeoutConstraint(0)
                 .addPath(new BezierLine(new Point(scoreIntermediatePose), new Point(score4Pose)))
-                .setConstantHeadingInterpolation(score4Pose.getHeading())
+                .setLinearHeadingInterpolation(scoreIntermediatePose.getHeading(), score4Pose.getHeading())
                 .build();
 
         park = follower.pathBuilder()
