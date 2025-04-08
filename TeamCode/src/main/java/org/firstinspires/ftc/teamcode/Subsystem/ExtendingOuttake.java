@@ -67,9 +67,9 @@ public class ExtendingOuttake {
         public ArmPitch.STATE armState = STATE.STOW;
         private final double armStowPosition = 0.025;
         private final double armTransferPosition = 0.025;
-        private final double armScoringBucketPosition = 0.7;
+        private final double armScoringBucketPosition = 0.66;
         private final double armScoringClipPosition = 0.2;
-        private final double armGrabClipWallPosition = 0.89;
+        private final double armGrabClipWallPosition = 0.903;
         private final double armVertPosition = 0.521;
         private final double armIncrement = 0.0005;
 
@@ -125,7 +125,7 @@ public class ExtendingOuttake {
         private final double extenderTransferPosition = 0.8;
         private final double extenderScoreBucketPosition = 0.98;
         private final double extenderScoreClipPosition = 0.95;
-        private final double extenderGrabClipWallPosition = 0.1944;
+        private final double extenderGrabClipWallPosition = 0.3378;
         private final double increment = 0.001;
 
         public ArmExtend() {}

@@ -29,7 +29,7 @@ public class VerticalSlides {
     public static int LOWER_LIMIT = -2;
 
     // encoder positions
-    public static int highBucketPos = 970;
+    public static int highBucketPos = 1000;
     public static int lowBucketPos = 320; // NOT CURRENT
     public static int retractedPos = 0;
     public static int prepClipPos = 625;
@@ -68,7 +68,7 @@ public class VerticalSlides {
     public void operate() {
         int currentPos = leftSlideMotor.getCurrentPosition();
         slidesRetracted = currentPos < RETRACTED_THRESHOLD;
-        atTarget = Math.abs(currentPos - target) < 40;
+        atTarget = Math.abs(currentPos - target) < 80;
         output = controller.calculate(currentPos, target);
 //        output = profiled_controller.cal`culateProfiledPID(currentPos, target);
         output = (target < currentPos ? -1 : 1) * Math.sqrt(Math.abs(output)) + (slidesRetracted && target < RETRACTED_THRESHOLD ? 0: Kg);
@@ -84,8 +84,6 @@ public class VerticalSlides {
 
     public void operateTuning(TelemetryPacket packet) {
         controller.setPID(Kp, Ki, Kd);
-
-
 
         if (opmode.gamepad1.y) {
             target = highBucketPos;

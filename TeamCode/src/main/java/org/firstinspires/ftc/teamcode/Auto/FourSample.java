@@ -84,15 +84,15 @@ public class FourSample extends OpMode {
     // back of bot towards bucket
 
     /** Bucket Scoring Pose */
-    private final Pose scorePose = new Pose(12, 132, Math.toRadians(315)); // TODO: tuned, but can make more optimal
+    private final Pose scorePose = new Pose(15, 129, Math.toRadians(315)); // TODO: tuned, but can make more optimal
 
     /** First Sample from the Spike Mark */
-    private final Pose pickup1Pose = new Pose(15, 128, Math.toRadians(0)); // TODO: tuned, but can make more optimal
+    private final Pose pickup1Pose = new Pose(16, 128, Math.toRadians(0)); // TODO: tuned, but can make more optimal
     // TODO: (e.g. with less movement from score, and turning instead) if need to save some time
     // old, very consistent pose, switch back if unable to tune new pos: 15, 128, Math.toRadians(0)
 
     /** Second Sample from the Spike Mark */
-    private final Pose pickup2Pose = new Pose(15, 133, Math.toRadians(0)); // tuned
+    private final Pose pickup2Pose = new Pose(16, 133, Math.toRadians(0)); // tuned
 
     /** Third Sample from the Spike Mark */
     private final Pose pickup3Pose = new Pose(25, 120, Math.toRadians(55)); // tuned
@@ -164,14 +164,14 @@ public class FourSample extends OpMode {
                 setPathState(1);
                 break;
             case 1:
-                if(!follower.isBusy()) {
+                if(!follower.isBusy() && !verticalSlides.atTarget) {
                     depositSampleAction();
                     prepToIntakeAction();
                     setPathState(990);
                 }
                 break;
             case 990:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) { // delay
+                if (pathTimer.getElapsedTimeSeconds() >= 1) { // delay
                     follower.followPath(grabPickup1,true);
                     setPathState(2);
                 }

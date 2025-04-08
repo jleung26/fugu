@@ -43,9 +43,9 @@ public class Hang {
         this.rightPto = robotHardware.rightPtoServo;
         this.leftVertMotor = robotHardware.leftVertMotor;
         this.rightVertMotor = robotHardware.rightVertMotor;
-//        this.rightArmPitchServo = robotHardware.rightArmPitchServo;
-//        this.leftArmPitchServo = robotHardware.leftArmPitchServo;
-//        this.armExtenderServo = robotHardware.armExtenderServo;
+        this.rightArmPitchServo = robotHardware.rightArmPitchServo;
+        this.leftArmPitchServo = robotHardware.leftArmPitchServo;
+        this.armExtenderServo = robotHardware.armExtenderServo;
         this.Fl = robotHardware.Fl;
         this.Fr = robotHardware.Fr;
         this.Bl = robotHardware.Bl;
