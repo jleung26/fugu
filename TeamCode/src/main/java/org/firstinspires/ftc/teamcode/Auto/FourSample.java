@@ -420,16 +420,16 @@ public class FourSample extends OpMode {
     public void transferAndPrepToScoreAction() {
         // full transfer and prep to score sequence
         runningActions.add(new SequentialAction(
-                new InstantAction(() -> intake.setIntake(0.4)), // push sample all the way in, kinda jank, maybe not necessary
+                new InstantAction(() -> intake.setIntake(0.5)), // push sample all the way in, kinda jank, maybe not necessary
                 new InstantAction(() -> outtake.toTransfer()),
-                new SleepAction(0.2), // TODO: play around with timings
+                new SleepAction(0.1), // TODO: play around with timings
                 new InstantAction(() -> outtake.closeClawTight()),
-                new SleepAction(0.3),
+                new SleepAction(0.5),
                 new InstantAction(() -> outtake.toStow()),
                 new SleepAction(0.1),
                 new InstantAction(() -> intake.setIntake(0)),
                 new InstantAction(() -> verticalSlides.raiseToHighBucket()),
-                new SleepAction(0.3),
+                new SleepAction(0.2),
                 new InstantAction(() -> outtake.toVert())
         ));
     }

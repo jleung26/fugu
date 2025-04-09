@@ -253,7 +253,7 @@ public class FiveSpec extends OpMode {
                 setPathState(1);
                 break;
             case 1:
-                if(!follower.isBusy()) {
+                if(follower.getPose().getX() > specScoreXThreshold) {
                     // score preload
                     finishScoringClipAction();
                     setPathState(2);

@@ -214,6 +214,17 @@ public class FullTeleOpCopy extends OpMode {
             }
         }
 
+        // backup force eject
+        if (currentGamepad1.b && !previousGamepad1.b) {
+            // run in reverse regardless of color sensor detection
+            runningActions.add(new SequentialAction(
+                    new InstantAction(() -> intake.dropDown()),
+                    new InstantAction(() -> intake.setIntake(-0.8)),
+                    new SleepAction(0.6),
+                    new InstantAction(() -> intake.idle())
+            ));
+        }
+
         /// outtake and scoring logic
         if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_BUCKET) {
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
