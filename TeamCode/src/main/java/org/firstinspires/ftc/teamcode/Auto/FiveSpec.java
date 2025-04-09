@@ -260,7 +260,8 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 2:
-                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) { // old conditional
+                if (outtake.claw.isClawOpen) { // new conditional, maybe faster, but also maybe arm gets caught on stuff
                     // get away from sub, and get ready to grab first sample
                     follower.followPath(intake1, true);
                     setPathState(3);
@@ -382,7 +383,8 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 18:
-                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+                if (outtake.claw.isClawOpen) { // new conditional, maybe faster, but also maybe arm gets caught on stuff
                     // drive to grab another once done with slam
                     follower.followPath(grab2, true);
                     setPathState(19);
@@ -408,7 +410,8 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 22:
-                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+                if (outtake.claw.isClawOpen) { // new conditional, maybe faster, but also maybe arm gets caught on stuff
                     follower.followPath(grab3, true);
                     setPathState(23);
                 }
@@ -432,7 +435,8 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 26:
-                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+                if (outtake.claw.isClawOpen) { // new conditional, maybe faster, but also maybe arm gets caught on stuff
                     follower.followPath(grab4, true);
                     setPathState(27);
                 }
@@ -456,7 +460,8 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 30:
-                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
+                if (outtake.claw.isClawOpen) { // new conditional, maybe faster, but also maybe arm gets caught on stuff
                     // huzzah we done, park
                     follower.followPath(park, true);
                     setPathState(-1);
@@ -580,7 +585,7 @@ public class FiveSpec extends OpMode {
                 new InstantAction(() -> outtake.openClaw()),
                 new SleepAction(0.3),
                 new InstantAction(() -> outtake.retractExtender()),
-                new SleepAction(0.2),
+                /*new SleepAction(0.2),*/ // TODO: we'll see if this can shave off a tiny bit of time
                 new InstantAction(() -> outtake.toGrabClip()),
                 new InstantAction(() -> verticalSlides.retract())
         ));
