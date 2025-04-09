@@ -27,10 +27,10 @@ public class Hang {
     public static double leftPtoDeployPos = 0.7617;
     public static double rightPtoStowPos = 1;
     public static double rightPtoDeployPos = 0.8078;
-    public static double armL2Pos = 0;
-    public static double armSwingPos = 0;
-    public static double armExtenderRetractedPos = 0;
-    public static double armExtenderExtendedPos = 0;
+    public static double armL2Pos = 0.521;
+    public static double armSwingPos = 0.621;
+    public static double armExtenderRetractedPos = 0.363;
+    public static double armExtenderExtendedPos = 0.98;
 
 
     public Hang() {}
@@ -148,7 +148,7 @@ public class Hang {
         leftVertMotor.setTargetPosition(0);
         rightVertMotor.setTargetPosition(0);
         leftVertMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightVertMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        rightVertMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftVertMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightVertMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         Fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -162,6 +162,8 @@ public class Hang {
         updateSequenceState(currentGamepad1,currentGamepad2, previousGamepad1, previousGamepad2);
         // drive loop separate file: Mecanum.java line 107
         opmode.telemetry.addData("hangState: ", hangState);
+        opmode.telemetry.addData("vert motor current pos: ", leftVertMotor.getCurrentPosition());
+        opmode.telemetry.addData("motor target", leftVertMotor.getTargetPosition());
     }
 
     public void updateSequenceState(Gamepad currentGamepad1, Gamepad currentGamepad2, Gamepad previousGamepad1, Gamepad previousGamepad2) {
@@ -169,14 +171,17 @@ public class Hang {
             case -1:
                 // reset if driver failed wheely
                 stowWheely();
+                disengagePTO();
                 setHangState(0);
             case 0: /// set motor modes, arm pos, and start wheely (the servos strain a lot, so move quickly)
                 if (currentGamepad2.a && !previousGamepad2.a) {
                     // motors all in modes
                     switchToHangMode();
+                    disengagePTO();
                     // raise slides to 2nd bar
                     leftVertMotor.setTargetPosition(500);
-                    rightVertMotor.setTargetPosition(500);
+                    leftVertMotor.setPower(0.5);
+//                    rightVertMotor.setTargetPosition(500);
                     // wheely
                     deployWheely();
                     // arm gets out of the way
@@ -190,11 +195,12 @@ public class Hang {
             case 1: /// engage PTO, disable slide motors
                 if (currentGamepad2.a && !previousGamepad2.a) {
                     // stop unnecessary current draw
-                    leftVertMotor.setMotorDisable(); // never used before, could be problematic, but seems self-explanatory
-                    rightVertMotor.setMotorDisable();
+                    leftVertMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//                    leftVertMotor.setMotorDisable(); // never used before, could be problematic, but seems self-explanatory
+//                    rightVertMotor.setMotorDisable();
+                    stowWheely();
                     // engage PTO
-                    leftPto.setPosition(leftPtoDeployPos);
-                    rightPto.setPosition(rightPtoDeployPos);
+                    engagePTO();
                     setHangState(2);
                 }
                 break;
@@ -224,6 +230,16 @@ public class Hang {
     public void stowWheely() {
         leftWheely.setPosition(leftWheelyStowPos);
         rightWheely.setPosition(rightWheelyStowPos);
+    }
+
+    public void engagePTO() {
+        leftPto.setPosition(leftPtoDeployPos);
+        rightPto.setPosition(rightPtoDeployPos);
+    }
+
+    public void disengagePTO() {
+        leftPto.setPosition(leftPtoStowPos);
+        rightPto.setPosition(rightPtoStowPos);
     }
 
     // drive up

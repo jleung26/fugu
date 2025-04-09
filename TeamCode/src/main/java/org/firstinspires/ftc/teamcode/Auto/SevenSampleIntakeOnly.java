@@ -33,8 +33,8 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "7 Sample Draft", group = "A", preselectTeleOp = "Full TeleOp FINAL")
-public class SevenSample extends OpMode {
+@Autonomous(name = "7 Sample Intake Only", group = "A", preselectTeleOp = "Full TeleOp FINAL")
+public class SevenSampleIntakeOnly extends OpMode {
     // declaring subsystems
     RobotHardware robotHardware = new RobotHardware();
     VerticalSlides verticalSlides = new VerticalSlides();
@@ -175,13 +175,13 @@ public class SevenSample extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                allToScoreAction();
+//                allToScoreAction();
                 follower.followPath(scorePreload);
                 setPathState(1);
                 break;
             case 1:
-                if(!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
-                    depositSampleAction();
+                if(!follower.isBusy()) {
+//                    depositSampleAction();
                     prepToIntakeAction();
                     setPathState(990);
                 }
@@ -216,17 +216,18 @@ public class SevenSample extends OpMode {
             case 4:
                 /* ready to transfer */
                 if(/*arm stuff*/horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
-                    transferAndPrepToScoreAction();
+//                    transferAndPrepToScoreAction();
                     setPathState(1000);
                 }
                 break;
             case 1000:
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
-                    depositSampleAction();
+                if (!follower.isBusy()) {
+//                    depositSampleAction();
                     setPathState(991);
                 }
+                break;
             case 991:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) {
+                if (pathTimer.getElapsedTimeSeconds() >= 0.5 && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                     prepToIntakeAction();
 
                     follower.followPath(grabPickup2,true);
@@ -261,13 +262,13 @@ public class SevenSample extends OpMode {
                 }
                 break;
             case 1001:
-                if (!follower.isBusy() && verticalSlides.atTarget) {
+                if (!follower.isBusy()) {
                     depositSampleAction();
                     setPathState(992);
                 }
                 break;
             case 992:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) {
+                if (pathTimer.getElapsedTimeSeconds() >= 0.5 && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                     follower.followPath(grabPickup3,true);
                     setPathState(10);
                 }
@@ -299,13 +300,13 @@ public class SevenSample extends OpMode {
                 }
                 break;
             case 1002:
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if (!follower.isBusy() && verticalSlides.atTarget && outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_BUCKET) {
                     depositSampleAction();
                     setPathState(993);
                 }
                 break;
             case 993:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) { // delay
+                if (pathTimer.getElapsedTimeSeconds() >= 0.5 && intake.chamberState == Intake.IntakeChamberState.EMPTY) { // delay
                     follower.followPath(park,true);
                     setPathState(13);
                 }

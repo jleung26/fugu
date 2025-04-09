@@ -125,7 +125,8 @@ public class ExtendingOuttake {
         private final double extenderTransferPosition = 0.98;
         private final double extenderScoreBucketPosition = 0.93;
         private final double extenderScoreClipPosition = 0.9;
-        private final double extenderGrabClipWallPosition = 0.3378;
+        private final double extenderAutoScoreClipPosition = 0.98;
+        private final double extenderGrabClipWallPosition = 0.4378;
         private final double increment = 0.001;
 
         public ArmExtend() {}
@@ -155,6 +156,10 @@ public class ExtendingOuttake {
             extenderServo.setPosition(extenderGrabClipWallPosition);
             isExtenderTransferring = false;
         }
+        public void extendToScoreClipAuto() {
+            extenderServo.setPosition(extenderAutoScoreClipPosition);
+            isExtenderTransferring = false;
+        }
 
         // Incremental extension
         public void incremental(int sign) {
@@ -165,7 +170,7 @@ public class ExtendingOuttake {
     public static class Claw {
         public Servo clawServo;
         public boolean isClawOpen = true;
-        private final double clawTightClosedPosition = 0.2;
+        private final double clawTightClosedPosition = 0.1778;
         private final double clawLooseClosePosition = 0.22;
         private final double clawOpenPosition = 0.66;
         private final double clawIncrement = 0.0003;

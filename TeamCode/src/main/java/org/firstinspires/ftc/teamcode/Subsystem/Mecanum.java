@@ -110,8 +110,13 @@ public class Mecanum {
             Fr.setPower(-opmode.gamepad2.left_stick_y);
             Bl.setPower(-opmode.gamepad2.left_stick_y);
             Br.setPower(-opmode.gamepad2.left_stick_y);
-        } else {
+        } else if (Math.abs(opmode.gamepad1.left_stick_x) > 0.1 || Math.abs(opmode.gamepad1.left_stick_y) > 0.1 || Math.abs(opmode.gamepad1.right_stick_x) > 0.1 ) {
             driveRobotCentric(opmode.gamepad1.left_stick_x, -opmode.gamepad1.left_stick_y, opmode.gamepad1.right_stick_x, false);
+        } else {
+            Fl.setPower(0);
+            Fr.setPower(0);
+            Bl.setPower(0);
+            Br.setPower(0);
         }
     }
 

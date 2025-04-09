@@ -78,24 +78,24 @@ public class FiveSpec extends OpMode {
     private final Pose intake1Pose = new Pose(26, 44, Math.toRadians(317));
 
     /** Spit out First Sample */
-    private final Pose eject1Pose = new Pose(24, 42, Math.toRadians(230));
+    private final Pose eject1Pose = new Pose(24, 42, Math.toRadians(240));
 
     /** Intake Second Sample from the Spike Mark */
     private final Pose intake2Pose = new Pose(24, 36, Math.toRadians(318));
 
     /** Spit out Second Sample */
-    private final Pose eject2Pose = new Pose(24, 35, Math.toRadians(230));
+    private final Pose eject2Pose = new Pose(24, 35, Math.toRadians(240));
 
     /** Intake Third Sample from the Spike Mark */
-    private final Pose intake3Pose = new Pose(24, 26, Math.toRadians(314));
+    private final Pose intake3Pose = new Pose(24, 26, Math.toRadians(318));
 
     /** Spit out Third Sample */
-    private final Pose eject3Pose = new Pose(24, 33, Math.toRadians(230));
+    private final Pose eject3Pose = new Pose(24, 33, Math.toRadians(240));
 
     /** Pick up from wall, reusable */
     private final Pose pickupWallPose = new Pose(9, 35, Math.toRadians(0));
 
-    private final Pose pickupWall1ControlPose = new Pose(12, 35, Math.toRadians(0));
+    private final Pose pickupWall1IntermediateControlPose = new Pose(12, 35, Math.toRadians(0));
 
     /** Bezier Control Point, reusable  */ // using tangential heading interpolation maybe?
     private final Pose scoreControlPose1 = new Pose(15, 34.5, Math.toRadians(999) /*heading unused*/);
@@ -105,21 +105,22 @@ public class FiveSpec extends OpMode {
     // might use a second, third, fourth control point for pathing,
 
     /** Score 2nd sample (sample index 1) */
-    private final Pose score1Pose = new Pose(38, 66, Math.toRadians(0));
+    private final Pose score1Pose = new Pose(37, 66, Math.toRadians(0));
 
     /** Score 3rd sample (sample index 2) */
-    private final Pose score2Pose = new Pose(38, 66, Math.toRadians(0));
+    private final Pose score2Pose = new Pose(37, 66, Math.toRadians(0));
 
     /** Score 4th sample (sample index 3) */
-    private final Pose score3Pose = new Pose(38, 66, Math.toRadians(0));
+    private final Pose score3Pose = new Pose(37, 66, Math.toRadians(0));
 
     /** Score 5th sample (sample index 4) */
-    private final Pose score4Pose = new Pose(38, 66, Math.toRadians(0));
+    private final Pose score4Pose = new Pose(37, 66, Math.toRadians(0));
 
     /** Park Pose for our robot, after we do all of the scoring. */
     private final Pose parkPose = new Pose(6.95, 30, Math.toRadians(0));
 
     private int movingEjectAngleThreshold = 250;
+    private double specScoreXThreshold = 38;
 
 //    /** Park Control Pose for our robot, this is used to manipulate the bezier curve that we will create for the parking.
 //    private final Pose parkControlPose = new Pose(60, 98, Math.toRadians(90));
@@ -179,11 +180,11 @@ public class FiveSpec extends OpMode {
                 .build();
 
         grab1 = follower.pathBuilder()
-//                .addPath(new BezierLine(new Point(eject3Pose), new Point(eject3Pose))) // veiled turnTo
-//                .setLinearHeadingInterpolation(eject3Pose.getHeading(), eject3Pose.getHeading())
+                .addPath(new BezierLine(new Point(eject3Pose), new Point(pickupWall1IntermediateControlPose))) // veiled turnTo
+                .setLinearHeadingInterpolation(eject3Pose.getHeading(), pickupWall1IntermediateControlPose.getHeading())
 //                .setPathEndTimeoutConstraint(0)
-                .addPath(new BezierCurve(new Point(eject3Pose), new Point(pickupWall1ControlPose), new Point(pickupWallPose)))
-                .setLinearHeadingInterpolation(eject3Pose.getHeading(), pickupWallPose.getHeading())
+                .addPath(new BezierLine(new Point(pickupWall1IntermediateControlPose),  new Point(pickupWallPose)))
+                .setLinearHeadingInterpolation(pickupWall1IntermediateControlPose.getHeading(), pickupWallPose.getHeading())
                 .build();
 
         score1 = follower.pathBuilder()
@@ -243,7 +244,11 @@ public class FiveSpec extends OpMode {
         switch (pathState) {
             case 0:
                 // drive up to bar
-                grabAndPrepClipAction();
+                runningActions.add(new SequentialAction(
+                        new InstantAction(() -> verticalSlides.raiseToPrepClip()),
+                        new SleepAction(0.2),
+                        new InstantAction(() -> outtake.armExtend.extendToScoreClipAuto())
+                ));
                 follower.followPath(score0);
                 setPathState(1);
                 break;
@@ -275,9 +280,10 @@ public class FiveSpec extends OpMode {
                     flipUpAction();
                     follower.followPath(eject1);
                     setPathState(5);
-                } else if (pathTimer.getElapsedTimeSeconds() > 3) { // empty intake already assumed
-                    setPathState(6);
                 }
+//                else if (pathTimer.getElapsedTimeSeconds() > 3) { // empty intake already assumed
+//                    setPathState(6);
+//                }
                 break;
             case 5:
                 if (follower.getPose().getHeading() < Math.toRadians(movingEjectAngleThreshold)) {
@@ -306,9 +312,10 @@ public class FiveSpec extends OpMode {
                     flipUpAction();
                     follower.followPath(eject2);
                     setPathState(9);
-                } else if (pathTimer.getElapsedTimeSeconds() > 3) { // empty intake already assumed
-                    setPathState(10);
-                } // backup case, in case fails to grab piece, moves to try get next piece
+                }
+//                else if (pathTimer.getElapsedTimeSeconds() > 3) { // empty intake already assumed
+//                    setPathState(10);
+//                } // backup case, in case fails to grab piece, moves to try get next piece
                 break;
             case 9:
                 if (follower.getPose().getHeading() < Math.toRadians(movingEjectAngleThreshold)) {
@@ -334,9 +341,10 @@ public class FiveSpec extends OpMode {
                     flipUpAction();
                     follower.followPath(eject3);
                     setPathState(13);
-                } else if (pathTimer.getElapsedTimeSeconds() > 3) { // empty intake already assumed
-                    setPathState(14);
-                } // backup case, in case fails to grab piece, moves on to score
+                }
+//                else if (pathTimer.getElapsedTimeSeconds() > 3) { // empty intake already assumed
+//                    setPathState(14);
+//                } // backup case, in case fails to grab piece, moves on to score
                 break;
             case 13:
                 if (follower.getPose().getHeading() < Math.toRadians(movingEjectAngleThreshold)) {
@@ -367,7 +375,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 17:
-                if(!follower.isBusy()) { // might use a different, more loose clause here
+                if(follower.getPose().getX() > specScoreXThreshold) { // might use a different, more loose clause here
                     // let go to score once at pose, and shoved on
                     finishScoringClipAction();
                     setPathState(18);
@@ -394,7 +402,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 21:
-                if(!follower.isBusy()) {
+                if(follower.getPose().getX() > specScoreXThreshold) {
                     finishScoringClipAction();
                     setPathState(22);
                 }
@@ -418,7 +426,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 25:
-                if(!follower.isBusy()) {
+                if(follower.getPose().getX() > specScoreXThreshold) {
                     finishScoringClipAction();
                     setPathState(26);
                 }
@@ -442,7 +450,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 29:
-                if(!follower.isBusy()) {
+                if(follower.getPose().getX() > specScoreXThreshold) {
                     finishScoringClipAction();
                     setPathState(30);
                 }
@@ -486,7 +494,8 @@ public class FiveSpec extends OpMode {
 
         // ready to go
         outtake.closeClawTight();
-        outtake.toStow();
+        outtake.armPitch.setArmScoreClip();
+        outtake.armExtend.extendToStow();
         intake.flipUp();
     }
 
@@ -562,7 +571,7 @@ public class FiveSpec extends OpMode {
                 new SleepAction(0.25),
                 new InstantAction(() -> outtake.armPitch.setArmScoreClip()), // decomposed into two movements to add delay
                 new SleepAction(0.4),
-                new InstantAction(() -> outtake.armExtend.extendToScoreClip()) // decomposed movements
+                new InstantAction(() -> outtake.armExtend.extendToScoreClipAuto()) // decomposed movements
         ));
     }
 
