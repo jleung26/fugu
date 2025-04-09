@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
+import org.firstinspires.ftc.teamcode.Subsystem.LimelightVision;
 import org.firstinspires.ftc.teamcode.Subsystem.Mecanum;
 import org.firstinspires.ftc.teamcode.Subsystem.ExtendingOuttake;
 import org.firstinspires.ftc.teamcode.Subsystem.VerticalSlides;
@@ -33,6 +34,8 @@ public class FullTeleOpCopy extends OpMode {
     HorizontalSlides horizontalSlides = new HorizontalSlides();
     ExtendingOuttake outtake = new ExtendingOuttake();
     Intake intake = new Intake();
+
+    LimelightVision lime = new LimelightVision();
 //    LEDManager blinkinLED = new LEDManager();
 //    Hang hang = new Hang();
 
@@ -72,6 +75,7 @@ public class FullTeleOpCopy extends OpMode {
         horizontalSlides.initialize(this, robotHardware, false);
         outtake.initialize(this, robotHardware);
         intake.initialize(this, robotHardware);
+        lime.initialize(this, robotHardware);
 //        hang.initialize(this, robotHardware);
 
         // bulk cache reading
@@ -138,6 +142,7 @@ public class FullTeleOpCopy extends OpMode {
             verticalSlides.operate();
         }
         horizontalSlides.operate();
+        lime.operate();
         intake.operateColorChecking();
 
         /// updating booleans

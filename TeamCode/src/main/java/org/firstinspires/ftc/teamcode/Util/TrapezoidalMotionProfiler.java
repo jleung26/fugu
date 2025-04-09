@@ -4,7 +4,7 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.pedropathing.util.PIDFController;
 
 public class TrapezoidalMotionProfiler {
-    private State m_current;
+    public State m_current;
 
     private State m_goal;
     private State m_target;

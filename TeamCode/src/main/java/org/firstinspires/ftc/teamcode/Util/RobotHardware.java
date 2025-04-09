@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Util;
 
 import com.pedropathing.localization.GoBildaPinpointDriver;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -20,6 +21,8 @@ public class RobotHardware {
     public GoBildaPinpointDriver odo;
 
     public RevColorSensorV3 intakeColorSensor;
+
+    public Limelight3A limelight;
 
     public void initialize(OpMode opmode) {
         /*
@@ -58,6 +61,8 @@ public class RobotHardware {
          */
         odo = opmode.hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         intakeColorSensor = opmode.hardwareMap.get(RevColorSensorV3.class, "color");
+
+        limelight = opmode.hardwareMap.get(Limelight3A.class, "limelight");
 
         Fl = opmode.hardwareMap.get(DcMotorEx.class, "Fl");
         Fr = opmode.hardwareMap.get(DcMotorEx.class, "Fr");
