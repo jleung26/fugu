@@ -119,7 +119,7 @@ public class SevenSample extends OpMode {
     private final Pose parkControlPose = new Pose(68, 110, Math.toRadians(999)/* heading unused*/); // done
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
-    private PathChain scorePreload, grabPickup1, grabPickup2, grabPickup3, grabSubPickup4, grabSubPickup5, grabSubPickup6, scorePickup1, scorePickup2, scorePickup3, park;
+    private PathChain scorePreload, grabPickup1, grabPickup2, grabPickup3, grabSubPickup4, wiggle, grabSubPickupBackup4, grabSubPickup5, grabSubPickupBackup5, grabSubPickup6, grabSubPickupBackup6, scorePickup1, scorePickup2, scorePickup3, scorePickup4, scorePickupBackup4, scorePickup5, scorePickup6, park;
 
 
     public void buildPaths() {
@@ -163,6 +163,37 @@ public class SevenSample extends OpMode {
         scorePickup3 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(pickup3Pose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
+                .build();
+
+        grabSubPickup4 = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(scorePose), /* Control Point */ new Point(parkControlPose), new Point(grabFromSub1Pose)))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), grabFromSub1Pose.getHeading())
+                .build();
+
+        wiggle = follower.pathBuilder() // drives in small triangle so hopefully gets samples out of the way
+                .addPath(new BezierLine(new Point(grabFromSub1Pose), new Point(wiggleInSub1Pose)))
+                .setLinearHeadingInterpolation(grabFromSub1Pose.getHeading(), wiggleInSub1Pose.getHeading())
+                .setPathEndTimeoutConstraint(0)
+                .addPath(new BezierLine(new Point(wiggleInSub1Pose), new Point(wiggleInSub2Pose)))
+                .setLinearHeadingInterpolation(wiggleInSub1Pose.getHeading(), wiggleInSub2Pose.getHeading())
+                .setPathEndTimeoutConstraint(0)
+                .addPath(new BezierLine(new Point(wiggleInSub2Pose), new Point(grabFromSub1Pose)))
+                .setLinearHeadingInterpolation(wiggleInSub2Pose.getHeading(), grabFromSub1Pose.getHeading())
+                .build();
+
+        grabSubPickupBackup4 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(grabFromSub1Pose), new Point(grabFromSub1BackupPose)))
+                .setLinearHeadingInterpolation(grabFromSub1Pose.getHeading(), grabFromSub1BackupPose.getHeading())
+                .build();
+
+        scorePickup4 = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(grabFromSub1Pose), /* Control Point */ new Point(parkControlPose), new Point(scorePose)))
+                .setLinearHeadingInterpolation(grabFromSub1Pose.getHeading(), scorePose.getHeading())
+                .build();
+
+        scorePickupBackup4 = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(grabFromSub1Pose), /* Control Point */ new Point(parkControlPose), new Point(scorePose)))
+                .setLinearHeadingInterpolation(grabFromSub1Pose.getHeading(), scorePose.getHeading())
                 .build();
 
         /* This is our park path. We are using a BezierCurve with 3 points, which is a curved line that is curved based off of the control point */

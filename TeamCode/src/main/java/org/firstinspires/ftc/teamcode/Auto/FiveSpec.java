@@ -99,9 +99,9 @@ public class FiveSpec extends OpMode {
     private final Pose eject3Pose = new Pose(24, 33, Math.toRadians(240));
 
     /** Pick up from wall, reusable */
-    private final Pose pickupWallPose = new Pose(9, 35, Math.toRadians(0));
+    private final Pose pickupWallPose = new Pose(11, 35, Math.toRadians(0));
 
-    private final Pose pickupWall1IntermediateControlPose = new Pose(12, 35, Math.toRadians(0));
+    private final Pose pickupWall1IntermediateControlPose = new Pose(14, 35, Math.toRadians(0));
 
     /** Bezier Control Point, reusable  */ // using tangential heading interpolation maybe?
     private final Pose scoreControlPose1 = new Pose(20, 32, Math.toRadians(999) /*heading unused*/);
@@ -123,7 +123,7 @@ public class FiveSpec extends OpMode {
     private final Pose score4Pose = new Pose(37, 66, Math.toRadians(0));
 
     /** Park Pose for our robot, after we do all of the scoring. */
-    private final Pose parkPose = new Pose(6.95, 30, Math.toRadians(0));
+    private final Pose parkPose = new Pose(9.5, 30, Math.toRadians(0));
 
     private int movingEjectAngleThreshold = 250;
     private double specScoreXThreshold = 38;
@@ -202,6 +202,7 @@ public class FiveSpec extends OpMode {
         grab2 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(score1Pose), new Point(scoreControlPose1), new Point(pickupWallPose)))
                 .setLinearHeadingInterpolation(score1Pose.getHeading(), pickupWallPose.getHeading())
+                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 //        grab2 = follower.pathBuilder() // backup in case new path clips sub
 //                .addPath(new BezierCurve(new Point(score1Pose), new Point(scoreControlPose2), new Point(scoreControlPose1), new Point(pickupWallPose)))
@@ -216,6 +217,7 @@ public class FiveSpec extends OpMode {
         grab3 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(score2Pose), new Point(scoreControlPose1), new Point(pickupWallPose)))
                 .setLinearHeadingInterpolation(score2Pose.getHeading(), pickupWallPose.getHeading())
+                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         score3 = follower.pathBuilder()
@@ -226,6 +228,7 @@ public class FiveSpec extends OpMode {
         grab4 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(score3Pose), new Point(scoreControlPose1), new Point(pickupWallPose)))
                 .setLinearHeadingInterpolation(score3Pose.getHeading(), pickupWallPose.getHeading())
+                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         score4 = follower.pathBuilder()
