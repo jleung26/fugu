@@ -261,9 +261,9 @@ public class FullTeleOpCopy extends OpMode {
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> intake.setIntake(0.4)), // push sample all the way in, kinda jank, maybe not necessary
                         new InstantAction(() -> outtake.toTransfer()),
-                        new SleepAction(0.2), // TODO: play around with timings
+                        new SleepAction(0.1), // TODO: play around with timings
                         new InstantAction(() -> outtake.closeClawTight()),
-                        new SleepAction(0.3),
+                        new SleepAction(0.5),
                         new InstantAction(() -> outtake.toStow()),
                         new SleepAction(0.1),
                         new InstantAction(() -> intake.setIntake(0)),
