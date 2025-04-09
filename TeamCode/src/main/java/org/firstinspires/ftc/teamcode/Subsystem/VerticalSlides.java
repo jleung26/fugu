@@ -32,7 +32,7 @@ public class VerticalSlides {
     public static int highBucketPos = 1000;
     public static int lowBucketPos = 320; // NOT CURRENT
     public static int retractedPos = 0;
-    public static int prepClipPos = 625;
+    public static int prepClipPos = 640;
     public static int pickupClipPos = 0;
 
     // declaring variables for later modification

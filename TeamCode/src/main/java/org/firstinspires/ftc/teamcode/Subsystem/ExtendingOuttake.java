@@ -69,7 +69,7 @@ public class ExtendingOuttake {
         private final double armTransferPosition = 0.025;
         private final double armScoringBucketPosition = 0.66;
         private final double armScoringClipPosition = 0.17;
-        private final double armGrabClipWallPosition = 0.903;
+        private final double armGrabClipWallPosition = 0.875;
         private final double armVertPosition = 0.521;
         private final double armIncrement = 0.0005;
 

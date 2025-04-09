@@ -107,6 +107,7 @@ public class FullTeleOpCopy extends OpMode {
     public void start() {
         COLOR_TO_REJECT = (redAlliance ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
         outtake.toStow();
+        outtake.openClaw();
         intake.flipUp();
         verticalSlides.retract();
         horizontalSlides.retract();
@@ -221,7 +222,7 @@ public class FullTeleOpCopy extends OpMode {
                         new InstantAction(() -> outtake.openClaw()),
                         new SleepAction(0.3),
                         new InstantAction(() -> outtake.toStow()),
-                        new SleepAction(1),
+                        new SleepAction(0.4),
                         new InstantAction(() -> verticalSlides.retract())
                 ));
             }
@@ -237,7 +238,7 @@ public class FullTeleOpCopy extends OpMode {
                         new InstantAction(() -> verticalSlides.retract())
                 ));
             } else if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && sampleMode) {
-                // finish depositing clip and return to stow
+                // finish depositing sample and return to stow
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> outtake.openClaw()),
                         new SleepAction(0.3),
@@ -264,7 +265,7 @@ public class FullTeleOpCopy extends OpMode {
             // full transfer sequence
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && horizontalSlides.slidesRetracted && intake.wristFlippedUp && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
                 runningActions.add(new SequentialAction(
-                        new InstantAction(() -> intake.setIntake(0.4)), // push sample all the way in, kinda jank, maybe not necessary
+                        new InstantAction(() -> intake.setIntake(0.5)), // push sample all the way in, kinda jank, maybe not necessary
                         new InstantAction(() -> outtake.toTransfer()),
                         new SleepAction(0.1), // TODO: play around with timings
                         new InstantAction(() -> outtake.closeClawTight()),
