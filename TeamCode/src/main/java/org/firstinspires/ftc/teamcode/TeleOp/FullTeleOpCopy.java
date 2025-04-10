@@ -166,7 +166,11 @@ public class FullTeleOpCopy extends OpMode {
                             new InstantAction(() -> intake.intake())
                     ));
                 }
-            } else if (intake.chamberState != COLOR_TO_REJECT) {
+            }
+            else if (!sampleMode && intake.chamberState == Intake.IntakeChamberState.YELLOW) {
+                runningActions.add(new InstantAction(() -> intake.reverse()));
+            }
+            else if (intake.chamberState != COLOR_TO_REJECT) {
                 if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
                     // spit out (into human player zone or for teammate bucket bot)
                     runningActions.add(new InstantAction(() -> intake.reverse()));
@@ -184,6 +188,8 @@ public class FullTeleOpCopy extends OpMode {
                             new InstantAction(() -> intake.idle())
                     ));
                 }
+            } else if (!sampleMode && intake.chamberState == Intake.IntakeChamberState.YELLOW) {
+                runningActions.add(new InstantAction(() -> intake.reverse()));
             } else if (intake.chamberState != COLOR_TO_REJECT) {
                 // yay grabbed correct color sample, can stow now
                 gamepad1.rumble(500); /// rumble
@@ -278,9 +284,9 @@ public class FullTeleOpCopy extends OpMode {
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> intake.setIntake(0.5)), // push sample all the way in, kinda jank, maybe not necessary
                         new InstantAction(() -> outtake.toTransfer()),
-                        new SleepAction(0.1), // TODO: play around with timings
+                        new SleepAction(0.2), // TODO: play around with timings
                         new InstantAction(() -> outtake.closeClawTight()),
-                        new SleepAction(0.5),
+                        new SleepAction(0.4),
                         new InstantAction(() -> outtake.toStow()),
                         new SleepAction(0.1),
                         new InstantAction(() -> intake.setIntake(0)),
