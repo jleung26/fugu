@@ -99,7 +99,7 @@ public class FiveSpec extends OpMode {
     private final Pose eject3Pose = new Pose(24, 33, Math.toRadians(240));
 
     /** Pick up from wall, reusable */
-    private final Pose pickupWallPose = new Pose(11, 35, Math.toRadians(0));
+    private final Pose pickupWallPose = new Pose(10, 35, Math.toRadians(0));
 
     private final Pose pickupWall1IntermediateControlPose = new Pose(14, 35, Math.toRadians(0));
 

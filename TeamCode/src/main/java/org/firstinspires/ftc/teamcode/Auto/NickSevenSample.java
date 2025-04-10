@@ -33,8 +33,8 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "Submersible Intake Test", group = "A")
-public class SubIntakeTest extends OpMode {
+@Autonomous(name = "7 Sample Nick", group = "A")
+public class NickSevenSample extends OpMode {
     // declaring subsystems
     RobotHardware robotHardware = new RobotHardware();
     VerticalSlides verticalSlides = new VerticalSlides();
@@ -78,36 +78,38 @@ public class SubIntakeTest extends OpMode {
     // use 42" limit in visualizer, might have to input 84" bot lol
 
     /** Start Pose of our robot */
-    private final Pose startPose = new Pose(62, 98, Math.toRadians(270));
+    private final Pose startPose = new Pose(6.25, 115, Math.toRadians(270));
     // X: bot against wall
     // Y: along closest edge of tile to bucket, just before covering the foam connecting teeth
     // back of bot towards bucket
 
     /** Bucket Scoring Pose */
-    private final Pose scorePose = new Pose(15, 129, Math.toRadians(315)); // TODO: tuned, but can make more optimal
+    private final Pose scorePose = new Pose(15, 132, Math.toRadians(315)); // TODO: tuned, but can make more optimal
 
     /** First Sample from the Spike Mark */
-    private final Pose pickup1Pose = new Pose(16, 128, Math.toRadians(0)); // TODO: tuned, but can make more optimal
+    private final Pose pickup1Pose = new Pose(19, 128, Math.toRadians(0)); // TODO: tuned, but can make more optimal
     // TODO: (e.g. with less movement from score, and turning instead) if need to save some time
     // old, very consistent pose, switch back if unable to tune new pos: 15, 128, Math.toRadians(0)
 
     /** Second Sample from the Spike Mark */
-    private final Pose pickup2Pose = new Pose(16, 133, Math.toRadians(0)); // tuned
+    private final Pose pickup2Pose = new Pose(18, 134, Math.toRadians(0)); // tuned
 
     /** Third Sample from the Spike Mark */
-    private final Pose pickup3Pose = new Pose(25, 120, Math.toRadians(55)); // tuned
+    private final Pose pickup3Pose = new Pose(27, 122, Math.toRadians(55)); // tuned
+
+    private final Pose scoreControlPose = new Pose(68, 110, Math.toRadians(999)/* heading unused*/); // done
+
+    private final Pose sub2Pose = new Pose(67, 98, Math.toRadians(270));
+
+    private final Pose sub3Pose = new Pose(72, 98, Math.toRadians(270));
 
     /** Park Pose for our robot, after we do all of the scoring. */
     private final Pose parkPose = new Pose(62, 98, Math.toRadians(270)); // tuned
 
-    private final Pose scoreControlPose = new Pose(68, 110, Math.toRadians(999)/* heading unused*/); // done
-
-    private final Pose sub2Pose = new Pose(startPose.getX()+5, 98, Math.toRadians(270));
-
-    private final Pose sub3Pose = new Pose(sub2Pose.getX()+5, 98, Math.toRadians(270));
+    private final Pose parkControlPose = new Pose(68, 110, Math.toRadians(999)/* heading unused*/); // done
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
-    private PathChain scorePreload, grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, scoreFrom1, sub2, scoreFrom2, sub3, scoreFrom3, repeatSub;
+    private PathChain scorePreload, grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, scoreFrom1, sub2, scoreFrom2, sub3, scoreFrom3, park;
 
 
     public void buildPaths() {
@@ -153,7 +155,6 @@ public class SubIntakeTest extends OpMode {
                 .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
                 .build();
 
-        /* This is our park path. We are using a BezierCurve with 3 points, which is a curved line that is curved based off of the control point */
         scoreFrom1 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(startPose), /* Control Point */ new Point(scoreControlPose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
@@ -179,73 +180,274 @@ public class SubIntakeTest extends OpMode {
                 .setLinearHeadingInterpolation(sub3Pose.getHeading(), scorePose.getHeading())
                 .build();
 
-        repeatSub = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(sub3Pose), new Point(startPose)))
-                .setConstantHeadingInterpolation(startPose.getHeading())
+        /* This is our park path. We are using a BezierCurve with 3 points, which is a curved line that is curved based off of the control point */
+        park = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(scorePose), /* Control Point */ new Point(parkControlPose), new Point(parkPose)))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading())
                 .build();
     }
 
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                subIntakeAction();
-                if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-                    retractIntakeAction();
-                    setPathState(13);
+                allToScoreAction();
+                follower.followPath(scorePreload);
+                setPathState(1);
+                break;
+            case 1:
+                if(!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                    depositSampleAction();
+                    prepToIntakeAction();
+                    setPathState(990);
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > 2) {
-                    retractIntakeAction();
+                break;
+            case 990:
+                if (pathTimer.getElapsedTimeSeconds() >= 0.4) { // delay
+                    follower.followPath(grabPickup1,true);
                     setPathState(2);
                 }
                 break;
             case 2:
-                follower.followPath(sub2, true);
-                setPathState(3);
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
+                if(!follower.isBusy()) {
+                    /* Grab Sample */
+                    runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
+                    setPathState(3);
+                }
+                break;
             case 3:
-                if (!follower.isBusy()) {
-                    subIntakeAction();
-                    if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-                        retractIntakeAction();
-                        setPathState(14);
-                    }
-                    else if (pathTimer.getElapsedTimeSeconds() > 2) {
-                        retractIntakeAction();
-                        setPathState(4);
-                    }
+                // wait until sample picked up
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                    // retract and prep for transfer
+                    retractIntakeAction();
+
+                    // drive up to scoring
+                    follower.followPath(scorePickup1,true);
+                    setPathState(4);
+                } else if (pathTimer.getElapsedTimeSeconds() > 2.5) { // intake's emptiness already assumed
+                    setPathState(991);
                 }
                 break;
             case 4:
-                follower.followPath(sub3, true);
-                setPathState(5);
+                /* ready to transfer */
+                if(/*arm stuff*/horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
+                    transferAndPrepToScoreAction();
+                    setPathState(1000);
+                }
+                break;
+            case 1000:
+                if (!follower.isBusy()  && verticalSlides.getCurrentPos() > 800) {
+                    depositSampleAction();
+                    setPathState(991);
+                }
+                break;
+            case 991:
+                if (pathTimer.getElapsedTimeSeconds() >= 0.5) {
+                    prepToIntakeAction();
+
+                    follower.followPath(grabPickup2,true);
+                    setPathState(5);
+                } 
+                break;
             case 5:
+                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
+                if(!follower.isBusy()) {
+                    /* Grab Sample */
+                    runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
+
+                    setPathState(7);
+                }
+                break;
+            case 7:
+                // wait until sample picked up
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                    // retract and prep for transfer
+                    retractIntakeAction();
+
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
+                    follower.followPath(scorePickup2,true);
+                    setPathState(8);
+                }
+                break;
+            case 8:
+                /* ready to transfer */
+                if(/*arm stuff*/ horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
+                    transferAndPrepToScoreAction();
+                    setPathState(1001);
+                }
+                break;
+            case 1001:
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                    depositSampleAction();
+                    setPathState(992);
+                }
+                break;
+            case 992:
+                if (pathTimer.getElapsedTimeSeconds() >= 0.5) {
+                    follower.followPath(grabPickup3,true);
+                    setPathState(10);
+                }
+                break;
+            case 10:
+                if (!follower.isBusy()) {
+                    prepToIntakeAction();
+                    runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
+                    setPathState(11);
+                }
+                break;
+            case 11:
+                // wait until sample picked up
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                    // retract and prep for transfer
+                    retractIntakeAction();
+
+                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
+                    follower.followPath(scorePickup3,true);
+                    setPathState(12);
+                }
+                break;
+            case 12:
+                /* ready to transfer */
+                if(/*arm stuff*/horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
+                    /* Transfer and prep to score*/
+                    transferAndPrepToScoreAction();
+                    setPathState(1002);
+                }
+                break;
+            case 1002:
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                    depositSampleAction();
+                    setPathState(993);
+                }
+                break;
+            case 993:
+                if (pathTimer.getElapsedTimeSeconds() >= 0.5) { // delay
+                    follower.followPath(park,true);
+                    setPathState(1999);
+                }
+                break;
+            case 13:
+                if(!follower.isBusy()) {
+                    /** Level 1 Ascent */
+                    // TODO: find a pose where the arm won't be out of servo range after teleop start
+
+                    /* Set the state to a case we won't use or define, so it just stops running an new paths */
+                    setPathState(-1);
+                }
+                break;
+            case 1999:
+                if (!follower.isBusy()) {
+                    subIntakeAction();
+                    setPathState(2000);
+                }
+            case 2000:
+                if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                    retractIntakeAction();
+                    follower.followPath(scoreFrom1, true);
+                    setPathState(2013);
+                } else if (pathTimer.getElapsedTimeSeconds() > 2) {
+                    retractIntakeAction();
+                    setPathState(2002);
+                }
+                break;
+            case 2002:
+                follower.followPath(sub2);
+                setPathState(2003);
+            case 2003:
                 if (!follower.isBusy()) {
                     subIntakeAction();
                     if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
                         retractIntakeAction();
-                        setPathState(15);
+                        follower.followPath(scoreFrom2, true);
+                        setPathState(2013);
+                    }
+                    else if (pathTimer.getElapsedTimeSeconds() > 2) {
+                        retractIntakeAction();
+                        setPathState(2004);
+                    }
+                }
+                break;
+            case 2004:
+                follower.followPath(sub3);
+                setPathState(2005);
+            case 2005:
+                if (!follower.isBusy()) {
+                    subIntakeAction();
+                    if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                        retractIntakeAction();
+                        follower.followPath(scoreFrom3, true);
+                        setPathState(2013);
                     }
                     else if (pathTimer.getElapsedTimeSeconds() > 2) {
                         setPathState(-1);
                     }
                 }
                 break;
-            case 13:
-                follower.followPath(scoreFrom1, true);
-                setPathState(16);
-                break;
-            case 14:
-                follower.followPath(scoreFrom2, true);
-                setPathState(16);
-                break;
-            case 15:
-                follower.followPath(scoreFrom3, true);
-                setPathState(16);
-                break;
-            case 16:
-                if (!follower.isBusy()) {
-                    setPathState(-1);
+            case 2013:
+                if (horizontalSlides.slidesRetracted && intake.wristFlippedUp) {
+                    transferAndPrepToScoreAction();
+                    setPathState(2016);
                 }
-            break;
+                break;
+            case 2016:
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                    depositSampleAction();
+                    setPathState(2998);
+                }
+                break;
+            case 2998:
+                if (pathTimer.getElapsedTimeSeconds() > 0.5) {
+                    follower.followPath(park);
+                    setPathState(2999);
+                }
+            case 2999:
+                if (!follower.isBusy()) {
+                    subIntakeAction();
+                    setPathState(2000);
+                }
+            case 3000:
+                if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                    retractIntakeAction();
+                    follower.followPath(scoreFrom1, true);
+                    setPathState(2013);
+                } else if (pathTimer.getElapsedTimeSeconds() > 2) {
+                    retractIntakeAction();
+                    setPathState(3002);
+                }
+                break;
+            case 3002:
+                follower.followPath(sub2);
+                setPathState(3003);
+            case 3003:
+                if (!follower.isBusy()) {
+                    subIntakeAction();
+                    if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                        retractIntakeAction();
+                        follower.followPath(scoreFrom2, true);
+                        setPathState(2013);
+                    }
+                    else if (pathTimer.getElapsedTimeSeconds() > 2) {
+                        retractIntakeAction();
+                        setPathState(3004);
+                    }
+                }
+                break;
+            case 3004:
+                follower.followPath(sub3);
+                setPathState(3005);
+            case 3005:
+                if (!follower.isBusy()) {
+                    subIntakeAction();
+                    if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                        retractIntakeAction();
+                        follower.followPath(scoreFrom3, true);
+                        setPathState(2013);
+                    }
+                    else if (pathTimer.getElapsedTimeSeconds() > 2) {
+                        setPathState(-1);
+                    }
+                }
+                break;
         }
     }
 
@@ -335,6 +537,7 @@ public class SubIntakeTest extends OpMode {
         telemetry.addData("pinpoint cooked? ", follower.isLocalizationNAN());
         telemetry.addData("robot stuck? ", follower.isRobotStuck());
         telemetry.addData("path timer seconds", pathTimer.getElapsedTimeSeconds());
+        telemetry.addData("current vert pos",  verticalSlides.getCurrentPos());
 
         telemetry.addLine("\n Pose");
         telemetry.addData("x: ", follower.getPose().getX());
@@ -361,16 +564,16 @@ public class SubIntakeTest extends OpMode {
     public void transferAndPrepToScoreAction() {
         // full transfer and prep to score sequence
         runningActions.add(new SequentialAction(
-                new InstantAction(() -> intake.setIntake(0.4)), // push sample all the way in, kinda jank, maybe not necessary
+                new InstantAction(() -> intake.setIntake(0.5)), // push sample all the way in, kinda jank, maybe not necessary
                 new InstantAction(() -> outtake.toTransfer()),
-                new SleepAction(0.2), // TODO: play around with timings
+                new SleepAction(0.1), // TODO: play around with timings
                 new InstantAction(() -> outtake.closeClawTight()),
-                new SleepAction(0.3),
+                new SleepAction(0.5),
                 new InstantAction(() -> outtake.toStow()),
                 new SleepAction(0.1),
                 new InstantAction(() -> intake.setIntake(0)),
                 new InstantAction(() -> verticalSlides.raiseToHighBucket()),
-                new SleepAction(0.3),
+                new SleepAction(0.2),
                 new InstantAction(() -> outtake.toVert())
         ));
     }
@@ -386,6 +589,14 @@ public class SubIntakeTest extends OpMode {
                         new InstantAction(() -> outtake.toStow()),
                         new InstantAction(() -> verticalSlides.retract())
                 )
+        ));
+    }
+
+    public void prepToIntakeAction() {
+        runningActions.add(new SequentialAction(
+                new InstantAction(() -> horizontalSlides.extendPartial()),
+                new InstantAction(() -> intake.dropDown()),
+                new InstantAction(() -> intake.intake())
         ));
     }
 
