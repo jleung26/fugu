@@ -84,7 +84,7 @@ public class NickSevenSample extends OpMode {
     // back of bot towards bucket
 
     /** Bucket Scoring Pose */
-    private final Pose scorePose = new Pose(15, 132, Math.toRadians(315)); // TODO: tuned, but can make more optimal
+    private final Pose scorePose = new Pose(16, 131, Math.toRadians(315)); // TODO: tuned, but can make more optimal
 
     /** First Sample from the Spike Mark */
     private final Pose pickup1Pose = new Pose(19, 128, Math.toRadians(0)); // TODO: tuned, but can make more optimal
@@ -92,7 +92,7 @@ public class NickSevenSample extends OpMode {
     // old, very consistent pose, switch back if unable to tune new pos: 15, 128, Math.toRadians(0)
 
     /** Second Sample from the Spike Mark */
-    private final Pose pickup2Pose = new Pose(18, 134, Math.toRadians(0)); // tuned
+    private final Pose pickup2Pose = new Pose(18, 132, Math.toRadians(0)); // tuned
 
     /** Third Sample from the Spike Mark */
     private final Pose pickup3Pose = new Pose(27, 122, Math.toRadians(55)); // tuned
@@ -340,6 +340,7 @@ public class NickSevenSample extends OpMode {
                     subIntakeAction();
                     setPathState(2000);
                 }
+                break;
             case 2000:
                 if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
                     retractIntakeAction();
@@ -353,6 +354,7 @@ public class NickSevenSample extends OpMode {
             case 2002:
                 follower.followPath(sub2);
                 setPathState(2003);
+                break;
             case 2003:
                 if (!follower.isBusy()) {
                     subIntakeAction();
@@ -370,6 +372,7 @@ public class NickSevenSample extends OpMode {
             case 2004:
                 follower.followPath(sub3);
                 setPathState(2005);
+                break;
             case 2005:
                 if (!follower.isBusy()) {
                     subIntakeAction();
@@ -400,11 +403,13 @@ public class NickSevenSample extends OpMode {
                     follower.followPath(park);
                     setPathState(2999);
                 }
+                break;
             case 2999:
                 if (!follower.isBusy()) {
                     subIntakeAction();
-                    setPathState(2000);
+                    setPathState(3000);
                 }
+                break;
             case 3000:
                 if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
                     retractIntakeAction();
@@ -418,6 +423,7 @@ public class NickSevenSample extends OpMode {
             case 3002:
                 follower.followPath(sub2);
                 setPathState(3003);
+                break;
             case 3003:
                 if (!follower.isBusy()) {
                     subIntakeAction();
@@ -435,6 +441,7 @@ public class NickSevenSample extends OpMode {
             case 3004:
                 follower.followPath(sub3);
                 setPathState(3005);
+                break;
             case 3005:
                 if (!follower.isBusy()) {
                     subIntakeAction();
