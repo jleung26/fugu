@@ -148,7 +148,7 @@ public class FullTeleOpCopy extends OpMode {
 
         /// updating booleans
         COLOR_TO_REJECT = (redAlliance ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
-        drive.slowModeBool = !horizontalSlides.slidesRetracted;
+        drive.slowModeBool = !horizontalSlides.slidesRetracted || currentGamepad2.left_trigger > 0.1;
         drive.angleLockBool = (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) || (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP);
         if (currentGamepad1.left_trigger > 0.1 && !(previousGamepad1.left_trigger > 0.1)) { // avoids setting every loop since it probably takes time
             drive.setZeroPowerBrake(true);

@@ -198,7 +198,6 @@ public class Hang {
                     leftVertMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //                    leftVertMotor.setMotorDisable(); // never used before, could be problematic, but seems self-explanatory
 //                    rightVertMotor.setMotorDisable();
-                    stowWheely();
                     // engage PTO
                     engagePTO();
                     setHangState(2);
@@ -209,6 +208,7 @@ public class Hang {
             /// driver 2 uses left stick manual control to extend to L3 height
             case 2: /// arm swings over, while driver 2 times to land hooks
                 if (currentGamepad2.a && !previousGamepad2.a) {
+                    stowWheely();
                     leftArmPitchServo.setPosition(armSwingPos);
                     rightArmPitchServo.setPosition(armSwingPos);
                     armExtenderServo.setPosition(armExtenderExtendedPos); // might need modification, idk where the linkage will intersect
