@@ -34,7 +34,7 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "6 Sample Final", group = "A")
+@Autonomous(name = "6 Sample Final", group = "A", preselectTeleOp = "Full TeleOp FINAL")
 public class SixSample extends OpMode {
     // declaring subsystems
     RobotHardware robotHardware = new RobotHardware();
