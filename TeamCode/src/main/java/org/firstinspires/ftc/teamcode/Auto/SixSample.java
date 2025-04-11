@@ -126,6 +126,7 @@ public class SixSample extends OpMode {
         scorePreload = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(startPose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
+                .setZeroPowerAccelerationMultiplier(2)
                 .build();
         /* Here is an example for Constant Interpolation
         scorePreload.setConstantInterpolation(startPose.getHeading()); */
@@ -140,6 +141,7 @@ public class SixSample extends OpMode {
         scorePickup1 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(pickup1Pose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
+                .setZeroPowerAccelerationMultiplier(2)
                 // TODO: maybe constant heading here?
                 .build();
 
@@ -151,6 +153,7 @@ public class SixSample extends OpMode {
         scorePickup2 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(pickup2Pose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading())
+                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         grabPickup3 = follower.pathBuilder()
@@ -161,6 +164,7 @@ public class SixSample extends OpMode {
         scorePickup3 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(pickup3Pose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
+                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         scoreToSub1 = follower.pathBuilder() // to sub for first grab
@@ -180,6 +184,7 @@ public class SixSample extends OpMode {
         scoreFrom1 = follower.pathBuilder() // from sub1 pose to scoring
                 .addPath(new BezierCurve(new Point(sub1Pose), /* Control Point */ new Point(scoreControlPose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(sub1Pose.getHeading(), scorePose.getHeading())
+                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         sub1ToSub2 = follower.pathBuilder()
@@ -195,6 +200,7 @@ public class SixSample extends OpMode {
         scoreFrom2 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(sub2Pose), /* Control Point */ new Point(scoreControlPose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(sub2Pose.getHeading(), scorePose.getHeading())
+                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         // backup, not for 7th sample
@@ -211,6 +217,7 @@ public class SixSample extends OpMode {
         scoreFrom3 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(sub3Pose), /* Control Point */ new Point(scoreControlPose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(sub3Pose.getHeading(), scorePose.getHeading())
+                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         /* This is our park path. We are using a BezierCurve with 3 points, which is a curved line that is curved based off of the control point */

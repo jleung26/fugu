@@ -115,6 +115,7 @@ public class FourSample extends OpMode {
         scorePreload = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(startPose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
+                .setZeroPowerAccelerationMultiplier(2)
                 .build();
         /* Here is an example for Constant Interpolation
         scorePreload.setConstantInterpolation(startPose.getHeading()); */
@@ -129,7 +130,7 @@ public class FourSample extends OpMode {
         scorePickup1 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(pickup1Pose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
-                // TODO: maybe constant heading here?
+                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         grabPickup2 = follower.pathBuilder()
@@ -140,6 +141,7 @@ public class FourSample extends OpMode {
         scorePickup2 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(pickup2Pose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading())
+                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         grabPickup3 = follower.pathBuilder()
@@ -150,6 +152,7 @@ public class FourSample extends OpMode {
         scorePickup3 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(pickup3Pose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
+                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         /* This is our park path. We are using a BezierCurve with 3 points, which is a curved line that is curved based off of the control point */
