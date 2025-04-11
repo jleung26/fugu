@@ -22,8 +22,6 @@ public class RobotHardware {
 
     public RevColorSensorV3 intakeColorSensor;
 
-    public Limelight3A limelight;
-
     public void initialize(OpMode opmode) {
         /*
             CONFIG:
@@ -61,8 +59,6 @@ public class RobotHardware {
          */
         odo = opmode.hardwareMap.get(GoBildaPinpointDriver.class, "odo");
         intakeColorSensor = opmode.hardwareMap.get(RevColorSensorV3.class, "color");
-
-        limelight = opmode.hardwareMap.get(Limelight3A.class, "limelight");
 
         Fl = opmode.hardwareMap.get(DcMotorEx.class, "Fl");
         Fr = opmode.hardwareMap.get(DcMotorEx.class, "Fr");
