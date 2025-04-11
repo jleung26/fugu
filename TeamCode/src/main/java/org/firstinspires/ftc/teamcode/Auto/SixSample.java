@@ -113,6 +113,8 @@ public class SixSample extends OpMode {
     private final Pose parkControlPose = new Pose(68, 110, Math.toRadians(999)/* heading unused*/); // done
 
     private final double SUB_GRAB_TIMEOUT = 1.5;
+    private final double DEPOSIT_DELAY = 0.5; // delay to wait before follow next path after deposit sample Action
+    private final double VERT_SLIDES_EXTENDED_THRESHOLD = 800;
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
     private PathChain scorePreload, grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, scoreToSub1, subStrafe, scoreFrom1, sub1ToSub2, scoreToSub2, scoreFrom2, sub2ToSub3, scoreToSub3, scoreFrom3, park;
@@ -227,14 +229,14 @@ public class SixSample extends OpMode {
                 setPathState(1);
                 break;
             case 1:
-                if(!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if(!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleAction();
                     prepToIntakeAction();
                     setPathState(2);
                 }
                 break;
             case 2:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.6) { // delay
+                if (pathTimer.getElapsedTimeSeconds() >= DEPOSIT_DELAY) {
                     follower.followPath(grabPickup1,true);
                     setPathState(3);
                 }
@@ -267,13 +269,13 @@ public class SixSample extends OpMode {
                 }
                 break;
             case 6:
-                if (!follower.isBusy()  && verticalSlides.getCurrentPos() > 800) {
+                if (!follower.isBusy()  && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleAction();
                     setPathState(7);
                 }
                 break;
             case 7:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) {
+                if (pathTimer.getElapsedTimeSeconds() >= DEPOSIT_DELAY) {
                     prepToIntakeAction();
                     follower.followPath(grabPickup2,true);
                     setPathState(8);
@@ -305,13 +307,13 @@ public class SixSample extends OpMode {
                 }
                 break;
             case 11:
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleAction();
                     setPathState(12);
                 }
                 break;
             case 12:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) {
+                if (pathTimer.getElapsedTimeSeconds() >= DEPOSIT_DELAY) {
                     follower.followPath(grabPickup3,true);
                     setPathState(13);
                 }
@@ -342,7 +344,7 @@ public class SixSample extends OpMode {
                 }
                 break;
             case 16:
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleAction();
                     setPathState(1001);
                 }
@@ -353,7 +355,7 @@ public class SixSample extends OpMode {
             /// intaking from sub now, lots of convoluted paths
             /// INTAKE: bucket to sub 1, strafe to clear samples, then intake
             case 1001:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) { // delay
+                if (pathTimer.getElapsedTimeSeconds() >= DEPOSIT_DELAY) { // delay
                     follower.followPath(scoreToSub1,true);
                     setPathState(1002);
                 }
@@ -372,7 +374,7 @@ public class SixSample extends OpMode {
                 break;
             /// INTAKE: bucket to sub 2, then intake
             case 2001:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) { // delay
+                if (pathTimer.getElapsedTimeSeconds() >= DEPOSIT_DELAY) { // delay
                     follower.followPath(scoreToSub2,true);
                     setPathState(2002);
                 }
@@ -391,7 +393,7 @@ public class SixSample extends OpMode {
                 break;
             /// INTAKE: bucket to sub 3, then intake
             case 3001:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) { // delay
+                if (pathTimer.getElapsedTimeSeconds() >= DEPOSIT_DELAY) { // delay
                     follower.followPath(scoreToSub3,true);
                     setPathState(3002);
                 }
@@ -424,7 +426,7 @@ public class SixSample extends OpMode {
                 }
                 break;
             case 1007: // score from sub 1
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleSubAction();
                     setPathState(2001); // back to sub to grab second sample
                 }
@@ -442,7 +444,7 @@ public class SixSample extends OpMode {
                 }
                 break;
             case 2008: // score from sub 2
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleSubAction();
                     if (samplesGrabbedFromSub == 1) {
                         setPathState(3001); // not done, go back
@@ -467,7 +469,7 @@ public class SixSample extends OpMode {
                 }
                 break;
             case 3008: // score from sub 3
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleSubAction();
                     setPathState(-1); // park
                 }

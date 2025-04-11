@@ -102,6 +102,9 @@ public class FourSample extends OpMode {
 
     private final Pose parkControlPose = new Pose(68, 110, Math.toRadians(999)/* heading unused*/); // done
 
+    private final double DEPOSIT_DELAY = 0.5;
+    private final double VERT_SLIDES_EXTENDED_THRESHOLD = 800;
+
     /* These are our Paths and PathChains that we will define in buildPaths() */
     private PathChain scorePreload, grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, park;
 
@@ -165,7 +168,7 @@ public class FourSample extends OpMode {
                 setPathState(1);
                 break;
             case 1:
-                if(!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if(!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleAction();
                     prepToIntakeAction();
                     setPathState(990);
@@ -206,13 +209,13 @@ public class FourSample extends OpMode {
                 }
                 break;
             case 1000:
-                if (!follower.isBusy()  && verticalSlides.getCurrentPos() > 800) {
+                if (!follower.isBusy()  && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleAction();
                     setPathState(991);
                 }
                 break;
             case 991:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) {
+                if (pathTimer.getElapsedTimeSeconds() >= DEPOSIT_DELAY) {
                     prepToIntakeAction();
 
                     follower.followPath(grabPickup2,true);
@@ -247,13 +250,13 @@ public class FourSample extends OpMode {
                 }
                 break;
             case 1001:
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleAction();
                     setPathState(992);
                 }
                 break;
             case 992:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) {
+                if (pathTimer.getElapsedTimeSeconds() >= DEPOSIT_DELAY) {
                     follower.followPath(grabPickup3,true);
                     setPathState(10);
                 }
@@ -285,13 +288,13 @@ public class FourSample extends OpMode {
                 }
                 break;
             case 1002:
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleAction();
                     setPathState(993);
                 }
                 break;
             case 993:
-                if (pathTimer.getElapsedTimeSeconds() >= 0.5) { // delay
+                if (pathTimer.getElapsedTimeSeconds() >= DEPOSIT_DELAY) { // delay
                     follower.followPath(park,true);
                     stowToParkAction();
                     setPathState(-1);
