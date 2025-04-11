@@ -58,7 +58,7 @@ public class FConstants {
         FollowerConstants.motorCachingThreshold = 0.005;
         FollowerConstants.automaticHoldEnd = false; // this can be changed later
 
-        FollowerConstants.pathEndTimeoutConstraint = 500; //100
+        FollowerConstants.pathEndTimeoutConstraint = 200; //100
         FollowerConstants.pathEndTValueConstraint = 0.995;
         FollowerConstants.pathEndVelocityConstraint = 0.1;
         FollowerConstants.pathEndTranslationalConstraint = 0.1;

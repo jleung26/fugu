@@ -17,6 +17,7 @@ import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -34,6 +35,7 @@ import pedroPathing.constants.LConstants;
 
 
 @Autonomous(name = "7 Sample Intake Only", group = "A", preselectTeleOp = "Full TeleOp FINAL")
+@Disabled
 public class SevenSampleIntakeOnly extends OpMode {
     // declaring subsystems
     RobotHardware robotHardware = new RobotHardware();

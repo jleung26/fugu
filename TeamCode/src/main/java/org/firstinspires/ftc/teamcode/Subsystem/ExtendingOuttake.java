@@ -71,6 +71,7 @@ public class ExtendingOuttake {
         private final double armScoringClipPosition = 0.17;
         private final double armGrabClipWallPosition = 0.9;
         private final double armVertPosition = 0.521;
+        private final double armSubParkPosition = 0.7; // TODO: tune
         private final double armIncrement = 0.0005;
 
 
@@ -116,6 +117,10 @@ public class ExtendingOuttake {
             setArmPosition(armVertPosition);
             armState = STATE.VERT;
         }
+        public void setArmSubPark() {
+            setArmPosition(armSubParkPosition);
+            armState = STATE.VERT;
+        }
     }
 
     public static class ArmExtend {
@@ -127,6 +132,7 @@ public class ExtendingOuttake {
         private final double extenderScoreClipPosition = 0.89;
         private final double extenderAutoScoreClipPosition = 0.98;
         private final double extenderGrabClipWallPosition = 0.19;
+        private final double extenderSubParkPosition = 0.363; // TODO: tune
         private final double increment = 0.001;
 
         public ArmExtend() {}
@@ -160,7 +166,10 @@ public class ExtendingOuttake {
             extenderServo.setPosition(extenderAutoScoreClipPosition);
             isExtenderTransferring = false;
         }
-
+        public void extendToSubPark() {
+            extenderServo.setPosition(extenderSubParkPosition);
+            isExtenderTransferring = false;
+        }
         // Incremental extension
         public void incremental(int sign) {
             extenderServo.setPosition(extenderServo.getPosition() + sign * increment);
@@ -240,6 +249,10 @@ public class ExtendingOuttake {
         armExtend.extendToGrabClip();
         armPitch.setArmVert();
     } // to vertical (claw facing straight up) "idle" position (only really intermediate for bucket scoring)
+    public void toSubPark() {
+        armExtend.extendToSubPark();
+        armPitch.setArmSubPark();
+    }
 
     public void closeClawTight() { claw.closeTight(); }
     public void closeClawLoose() { claw.closeLoose(); }

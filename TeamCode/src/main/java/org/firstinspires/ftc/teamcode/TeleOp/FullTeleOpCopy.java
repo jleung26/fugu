@@ -106,6 +106,8 @@ public class FullTeleOpCopy extends OpMode {
     @Override
     public void start() {
         COLOR_TO_REJECT = (redAlliance ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
+        robotHardware.rightPtoServo.setPosition(1);
+        robotHardware.leftPtoServo.setPosition(0.9639);
         outtake.toStow();
         outtake.openClaw();
         intake.flipUp();
