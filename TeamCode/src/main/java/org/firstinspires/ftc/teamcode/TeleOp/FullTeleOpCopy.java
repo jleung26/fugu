@@ -139,7 +139,7 @@ public class FullTeleOpCopy extends OpMode {
         if (hangBool) {
             hang.operate(currentGamepad1, currentGamepad2, previousGamepad1, previousGamepad2);
             // failed wheely tilt, reset button
-            if (currentGamepad2.b && !previousGamepad2.b) {
+            if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
                 //undo wheely
                 hang.setHangState(-1);
             }
@@ -338,10 +338,10 @@ public class FullTeleOpCopy extends OpMode {
             sampleMode = !sampleMode;
         }
 
-        // set target for spec cycles, yaw never really needs to reset
-        if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
-            drive.setTargetToCurrentHeading();
-        }
+//        // set target for spec cycles, yaw never really needs to reset
+//        if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
+//            drive.setTargetToCurrentHeading();
+//        }
 
         // hang logic (this is where it gets messy :NOOOOO:)
         if (currentGamepad2.right_stick_button && !previousGamepad2.right_stick_button) {

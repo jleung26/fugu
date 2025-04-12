@@ -175,7 +175,7 @@ public class Hang {
                 disengagePTO();
                 setHangState(0);
             case 0: /// set motor modes, arm pos, and start wheely (the servos strain a lot, so move quickly)
-                if (currentGamepad2.a && !previousGamepad2.a) {
+                if (currentGamepad2.y && !previousGamepad2.y) {
                     // motors all in modes
                     switchToHangMode();
                     disengagePTO();
@@ -195,7 +195,7 @@ public class Hang {
                 break;
             /// driver 1 positions bot, driver 2 uses left stick to straight drive and tip (need good timing)
             case 1: /// engage PTO, disable slide motors
-                if (currentGamepad2.a && !previousGamepad2.a) {
+                if (currentGamepad2.y && !previousGamepad2.y) {
                     // stop unnecessary current draw
                     leftVertMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //                    leftVertMotor.setMotorDisable(); // never used before, could be problematic, but seems self-explanatory
@@ -209,7 +209,7 @@ public class Hang {
             /// driver 2 uses left stick manual control (in mecanum file) to drop onto secondary hooks
             /// driver 2 uses left stick manual control to extend to L3 height
             case 2: /// arm swings over, while driver 2 times to land hooks
-                if (currentGamepad2.a && !previousGamepad2.a) {
+                if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
                     stowWheely();
                     engagePTO();
                     leftArmPitchServo.setPosition(armSwingPos);
@@ -219,7 +219,7 @@ public class Hang {
                     setHangState(3);
                 }
             case 3:
-                if (currentGamepad2.a && !previousGamepad2.a) {
+                if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
                     toggleSwingArm();
                 } // never leaves this case
                 break;

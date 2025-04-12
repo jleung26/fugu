@@ -41,7 +41,7 @@ public class ManualHangTest extends OpMode {
 
         hang.operate(currentGamepad1, currentGamepad2, previousGamepad1, previousGamepad2);
         // failed wheely tilt, reset button
-        if (currentGamepad2.b && !previousGamepad2.b) {
+        if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
             //undo wheely
             hang.setHangState(-1);
         }
