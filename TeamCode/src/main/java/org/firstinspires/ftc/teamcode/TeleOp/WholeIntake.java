@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @TeleOp(group = "B")
+@Disabled
 public class WholeIntake extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     Intake intake = new Intake();
