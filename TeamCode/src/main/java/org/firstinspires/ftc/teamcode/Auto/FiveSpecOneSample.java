@@ -12,6 +12,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
+import com.pedropathing.pathgen.BezierPoint;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Timer;
@@ -33,8 +34,8 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "5+0", group = "A", preselectTeleOp = "Full TeleOp FINAL")
-public class FiveSpec extends OpMode {
+@Autonomous(name = "5+1", group = "A", preselectTeleOp = "Full TeleOp FINAL")
+public class FiveSpecOneSample extends OpMode {
     // declaring subsystems
     RobotHardware robotHardware = new RobotHardware();
     VerticalSlides verticalSlides = new VerticalSlides();
@@ -123,7 +124,11 @@ public class FiveSpec extends OpMode {
     private final Pose score4Pose = new Pose(37, 66, Math.toRadians(0));
 
     /** Park Pose for our robot, after we do all of the scoring. */
-    private final Pose parkPose = new Pose(9.5, 30, Math.toRadians(0));
+    private final Pose grabYellowPose = new Pose(12, 54, Math.toRadians(270));
+
+    private final Pose scoreBucketPose = new Pose(7, 130, Math.toRadians(270));
+
+    private final Pose parkPose = new Pose(18, 132, Math.toRadians(270));
 
     private int movingEjectAngleThreshold = 250;
     private double specScoreXThreshold = 38;
@@ -132,24 +137,10 @@ public class FiveSpec extends OpMode {
 //    private final Pose parkControlPose = new Pose(60, 98, Math.toRadians(90));
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
-    private PathChain score0, prepIntake1, intake1, eject1, intake2, eject2, intake3, eject3, grab1, score1, grab2, score2, grab3, score3, grab4, score4, park;
+    private PathChain score0, prepIntake1, intake1, eject1, intake2, eject2, intake3, eject3, grab1, score1, grab2, score2, grab3, score3, grab4, score4, grabYellow, scoreBucket, park;
 
     public void buildPaths() {
 
-        /* There are two major types of paths components: BezierCurves and BezierLines.
-         *    * BezierCurves are curved, and require >= 3 points. There are the start and end points, and the control points.
-         *    - Control points manipulate the curve between the start and end points.
-         *    - A good visualizer for this is [this](https://pedro-path-generator.vercel.app/).
-         *    * BezierLines are straight, and require 2 points. There are the start and end points.
-         * Paths have can have heading interpolation: Constant, Linear, or Tangential
-         *    * Linear heading interpolation:
-         *    - Pedro will slowly change the heading of the robot from the startHeading to the endHeading over the course of the entire path.
-         *    * Constant Heading Interpolation:
-         *    - Pedro will maintain one heading throughout the entire path.
-         *    * Tangential Heading Interpolation:
-         *    - Pedro will follows the angle of the path such that the robot is always driving forward when it follows the path.
-         * PathChains hold Path(s) within it and are able to hold their end point, meaning that they will holdPoint until another path is followed.
-         * Here is a explanation of the difference between Paths and PathChains <https://pedropathing.com/commonissues/pathtopathchain.html> */
         score0 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(startPose), new Point(score0Pose)))
                 .setLinearHeadingInterpolation(startPose.getHeading(), score0Pose.getHeading())
@@ -237,9 +228,20 @@ public class FiveSpec extends OpMode {
                 .setConstantHeadingInterpolation(score4Pose.getHeading())
                 .build();
 
+        // TODO TODO TODO TODO TODO TODO TODO TODO: tune following 3 poses
+        grabYellow = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(score4Pose), new Point(grabYellowPose)))
+                .setLinearHeadingInterpolation(score4Pose.getHeading(), grabYellowPose.getHeading())
+                .build();
+
+        scoreBucket = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(grabYellowPose), new Point(scoreBucketPose)))
+                .setConstantHeadingInterpolation(scoreBucketPose.getHeading())
+                .build();
+
         park = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(score4Pose), new Point(parkPose)))
-                .setLinearHeadingInterpolation(score4Pose.getHeading(), parkPose.getHeading())
+                .addPath(new BezierLine(new Point(scoreBucketPose), new Point(parkPose)))
+                .setLinearHeadingInterpolation(scoreBucketPose.getHeading(), parkPose.getHeading())
                 .build();
     }
 
@@ -263,8 +265,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 2:
-//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) { // old conditional
-                if (outtake.claw.isClawOpen) { // new conditional, maybe faster, but also maybe arm gets caught on stuff
+                if (outtake.claw.isClawOpen) {
                     // get away from sub, and get ready to grab first sample
                     follower.followPath(intake1, true);
                     setPathState(3);
@@ -386,8 +387,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 18:
-//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
-                if (outtake.claw.isClawOpen) { // new conditional, maybe faster, but also maybe arm gets caught on stuff
+                if (outtake.claw.isClawOpen) {
                     // drive to grab another once done with slam
                     follower.followPath(grab2, true);
                     setPathState(19);
@@ -413,8 +413,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 22:
-//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
-                if (outtake.claw.isClawOpen) { // new conditional, maybe faster, but also maybe arm gets caught on stuff
+                if (outtake.claw.isClawOpen) {
                     follower.followPath(grab3, true);
                     setPathState(23);
                 }
@@ -438,8 +437,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 26:
-//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
-                if (outtake.claw.isClawOpen) { // new conditional, maybe faster, but also maybe arm gets caught on stuff
+                if (outtake.claw.isClawOpen) {
                     follower.followPath(grab4, true);
                     setPathState(27);
                 }
@@ -463,10 +461,46 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 30:
-//                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) {
-                if (outtake.claw.isClawOpen) { // new conditional, maybe faster, but also maybe arm gets caught on stuff
-                    // huzzah we done, park
-                    follower.followPath(park, true);
+                if (outtake.claw.isClawOpen) {
+                    follower.followPath(grabYellow, true);
+                    prepToIntakeAction();
+                    setPathState(31);
+                }
+                break;
+            // TODO TODO TODO TODO TODO TODO TODO TODO: tune from here below, change
+            //      maybe change case 31 isBusy
+            //      maybe change case 33 70 -> 60
+            //      maybe change case 34 -2 > -4, 800 -> 900, etc.
+            // praying we don't run out of time
+            case 31:
+                if (!follower.isBusy()) {
+                    extendIntakeAction();
+                    setPathState(32);
+                }
+                break;
+            case 32:
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                    retractIntakeAction();
+                    follower.followPath(scoreBucket);
+                    setPathState(33);
+                }
+                break;
+            case 33:
+                if (follower.getPose().getY() > 70) {
+                    transferAndRushToScoreAction();
+                    setPathState(34);
+                }
+            case 34:
+                if(follower.getPose().getY() > scoreBucketPose.getY() - 2 && verticalSlides.getCurrentPos() > 800) {
+                    depositSampleRushAction();
+                    prepToIntakeAction();
+                    setPathState(35);
+                }
+                break;
+            case 35:
+                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.STOW) {
+                    runningActions.add(new InstantAction(() -> verticalSlides.retract()));
+                    follower.followPath(park);
                     setPathState(-1);
                 }
                 break;
@@ -626,6 +660,29 @@ public class FiveSpec extends OpMode {
                 new InstantAction(() -> horizontalSlides.retract()),
                 new InstantAction(() -> intake.flipUp()),
                 new InstantAction(() -> intake.fullStop())
+        ));
+    }
+
+    public void transferAndRushToScoreAction() {
+        runningActions.add(new SequentialAction(
+                new InstantAction(() -> intake.setIntake(0.5)), // push sample all the way in, kinda jank, maybe not necessary
+                new InstantAction(() -> outtake.toTransfer()),
+                new SleepAction(0.1),
+                new InstantAction(() -> outtake.closeClawTight()),
+                new SleepAction(0.35),
+                new InstantAction(() -> outtake.toStow()),
+                new InstantAction(() -> intake.setIntake(0)),
+                new InstantAction(() -> verticalSlides.raiseToHighBucket()),
+                new SleepAction(0.2),
+                new InstantAction(() -> outtake.toScoreBucket())
+        ));
+    }
+
+    public void depositSampleRushAction() {
+        runningActions.add(new SequentialAction(
+                new InstantAction(() -> outtake.openClaw()),
+                new SleepAction(0.2),
+                new InstantAction(() -> outtake.toStow())
         ));
     }
 }

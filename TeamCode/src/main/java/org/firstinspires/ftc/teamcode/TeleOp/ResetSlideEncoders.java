@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOp.Testing;
+package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.VerticalSlides;
 import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 
-@TeleOp(group = "A")
+@TeleOp(name = "zReset Slide Encoders", group = "A")
 public class ResetSlideEncoders extends OpMode {
     RobotHardware robotHardware = new RobotHardware();
     VerticalSlides verticalSlides = new VerticalSlides();

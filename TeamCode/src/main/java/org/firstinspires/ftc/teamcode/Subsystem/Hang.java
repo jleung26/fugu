@@ -18,6 +18,7 @@ public class Hang {
     private Servo rightArmPitchServo, leftArmPitchServo, armExtenderServo;
     private DcMotorEx Fl, Fr, Bl, Br, leftVertMotor, rightVertMotor;
     private int hangState;
+    private boolean swingArmBool = false;
 
     public static double leftWheelyStowPos = 0.775;
     public static double leftWheelyDeployPos = 0.1494;
@@ -187,7 +188,8 @@ public class Hang {
                     // arm gets out of the way
                     leftArmPitchServo.setPosition(armL2Pos);
                     rightArmPitchServo.setPosition(armL2Pos);
-                    armExtenderServo.setPosition(armExtenderRetractedPos);
+                    swingArmBool = false;
+                    armExtenderServo.setPosition(armExtenderExtendedPos);
                     setHangState(1);
                 }
                 break;
@@ -212,11 +214,27 @@ public class Hang {
                     engagePTO();
                     leftArmPitchServo.setPosition(armSwingPos);
                     rightArmPitchServo.setPosition(armSwingPos);
-                    armExtenderServo.setPosition(armExtenderExtendedPos); // might need modification, idk where the linkage will intersect
-                    setHangState(-5);
+                    armExtenderServo.setPosition(armExtenderExtendedPos);
+                    swingArmBool = true;
+                    setHangState(3);
                 }
+            case 3:
+                if (currentGamepad2.a && !previousGamepad2.a) {
+                    toggleSwingArm();
+                } // never leaves this case
                 break;
             /// driver 2 does final pull up and puts controller down
+        }
+    }
+    private void toggleSwingArm() {
+        if (swingArmBool) {
+            leftArmPitchServo.setPosition(armSwingPos);
+            rightArmPitchServo.setPosition(armSwingPos);
+            armExtenderServo.setPosition(armExtenderExtendedPos);
+        } else {
+            leftArmPitchServo.setPosition(armL2Pos);
+            rightArmPitchServo.setPosition(armL2Pos);
+            armExtenderServo.setPosition(armExtenderExtendedPos);
         }
     }
 

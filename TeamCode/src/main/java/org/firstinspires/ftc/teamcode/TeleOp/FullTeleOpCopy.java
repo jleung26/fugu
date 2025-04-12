@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Subsystem.Hang;
 import org.firstinspires.ftc.teamcode.Subsystem.HorizontalSlides;
 import org.firstinspires.ftc.teamcode.Subsystem.Intake;
 import org.firstinspires.ftc.teamcode.Subsystem.Mecanum;
@@ -33,16 +34,14 @@ public class FullTeleOpCopy extends OpMode {
     HorizontalSlides horizontalSlides = new HorizontalSlides();
     ExtendingOuttake outtake = new ExtendingOuttake();
     Intake intake = new Intake();
-
-//    LimelightVision lime = new LimelightVision();
-//    LEDManager blinkinLED = new LEDManager();
-//    Hang hang = new Hang();
+    Hang hang = new Hang();
 
     // booleans
     // team color
     // spec/sample
     boolean redAlliance = true;
     boolean sampleMode = true;
+    boolean hangBool = false;
     Intake.IntakeChamberState COLOR_TO_REJECT;
 
     // Action stuff
@@ -74,8 +73,7 @@ public class FullTeleOpCopy extends OpMode {
         horizontalSlides.initialize(this, robotHardware, false);
         outtake.initialize(this, robotHardware);
         intake.initialize(this, robotHardware);
-//        lime.initialize(this, robotHardware);
-//        hang.initialize(this, robotHardware);
+        hang.initialize(this, robotHardware);
 
         // bulk cache reading
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -105,8 +103,7 @@ public class FullTeleOpCopy extends OpMode {
     @Override
     public void start() {
         COLOR_TO_REJECT = (redAlliance ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
-        robotHardware.rightPtoServo.setPosition(1);
-        robotHardware.leftPtoServo.setPosition(0.9639);
+        hang.disengagePTO();
         outtake.toStow();
         outtake.openClaw();
         intake.flipUp();
@@ -139,12 +136,20 @@ public class FullTeleOpCopy extends OpMode {
         runningActions = newActions;
 
         /// loops
-        if (true) { // TODO: once hang ready to implement, hang state here
+        if (hangBool) {
+            hang.operate(currentGamepad1, currentGamepad2, previousGamepad1, previousGamepad2);
+            // failed wheely tilt, reset button
+            if (currentGamepad2.b && !previousGamepad2.b) {
+                //undo wheely
+                hang.setHangState(-1);
+            }
+            drive.operateHang();
+        } else {
             drive.operateTeleOp();
             verticalSlides.operate();
         }
+
         horizontalSlides.operate();
-//        lime.operate();
         intake.operateColorChecking();
 
         /// updating booleans
@@ -338,9 +343,10 @@ public class FullTeleOpCopy extends OpMode {
             drive.setTargetToCurrentHeading();
         }
 
-
         // hang logic (this is where it gets messy :NOOOOO:)
-
+        if (currentGamepad2.right_stick_button && !previousGamepad2.right_stick_button) {
+            hangBool = !hangBool;
+        }
 
         // telemetry
         telemetry.addData("red alliance? ", redAlliance);
