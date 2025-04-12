@@ -189,8 +189,9 @@ public class FiveSpec extends OpMode {
                 .addPath(new BezierLine(new Point(eject3Pose), new Point(pickupWall1IntermediateControlPose))) // veiled turnTo
                 .setLinearHeadingInterpolation(eject3Pose.getHeading(), pickupWall1IntermediateControlPose.getHeading())
 //                .setPathEndTimeoutConstraint(0)
-                .addPath(new BezierLine(new Point(pickupWall1IntermediateControlPose),  new Point(pickupWallPose)))
+                .addPath(new BezierLine(new Point(pickupWall1IntermediateControlPose.getX()-3, pickupWall1IntermediateControlPose.getY()),  new Point(pickupWallPose)))
                 .setLinearHeadingInterpolation(pickupWall1IntermediateControlPose.getHeading(), pickupWallPose.getHeading())
+                .setPathEndTimeoutConstraint(500)
                 .build();
 
 

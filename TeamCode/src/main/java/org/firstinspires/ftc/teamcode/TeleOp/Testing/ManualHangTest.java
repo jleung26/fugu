@@ -46,7 +46,5 @@ public class ManualHangTest extends OpMode {
             hang.setHangState(-1);
         }
         mecanum.operateHang();
-
-//        hang.operateSetPos();
     }
 }

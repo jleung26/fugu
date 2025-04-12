@@ -19,17 +19,17 @@ public class Hang {
     private DcMotorEx Fl, Fr, Bl, Br, leftVertMotor, rightVertMotor;
     private int hangState;
 
-    public static double leftWheelyStowPos = 0.7928;
-    public static double leftWheelyDeployPos = 0.097;
-    public static double rightWheelyStowPos = 0.8661;
-    public static double rightWheelyDeployPos = 0.147;
+    public static double leftWheelyStowPos = 0.775;
+    public static double leftWheelyDeployPos = 0.1494;
+    public static double rightWheelyStowPos = 0.8239;
+    public static double rightWheelyDeployPos = 0.2128;
     public static double leftPtoStowPos = 0.9639;
     public static double leftPtoDeployPos = 0.7617;
     public static double rightPtoStowPos = 1;
     public static double rightPtoDeployPos = 0.8078;
-    public static double armL2Pos = 0.521;
-    public static double armSwingPos = 0.621;
-    public static double armExtenderRetractedPos = 0.363;
+    public static double armL2Pos = 0.3;
+    public static double armSwingPos = 0.77;
+    public static double armExtenderRetractedPos = 0.8;
     public static double armExtenderExtendedPos = 0.98;
 
 
@@ -180,7 +180,7 @@ public class Hang {
                     disengagePTO();
                     // raise slides to 2nd bar
                     leftVertMotor.setTargetPosition(500);
-                    leftVertMotor.setPower(0.5);
+                    leftVertMotor.setPower(1);
 //                    rightVertMotor.setTargetPosition(500);
                     // wheely
                     deployWheely();
@@ -209,10 +209,11 @@ public class Hang {
             case 2: /// arm swings over, while driver 2 times to land hooks
                 if (currentGamepad2.a && !previousGamepad2.a) {
                     stowWheely();
+                    engagePTO();
                     leftArmPitchServo.setPosition(armSwingPos);
                     rightArmPitchServo.setPosition(armSwingPos);
                     armExtenderServo.setPosition(armExtenderExtendedPos); // might need modification, idk where the linkage will intersect
-                    setHangState(-1);
+                    setHangState(-5);
                 }
                 break;
             /// driver 2 does final pull up and puts controller down

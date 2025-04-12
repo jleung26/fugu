@@ -29,6 +29,7 @@ public class HorizontalSlides {
     public static double extendedPos = 880;
     public static double halfExtendedPos = 440; // 50% of full extension
     public static double barelyExtendedPos = 250;
+    public static double mostlyExtendPos = 660;
     public static double retractedPos = 0;
 
     // declaring variables for later modification
@@ -137,6 +138,7 @@ public class HorizontalSlides {
     }
     public void extend()        { moveToPosition(extendedPos); }
     public void extendPartial() { moveToPosition(halfExtendedPos); }
+    public void extendMostly() { moveToPosition(mostlyExtendPos); }
     public void retract()       { moveToPosition(retractedPos); }
     public void extendBarely()  { moveToPosition(barelyExtendedPos);}
 

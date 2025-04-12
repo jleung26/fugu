@@ -86,15 +86,15 @@ public class SixSample extends OpMode {
     // back of bot towards bucket
 
     /** Bucket Scoring Pose */
-    private final Pose scorePose = new Pose(16, 131, Math.toRadians(315)); // TODO: tuned, but can make more optimal
+    private final Pose scorePose = new Pose(14, 132, Math.toRadians(315)); // TODO: tuned, but can make more optimal
 
     /** First Sample from the Spike Mark */
-    private final Pose pickup1Pose = new Pose(19, 128, Math.toRadians(0)); // TODO: tuned, but can make more optimal
+    private final Pose pickup1Pose = new Pose(17.5, 126.3, Math.toRadians(0)); // TODO: tuned, but can make more optimal
     // TODO: (e.g. with less movement from score, and turning instead) if need to save some time
     // old, very consistent pose, switch back if unable to tune new pos: 15, 128, Math.toRadians(0)
 
     /** Second Sample from the Spike Mark */
-    private final Pose pickup2Pose = new Pose(18, 132, Math.toRadians(0)); // tuned
+    private final Pose pickup2Pose = new Pose(18, 132.5, Math.toRadians(0)); // tuned
 
     /** Third Sample from the Spike Mark */
     private final Pose pickup3Pose = new Pose(27, 122, Math.toRadians(55)); // tuned
@@ -112,7 +112,7 @@ public class SixSample extends OpMode {
 
     private final Pose parkControlPose = new Pose(68, 110, Math.toRadians(999)/* heading unused*/); // done
 
-    private final double SUB_GRAB_TIMEOUT = 1.5;
+    private final double SUB_GRAB_TIMEOUT = 2.5;
     private final double DEPOSIT_DELAY = 0.5; // delay to wait before follow next path after deposit sample Action
     private final double VERT_SLIDES_EXTENDED_THRESHOLD = 800;
 
@@ -184,7 +184,6 @@ public class SixSample extends OpMode {
         scoreFrom1 = follower.pathBuilder() // from sub1 pose to scoring
                 .addPath(new BezierCurve(new Point(sub1Pose), /* Control Point */ new Point(scoreControlPose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(sub1Pose.getHeading(), scorePose.getHeading())
-                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         sub1ToSub2 = follower.pathBuilder()
@@ -200,7 +199,6 @@ public class SixSample extends OpMode {
         scoreFrom2 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(sub2Pose), /* Control Point */ new Point(scoreControlPose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(sub2Pose.getHeading(), scorePose.getHeading())
-                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         // backup, not for 7th sample
@@ -217,14 +215,12 @@ public class SixSample extends OpMode {
         scoreFrom3 = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(sub3Pose), /* Control Point */ new Point(scoreControlPose), new Point(scorePose)))
                 .setLinearHeadingInterpolation(sub3Pose.getHeading(), scorePose.getHeading())
-                .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         /* This is our park path. We are using a BezierCurve with 3 points, which is a curved line that is curved based off of the control point */
         park = follower.pathBuilder()
                 .addPath(new BezierCurve(new Point(scorePose), /* Control Point */ new Point(parkControlPose), new Point(parkPose)))
                 .setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading())
-                .setZeroPowerAccelerationMultiplier(2)
                 .build();
     }
 
@@ -375,7 +371,14 @@ public class SixSample extends OpMode {
                 break;
             case 1003:
                 if (pathTimer.getElapsedTimeSeconds() > 0.3) { // back to sub1Pose now, should have cleared a decent row, so can try to intake
-                    runningActions.add(new InstantAction(() -> horizontalSlides.extendPartial()));
+                    runningActions.add(new SequentialAction(
+                            new InstantAction(() -> horizontalSlides.extendMostly()),
+                            new SleepAction(0.3),
+                            new InstantAction(() -> horizontalSlides.extendBarely()),
+                            new SleepAction(0.3),
+                            new InstantAction(() -> intake.intake()),
+                            new InstantAction(() -> horizontalSlides.extendMostly())
+                    ));
                     setPathState(1004); // sub 1 intaking (further down)
                 }
                 break;
@@ -394,7 +397,14 @@ public class SixSample extends OpMode {
                 break;
             case 2003:
                 if (pathTimer.getElapsedTimeSeconds() > 0.3) { // back to sub1Pose now, should have cleared a decent row already, so can try to intake
-                    runningActions.add(new InstantAction(() -> horizontalSlides.extendPartial()));
+                    runningActions.add(new SequentialAction(
+                            new InstantAction(() -> horizontalSlides.extendMostly()),
+                            new SleepAction(0.3),
+                            new InstantAction(() -> horizontalSlides.extendBarely()),
+                            new SleepAction(0.3),
+                            new InstantAction(() -> intake.intake()),
+                            new InstantAction(() -> horizontalSlides.extendMostly())
+                    ));
                     setPathState(2004); // sub 2 intaking logic
                 }
                 break;
@@ -413,7 +423,14 @@ public class SixSample extends OpMode {
                 break;
             case 3003:
                 if (pathTimer.getElapsedTimeSeconds() > 0.3) { // back to sub1Pose now, should have cleared a decent row, so can try to intake
-                    runningActions.add(new InstantAction(() -> horizontalSlides.extendPartial()));
+                    runningActions.add(new SequentialAction(
+                            new InstantAction(() -> horizontalSlides.extendMostly()),
+                            new SleepAction(0.3),
+                            new InstantAction(() -> horizontalSlides.extendBarely()),
+                            new SleepAction(0.3),
+                            new InstantAction(() -> intake.intake()),
+                            new InstantAction(() -> horizontalSlides.extendMostly())
+                    ));
                     setPathState(3004);
                 }
                 break;
@@ -477,8 +494,8 @@ public class SixSample extends OpMode {
                 break;
             case 3008: // score from sub 3
                 if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
-                    depositSampleSubAction();
-                    setPathState(-1); // park
+                    depositSampleParkAction();
+                    setPathState(-1);
                 }
                 break;
 
@@ -554,15 +571,19 @@ public class SixSample extends OpMode {
                 }
                 else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT) { // nothing in reach, take too long, extend all the way; last ditch effort
                     runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
-                } else if (opmodeTimer.getElapsedTimeSeconds() > 29.5) {
-                    retractIntakeAction();
-                    follower.holdPoint(new Point(parkPose), parkPose.getHeading());
                 }
                 break;
             case -1: // park
-                follower.followPath(park);
-                stowToParkAction();
+                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.STOW) {
+                    follower.followPath(park);
+                    setPathState(-2);
+                }
                 break;
+            case -2:
+                if (follower.getPose().getX() > 30) {
+                    stowToParkAction();
+                    setPathState(-3);
+                }
         }
     }
 
@@ -731,6 +752,14 @@ public class SixSample extends OpMode {
         ));
     }
 
+    public void depositSampleParkAction() {
+        runningActions.add(new SequentialAction(
+                new InstantAction(() -> outtake.openClaw()),
+                new SleepAction(0.2),
+                new InstantAction(() -> outtake.toStow())
+        ));
+    }
+
     public void prepToIntakeAction() {
         runningActions.add(new SequentialAction(
                 new InstantAction(() -> horizontalSlides.extendPartial()),
@@ -742,8 +771,7 @@ public class SixSample extends OpMode {
     public void subIntakeAction() {
         runningActions.add(new SequentialAction(
                 new InstantAction(() -> horizontalSlides.extendBarely()),
-                new InstantAction(() -> intake.dropDown()),
-                new InstantAction(() -> intake.intake())
+                new InstantAction(() -> intake.dropDown())
         ));
     }
 
@@ -762,12 +790,12 @@ public class SixSample extends OpMode {
                         new InstantAction(() -> intake.idle()),
                         new InstantAction(()-> outtake.toSubPark()),
                         new InstantAction(()-> outtake.openClaw())
-                ),
-                new SleepAction(0.7),
-                new ParallelAction(
-                        new InstantAction(() -> verticalSlides.retract()),
-                        new InstantAction(()-> horizontalSlides.retract())
                 )
+//                new SleepAction(0.7),
+//                new ParallelAction(
+//                        new InstantAction(() -> verticalSlides.retract()),
+//                        new InstantAction(()-> horizontalSlides.retract())
+//                )
         ));
     }
 
