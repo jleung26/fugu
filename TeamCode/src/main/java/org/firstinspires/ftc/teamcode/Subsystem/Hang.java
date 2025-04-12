@@ -175,10 +175,11 @@ public class Hang {
                 disengagePTO();
                 setHangState(0);
             case 0: /// set motor modes, arm pos, and start wheely (the servos strain a lot, so move quickly)
-                if (currentGamepad2.y && !previousGamepad2.y) {
+                if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
                     // motors all in modes
                     switchToHangMode();
                     disengagePTO();
+                    // raise slides to 2nd bar
                     // raise slides to 2nd bar
                     leftVertMotor.setTargetPosition(500);
                     leftVertMotor.setPower(1);
@@ -195,7 +196,7 @@ public class Hang {
                 break;
             /// driver 1 positions bot, driver 2 uses left stick to straight drive and tip (need good timing)
             case 1: /// engage PTO, disable slide motors
-                if (currentGamepad2.y && !previousGamepad2.y) {
+                if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
                     // stop unnecessary current draw
                     leftVertMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //                    leftVertMotor.setMotorDisable(); // never used before, could be problematic, but seems self-explanatory
@@ -231,10 +232,12 @@ public class Hang {
             leftArmPitchServo.setPosition(armSwingPos);
             rightArmPitchServo.setPosition(armSwingPos);
             armExtenderServo.setPosition(armExtenderExtendedPos);
+            swingArmBool = !swingArmBool;
         } else {
             leftArmPitchServo.setPosition(armL2Pos);
             rightArmPitchServo.setPosition(armL2Pos);
             armExtenderServo.setPosition(armExtenderExtendedPos);
+            swingArmBool = !swingArmBool;
         }
     }
 

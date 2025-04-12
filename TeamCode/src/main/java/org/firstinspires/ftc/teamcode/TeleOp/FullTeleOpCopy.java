@@ -352,6 +352,7 @@ public class FullTeleOpCopy extends OpMode {
         telemetry.addData("red alliance? ", redAlliance);
         telemetry.addData("sample mode: ", sampleMode);
         telemetry.addData("Loop Times", elapsedtime.milliseconds());
+        telemetry.addData("hang time", hangBool);
         elapsedtime.reset();
     }
 }
