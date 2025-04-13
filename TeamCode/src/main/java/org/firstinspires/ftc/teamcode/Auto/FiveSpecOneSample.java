@@ -126,7 +126,7 @@ public class FiveSpecOneSample extends OpMode {
     /** Park Pose for our robot, after we do all of the scoring. */
     private final Pose grabYellowPose = new Pose(12, 54, Math.toRadians(270));
 
-    private final Pose scoreBucketPose = new Pose(7, 130, Math.toRadians(270));
+    private final Pose scoreBucketPose = new Pose(7, 126, Math.toRadians(270));
 
     private final Pose parkPose = new Pose(18, 132, Math.toRadians(270));
 
@@ -180,7 +180,7 @@ public class FiveSpecOneSample extends OpMode {
                 .addPath(new BezierLine(new Point(eject3Pose), new Point(pickupWall1IntermediateControlPose))) // veiled turnTo
                 .setLinearHeadingInterpolation(eject3Pose.getHeading(), pickupWall1IntermediateControlPose.getHeading())
 //                .setPathEndTimeoutConstraint(0)
-                .addPath(new BezierLine(new Point(pickupWall1IntermediateControlPose.getX()-3, pickupWall1IntermediateControlPose.getY()),  new Point(pickupWallPose)))
+                .addPath(new BezierLine(new Point(pickupWall1IntermediateControlPose.getX(), pickupWall1IntermediateControlPose.getY()),  new Point(pickupWallPose)))
                 .setLinearHeadingInterpolation(pickupWall1IntermediateControlPose.getHeading(), pickupWallPose.getHeading())
                 .setPathEndTimeoutConstraint(500)
                 .build();
@@ -456,14 +456,13 @@ public class FiveSpecOneSample extends OpMode {
                 break;
             case 29:
                 if(follower.getPose().getX() > specScoreXThreshold) {
-                    finishScoringClipAction();
+                    finishScoringLastClipAction();
                     setPathState(30);
                 }
                 break;
             case 30:
                 if (outtake.claw.isClawOpen) {
                     follower.followPath(grabYellow, true);
-                    prepToIntakeAction();
                     setPathState(31);
                 }
                 break;
@@ -474,6 +473,7 @@ public class FiveSpecOneSample extends OpMode {
             // praying we don't run out of time
             case 31:
                 if (!follower.isBusy()) {
+                    prepToIntakeAction();
                     extendIntakeAction();
                     setPathState(32);
                 }
@@ -486,14 +486,14 @@ public class FiveSpecOneSample extends OpMode {
                 }
                 break;
             case 33:
-                if (follower.getPose().getY() > 70) {
+                if (horizontalSlides.horiMotor.getCurrentPosition() < 20) {
                     transferAndRushToScoreAction();
                     setPathState(34);
                 }
             case 34:
-                if(follower.getPose().getY() > scoreBucketPose.getY() - 2 && verticalSlides.getCurrentPos() > 800) {
+                if(!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
                     depositSampleRushAction();
-                    prepToIntakeAction();
+//                    prepToIntakeAction();
                     setPathState(35);
                 }
                 break;
@@ -624,6 +624,17 @@ public class FiveSpecOneSample extends OpMode {
                 new InstantAction(() -> outtake.retractExtender()),
                 /*new SleepAction(0.2),*/ // TODO: we'll see if this can shave off a tiny bit of time
                 new InstantAction(() -> outtake.toGrabClip()),
+                new InstantAction(() -> verticalSlides.retract())
+        ));
+    }
+
+    public void finishScoringLastClipAction() {
+        runningActions.add(new SequentialAction(
+                new InstantAction(() -> outtake.openClaw()),
+                new SleepAction(0.3),
+                new InstantAction(() -> outtake.retractExtender()),
+                /*new SleepAction(0.2),*/ // TODO: we'll see if this can shave off a tiny bit of time
+                new InstantAction(() -> outtake.toStow()),
                 new InstantAction(() -> verticalSlides.retract())
         ));
     }
