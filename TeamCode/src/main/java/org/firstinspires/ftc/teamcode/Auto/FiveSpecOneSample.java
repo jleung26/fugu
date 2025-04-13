@@ -493,7 +493,6 @@ public class FiveSpecOneSample extends OpMode {
             case 34:
                 if(!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
                     depositSampleRushAction();
-//                    prepToIntakeAction();
                     setPathState(35);
                 }
                 break;

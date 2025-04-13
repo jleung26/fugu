@@ -39,9 +39,10 @@ public class FullTeleOpCopy extends OpMode {
     // booleans
     // team color
     // spec/sample
-    boolean redAlliance = true;
-    boolean sampleMode = true;
+    boolean redAllianceBool = true;
+    boolean sampleModeBool = true;
     boolean hangBool = false;
+    boolean highBucketBool = true;
     Intake.IntakeChamberState COLOR_TO_REJECT;
 
     // Action stuff
@@ -90,19 +91,19 @@ public class FullTeleOpCopy extends OpMode {
         currentGamepad2.copy(gamepad2);
 
         if ((currentGamepad1.a && !previousGamepad1.a) || (currentGamepad2.a && !previousGamepad2.a)) {
-            redAlliance = !redAlliance;
+            redAllianceBool = !redAllianceBool;
         }
 
         if ((currentGamepad1.b && !previousGamepad1.b) || (currentGamepad2.b && !previousGamepad2.b)) {
-            sampleMode = !sampleMode;
+            sampleModeBool = !sampleModeBool;
         }
-        telemetry.addData("red alliance? ", redAlliance);
-        telemetry.addData("sample mode:  ", sampleMode);
+        telemetry.addData("red alliance? ", redAllianceBool);
+        telemetry.addData("sample mode:  ", sampleModeBool);
     }
 
     @Override
     public void start() {
-        COLOR_TO_REJECT = (redAlliance ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
+        COLOR_TO_REJECT = (redAllianceBool ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
         hang.disengagePTO();
         outtake.toStow();
         outtake.openClaw();
@@ -153,7 +154,7 @@ public class FullTeleOpCopy extends OpMode {
         intake.operateColorChecking();
 
         /// updating booleans
-        COLOR_TO_REJECT = (redAlliance ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
+        COLOR_TO_REJECT = (redAllianceBool ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
         drive.slowModeBool = !horizontalSlides.slidesRetracted || currentGamepad2.left_trigger > 0.1;
         drive.angleLockBool = (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) || (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP);
         if (currentGamepad1.left_trigger > 0.1 && !(previousGamepad1.left_trigger > 0.1)) { // avoids setting every loop since it probably takes time
@@ -173,7 +174,7 @@ public class FullTeleOpCopy extends OpMode {
                     ));
                 }
             }
-            else if (!sampleMode && intake.chamberState == Intake.IntakeChamberState.YELLOW) {
+            else if (!sampleModeBool && intake.chamberState == Intake.IntakeChamberState.YELLOW) {
                 runningActions.add(new InstantAction(() -> intake.reverse()));
             }
             else if (intake.chamberState != COLOR_TO_REJECT) {
@@ -194,12 +195,13 @@ public class FullTeleOpCopy extends OpMode {
                             new InstantAction(() -> intake.idle())
                     ));
                 }
-            } else if (!sampleMode && intake.chamberState == Intake.IntakeChamberState.YELLOW) {
+            } else if (!sampleModeBool && intake.chamberState == Intake.IntakeChamberState.YELLOW) {
                 runningActions.add(new InstantAction(() -> intake.reverse()));
             } else if (intake.chamberState != COLOR_TO_REJECT) {
                 // yay grabbed correct color sample, can stow now
-                gamepad1.rumble(500); /// rumble
+//                gamepad1.rumble(500); /// rumble
                 runningActions.add(new SequentialAction(
+                        new InstantAction(() -> gamepad1.rumble(500)), // maybe fixes massive delay
                         new InstantAction(() -> intake.flipUp()),
                         new InstantAction(() -> intake.idle())
                 ));
@@ -250,7 +252,7 @@ public class FullTeleOpCopy extends OpMode {
                 ));
             }
         } else if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
-            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && !sampleMode) {
+            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && !sampleModeBool) {
                 // finish depositing clip and return to grab another
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> outtake.openClaw()),
@@ -260,7 +262,7 @@ public class FullTeleOpCopy extends OpMode {
                         new InstantAction(() -> outtake.toGrabClip()),
                         new InstantAction(() -> verticalSlides.retract())
                 ));
-            } else if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && sampleMode) {
+            } else if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && sampleModeBool) {
                 // finish depositing sample and return to stow
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> outtake.openClaw()),
@@ -287,21 +289,37 @@ public class FullTeleOpCopy extends OpMode {
         } else if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.STOW) {
             // full transfer sequence
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && horizontalSlides.slidesRetracted && intake.wristFlippedUp && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-                runningActions.add(new SequentialAction(
-                        new InstantAction(() -> intake.setIntake(0.5)), // push sample all the way in, kinda jank, maybe not necessary
-                        new InstantAction(() -> outtake.toTransfer()),
-                        new SleepAction(0.2), // TODO: play around with timings
-                        new InstantAction(() -> outtake.closeClawTight()),
-                        new SleepAction(0.4),
-                        new InstantAction(() -> outtake.toStow()),
-                        new SleepAction(0.1),
-                        new InstantAction(() -> intake.setIntake(0)),
-                        new InstantAction(() -> verticalSlides.raiseToHighBucket()),
-                        new SleepAction(0.2),
-                        new InstantAction(() -> outtake.toVert()),
-                        new SleepAction(0.6), // TODO: tune this based on extension speed 0.3+0.5, probably only change 0.5
-                        new InstantAction(() -> outtake.toScoreBucket())
-                ));
+                if (highBucketBool) { // high bucket
+                    runningActions.add(new SequentialAction(
+                            new InstantAction(() -> intake.setIntake(0.5)), // push sample all the way in, kinda jank, maybe not necessary
+                            new InstantAction(() -> outtake.toTransfer()),
+                            new SleepAction(0.2), // TODO: play around with timings
+                            new InstantAction(() -> outtake.closeClawTight()),
+                            new SleepAction(0.4),
+                            new InstantAction(() -> outtake.toStow()),
+                            new SleepAction(0.1),
+                            new InstantAction(() -> intake.setIntake(0)),
+                            new InstantAction(() -> verticalSlides.raiseToHighBucket()),
+                            new SleepAction(0.2),
+                            new InstantAction(() -> outtake.toVert()),
+                            new SleepAction(0.6), // TODO: tune this based on extension speed 0.3+0.5, probably only change 0.5
+                            new InstantAction(() -> outtake.toScoreBucket())
+                    ));
+                } else { // low bucket
+                    runningActions.add(new SequentialAction(
+                            new InstantAction(() -> intake.setIntake(0.5)), // push sample all the way in, kinda jank, maybe not necessary
+                            new InstantAction(() -> outtake.toTransfer()),
+                            new SleepAction(0.2), // TODO: play around with timings
+                            new InstantAction(() -> outtake.closeClawTight()),
+                            new SleepAction(0.4),
+                            new InstantAction(() -> outtake.toStow()),
+                            new SleepAction(0.1),
+                            new InstantAction(() -> intake.setIntake(0)),
+                            new InstantAction(() -> verticalSlides.raiseToLowBucket()),
+                            new SleepAction(0.2),
+                            new InstantAction(() -> outtake.toScoreBucket())
+                    ));
+                }
             }
             else if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                 // flip over to grab clip
@@ -331,17 +349,19 @@ public class FullTeleOpCopy extends OpMode {
             ));
         }
 
-        // secondary driver toggles
-        if (currentGamepad2.a && !previousGamepad2.a) {
-            redAlliance = !redAlliance;
-        } else if (currentGamepad2.b && !previousGamepad2.b) {
-            sampleMode = !sampleMode;
+        // GAMEPAD 2 toggles, hang code above by loops
+        if (currentGamepad2.a && !previousGamepad2.a) { // alliance color
+            redAllianceBool = !redAllianceBool;
         }
 
-//        // set target for spec cycles, yaw never really needs to reset
-//        if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
-//            drive.setTargetToCurrentHeading();
-//        }
+        if (currentGamepad2.b && !previousGamepad2.b) { // sample spec mode
+            sampleModeBool = !sampleModeBool;
+        }
+
+        // high low bucket toggle
+        if (currentGamepad2.y && !previousGamepad2.y) { // high low bucket scoring
+            highBucketBool = !highBucketBool;
+        }
 
         // hang logic (this is where it gets messy :NOOOOO:)
         if (currentGamepad2.right_stick_button && !previousGamepad2.right_stick_button) {
@@ -349,10 +369,11 @@ public class FullTeleOpCopy extends OpMode {
         }
 
         // telemetry
-        telemetry.addData("red alliance? ", redAlliance);
-        telemetry.addData("sample mode: ", sampleMode);
+        telemetry.addData("Red alliance? ", redAllianceBool);
+        telemetry.addData("Sample Mode: ", sampleModeBool);
+        telemetry.addData("High Bucket Mode: ", highBucketBool);
+        telemetry.addData("Hang Bool: ", hangBool);
         telemetry.addData("Loop Times", elapsedtime.milliseconds());
-        telemetry.addData("hang time", hangBool);
         elapsedtime.reset();
     }
 }

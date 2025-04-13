@@ -174,6 +174,7 @@ public class Hang {
                 stowWheely();
                 disengagePTO();
                 setHangState(0);
+                break;
             case 0: /// set motor modes, arm pos, and start wheely (the servos strain a lot, so move quickly)
                 if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
                     // motors all in modes
@@ -219,6 +220,7 @@ public class Hang {
                     swingArmBool = true;
                     setHangState(3);
                 }
+                break;
             case 3:
                 if (currentGamepad2.dpad_up && !previousGamepad2.dpad_up) {
                     toggleSwingArm();
@@ -228,16 +230,16 @@ public class Hang {
         }
     }
     private void toggleSwingArm() {
-        if (swingArmBool) {
-            leftArmPitchServo.setPosition(armSwingPos);
-            rightArmPitchServo.setPosition(armSwingPos);
-            armExtenderServo.setPosition(armExtenderExtendedPos);
-            swingArmBool = !swingArmBool;
-        } else {
+        if (swingArmBool) { // true means arm currently swung towards back of bot
             leftArmPitchServo.setPosition(armL2Pos);
             rightArmPitchServo.setPosition(armL2Pos);
             armExtenderServo.setPosition(armExtenderExtendedPos);
-            swingArmBool = !swingArmBool;
+            swingArmBool = false;
+        } else {
+            leftArmPitchServo.setPosition(armSwingPos);
+            rightArmPitchServo.setPosition(armSwingPos);
+            armExtenderServo.setPosition(armExtenderExtendedPos);
+            swingArmBool = true;
         }
     }
 
