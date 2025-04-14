@@ -132,7 +132,7 @@ public class ExtendingOuttake {
         private final double extenderScoreClipPosition = 0.89;
         private final double extenderAutoScoreClipPosition = 0.98;
         private final double extenderGrabClipWallPosition = 0.19;
-        private final double extenderSubParkPosition = 0.363; // TODO: tune
+        private final double extenderSubParkPosition = 0.98; // TODO: tune
         private final double increment = 0.001;
 
         public ArmExtend() {}
