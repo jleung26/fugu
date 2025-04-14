@@ -137,7 +137,7 @@ public class VerticalSlides {
     public void retract()           { moveToPosition(retractedPos);}
 //    public void raiseToPickupClip() { moveToPosition(pickupClipPos);}
 
-    public double getCurrentPos() { return currentPos;}
+    public int getCurrentPos() { return currentPos;}
 
     private boolean isDifferent(double val1, double val2) {
         return Math.abs(val1 - val2) >= CACHING_THRESHOLD;

@@ -12,7 +12,6 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
-import com.pedropathing.pathgen.BezierPoint;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Timer;
@@ -34,8 +33,8 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "0+6", group = "A", preselectTeleOp = "Full TeleOp FINAL")
-public class SixSample extends OpMode {
+@Autonomous(name = "0+6 OPTIMIZED TEST", group = "A", preselectTeleOp = "Full TeleOp FINAL")
+public class SevenSample extends OpMode {
     // declaring subsystems
     RobotHardware robotHardware = new RobotHardware();
     VerticalSlides verticalSlides = new VerticalSlides();
@@ -75,20 +74,26 @@ public class SixSample extends OpMode {
     // back of bot towards bucket
 
     /** Bucket Scoring Pose */
-    private final Pose scorePose = new Pose(14, 132, Math.toRadians(315)); // TODO: tuned, but can make more optimal
+    private final Pose score0Pose = new Pose(12, 130, Math.toRadians(340)); // TODO: tune
 
-    /** First Sample from the Spike Mark */
-    private final Pose pickup1Pose = new Pose(17.5, 126.3, Math.toRadians(0)); // TODO: tuned, but can make more optimal
-    // TODO: (e.g. with less movement from score, and turning instead) if need to save some time
-    // old, very consistent pose, switch back if unable to tune new pos: 15, 128, Math.toRadians(0)
+    private final Pose score1Pose = new Pose(12, 132, Math.toRadians(330)); // TODO: tune
 
-    /** Second Sample from the Spike Mark */
-    private final Pose pickup2Pose = new Pose(18, 132.5, Math.toRadians(0)); // tuned
+    private final Pose score2Pose = new Pose(15, 137, 0); // TODO: tune, maybe >15 so no L4
 
-    /** Third Sample from the Spike Mark */
-    private final Pose pickup3Pose = new Pose(27, 122, Math.toRadians(55)); // tuned
+    private final Pose score3Pose = new Pose(14, 132, 330); //
 
-    private final Pose scoreControlPose = new Pose(68, 110, Math.toRadians(999)/* heading unused*/); // done
+    // Pick up spike marks
+    private final Pose pickup1Pose = new Pose(17, 131, Math.toRadians(340)); // TODO: tune
+
+    private final Pose pickup2Pose = new Pose(16, 132, Math.toRadians(0)); // TODO: tune
+
+    private final Pose pickup3Pose = new Pose(24, 124, Math.toRadians(40)); // TODO: tune
+
+
+    // to and from sub
+    private final Pose scoreControlPose = new Pose(64, 110, Math.toRadians(999)/* heading unused*/);
+
+    private final Pose subScorePose = new Pose(12, 132, Math.toRadians(330)); // TODO: tune
 
     private final Pose sub1Pose = new Pose(62, 98, Math.toRadians(270));
 
@@ -96,87 +101,79 @@ public class SixSample extends OpMode {
 
     private final Pose sub3Pose = new Pose(72, 98, Math.toRadians(270));
 
+    private final Pose sub4Pose = new Pose(77, 98, Math.toRadians(270));
+
     /** Park Pose for our robot, after we do all of the scoring. */
     private final Pose parkPose = new Pose(62, 98, Math.toRadians(90)); // tuned
 
-    private final Pose parkControlPose = new Pose(68, 110, Math.toRadians(999)/* heading unused*/); // done
+    private final Pose parkControlPose = new Pose(64, 110, Math.toRadians(999)/* heading unused*/); // done
 
-    private final double SUB_GRAB_TIMEOUT_1 = 0.5; // TODO
-    private final double SUB_GRAB_TIMEOUT_2 = 1; // TODO
+    // constants and thresholds
+    private final double SUB_GRAB_TIMEOUT_1 = 0.4; // TODO
+    private final double SUB_GRAB_TIMEOUT_2 = 0.8; // TODO
     private final double SUB_GRAB_TIMEOUT_3 = 1.5; // TODO
     private final double DEPOSIT_DELAY = 0.4; // delay to wait before follow next path after deposit sample Action
     private final double VERT_SLIDES_EXTENDED_THRESHOLD = 800;
+    private final double SLIDES_STUCK_TIMEOUT = 3;
     private final double SPIKE_MARK_TIMEOUT = 2;
     private final double AT_SUB_Y_THRESHOLD = 100; // TODO
+    private final double RUSH_SCORE_X_THRESHOLD = subScorePose.getX() + 2; // TODO
+    private final double RUSH_SCORE_Y_THRESHOLD = subScorePose.getY() - 2; // TODO
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
-    private PathChain scorePreload, grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, scoreToSub1, subStrafe, scoreFrom1, sub1ToSub2, scoreToSub2, scoreFrom2, sub2ToSub3, scoreToSub3, scoreFrom3, park;
+    private PathChain scorePreload, grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, scoreToSub1, scoreFrom1, sub1ToSub2, scoreToSub2, scoreFrom2, sub2ToSub3, scoreToSub3, scoreFrom3, scoreToSub4, sub3ToSub4, scoreFrom4, park;
 
 
     public void buildPaths() {
-
-        /* This is our scorePreload path. We are using a BezierLine, which is a straight line. */
         scorePreload = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(startPose), new Point(scorePose)))
-                .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(new Point(startPose), new Point(score0Pose)))
+                .setLinearHeadingInterpolation(startPose.getHeading(), score0Pose.getHeading())
                 .setZeroPowerAccelerationMultiplier(2)
                 .build();
-        /* Here is an example for Constant Interpolation
-        scorePreload.setConstantInterpolation(startPose.getHeading()); */
 
-        /* This is our grabPickup1 PathChain. Straight line. */
         grabPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(scorePose), new Point(pickup1Pose)))
+                .addPath(new BezierLine(new Point(score0Pose), new Point(pickup1Pose)))
                 .setConstantHeadingInterpolation(pickup1Pose.getHeading())
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
+                .setLinearHeadingInterpolation(score0Pose.getHeading(), pickup1Pose.getHeading())
                 .build();
 
         scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(pickup1Pose), new Point(scorePose)))
-                .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(new Point(pickup1Pose), new Point(score1Pose)))
+                .setLinearHeadingInterpolation(pickup1Pose.getHeading(), score1Pose.getHeading())
                 .setZeroPowerAccelerationMultiplier(2)
                 // TODO: maybe constant heading here?
                 .build();
 
         grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(scorePose), new Point(pickup2Pose)))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2Pose.getHeading())
+                .addPath(new BezierLine(new Point(score1Pose), new Point(pickup2Pose)))
+                .setLinearHeadingInterpolation(score1Pose.getHeading(), pickup2Pose.getHeading())
                 .build();
 
         scorePickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(pickup2Pose), new Point(scorePose)))
-                .setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(new Point(pickup2Pose), new Point(score2Pose)))
+                .setLinearHeadingInterpolation(pickup2Pose.getHeading(), score2Pose.getHeading())
                 .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         grabPickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(scorePose), new Point(pickup3Pose)))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup3Pose.getHeading())
+                .addPath(new BezierLine(new Point(score2Pose), new Point(pickup3Pose)))
+                .setLinearHeadingInterpolation(score2Pose.getHeading(), pickup3Pose.getHeading())
                 .build();
 
         scorePickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(pickup3Pose), new Point(scorePose)))
-                .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierLine(new Point(pickup3Pose), new Point(score3Pose)))
+                .setLinearHeadingInterpolation(pickup3Pose.getHeading(), score3Pose.getHeading())
                 .setZeroPowerAccelerationMultiplier(2)
                 .build();
 
         scoreToSub1 = follower.pathBuilder() // to sub for first grab
-                .addPath(new BezierCurve(new Point(scorePose), /* Control Point */ new Point(parkControlPose), new Point(sub1Pose)))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), sub1Pose.getHeading())
-                .build();
-
-        subStrafe = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(sub1Pose), new Point(sub3Pose)))
-                .setConstantHeadingInterpolation(sub1Pose.getHeading())
-                .setPathEndTimeoutConstraint(0)
-                .setZeroPowerAccelerationMultiplier(3)
-                .addPath(new BezierLine(new Point(sub3Pose), new Point(sub1Pose)))
-                .setConstantHeadingInterpolation(sub1Pose.getHeading())
+                .addPath(new BezierCurve(new Point(score3Pose), /* Control Point */ new Point(parkControlPose), new Point(sub1Pose)))
+                .setLinearHeadingInterpolation(score3Pose.getHeading(), sub1Pose.getHeading())
                 .build();
 
         scoreFrom1 = follower.pathBuilder() // from sub1 pose to scoring
-                .addPath(new BezierCurve(new Point(sub1Pose), /* Control Point */ new Point(scoreControlPose), new Point(scorePose)))
-                .setLinearHeadingInterpolation(sub1Pose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierCurve(new Point(sub1Pose), /* Control Point */ new Point(scoreControlPose), new Point(subScorePose)))
+                .setLinearHeadingInterpolation(sub1Pose.getHeading(), subScorePose.getHeading())
                 .build();
 
         sub1ToSub2 = follower.pathBuilder()
@@ -185,13 +182,13 @@ public class SixSample extends OpMode {
                 .build();
 
         scoreToSub2 = follower.pathBuilder() // to sub for second grab
-                .addPath(new BezierCurve(new Point(scorePose), /* Control Point */ new Point(parkControlPose), new Point(sub2Pose)))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), sub2Pose.getHeading())
+                .addPath(new BezierCurve(new Point(subScorePose), /* Control Point */ new Point(parkControlPose), new Point(sub2Pose)))
+                .setLinearHeadingInterpolation(subScorePose.getHeading(), sub2Pose.getHeading())
                 .build();
 
         scoreFrom2 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(sub2Pose), /* Control Point */ new Point(scoreControlPose), new Point(scorePose)))
-                .setLinearHeadingInterpolation(sub2Pose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierCurve(new Point(sub2Pose), /* Control Point */ new Point(scoreControlPose), new Point(subScorePose)))
+                .setLinearHeadingInterpolation(sub2Pose.getHeading(), subScorePose.getHeading())
                 .build();
 
         // backup, not for 7th sample
@@ -200,20 +197,34 @@ public class SixSample extends OpMode {
                 .setConstantHeadingInterpolation(sub3Pose.getHeading())
                 .build();
 
-        scoreToSub3 = follower.pathBuilder() // to sub for first grab
-                .addPath(new BezierCurve(new Point(scorePose), /* Control Point */ new Point(parkControlPose), new Point(sub3Pose)))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), sub3Pose.getHeading())
+        scoreToSub3 = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(subScorePose), /* Control Point */ new Point(parkControlPose), new Point(sub3Pose)))
+                .setLinearHeadingInterpolation(subScorePose.getHeading(), sub3Pose.getHeading())
                 .build();
 
         scoreFrom3 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(sub3Pose), /* Control Point */ new Point(scoreControlPose), new Point(scorePose)))
-                .setLinearHeadingInterpolation(sub3Pose.getHeading(), scorePose.getHeading())
+                .addPath(new BezierCurve(new Point(sub3Pose), /* Control Point */ new Point(scoreControlPose), new Point(subScorePose)))
+                .setLinearHeadingInterpolation(sub3Pose.getHeading(), subScorePose.getHeading())
                 .build();
 
-        /* This is our park path. We are using a BezierCurve with 3 points, which is a curved line that is curved based off of the control point */
+        sub3ToSub4 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(sub3Pose), new Point(sub4Pose)))
+                .setConstantHeadingInterpolation(sub4Pose.getHeading())
+                .build();
+
+        scoreToSub4 = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(subScorePose), /* Control Point */ new Point(parkControlPose), new Point(sub4Pose)))
+                .setLinearHeadingInterpolation(subScorePose.getHeading(), sub4Pose.getHeading())
+                .build();
+
+        scoreFrom4 = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(sub4Pose), /* Control Point */ new Point(scoreControlPose), new Point(subScorePose)))
+                .setLinearHeadingInterpolation(sub4Pose.getHeading(), subScorePose.getHeading())
+                .build();
+
         park = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(scorePose), /* Control Point */ new Point(parkControlPose), new Point(parkPose)))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading())
+                .addPath(new BezierCurve(new Point(subScorePose), /* Control Point */ new Point(parkControlPose), new Point(parkPose)))
+                .setLinearHeadingInterpolation(subScorePose.getHeading(), parkPose.getHeading())
                 .build();
     }
 
@@ -238,9 +249,7 @@ public class SixSample extends OpMode {
                 }
                 break;
             case 3:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
                 if(!follower.isBusy()) {
-                    /* Grab Sample */
                     runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
                     setPathState(4);
                 }
@@ -276,9 +285,7 @@ public class SixSample extends OpMode {
                 }
                 break;
             case 8:
-                /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
                 if(!follower.isBusy()) {
-                    /* Grab Sample */
                     runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
                     setPathState(9);
                 }
@@ -288,7 +295,6 @@ public class SixSample extends OpMode {
                 if (intake.chamberState != Intake.IntakeChamberState.EMPTY || pathTimer.getElapsedTimeSeconds() > SPIKE_MARK_TIMEOUT) {
                     // retract and prep for transfer
                     retractIntakeAction();
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     follower.followPath(scorePickup2,true);
                     setPathState(10);
                 }
@@ -320,11 +326,10 @@ public class SixSample extends OpMode {
                 }
                 break;
             case 14:
-                // wait until sample picked up
+                // wait until sample picked up or times out
                 if (intake.chamberState != Intake.IntakeChamberState.EMPTY || pathTimer.getElapsedTimeSeconds() > SPIKE_MARK_TIMEOUT) {
                     // retract and prep for transfer
                     retractIntakeAction();
-                    /* Since this is a pathChain, we can have Pedro hold the end point while we are scoring the sample */
                     follower.followPath(scorePickup3,true);
                     setPathState(15);
                 }
@@ -346,7 +351,6 @@ public class SixSample extends OpMode {
 
 
 
-            /// intaking from sub now, lots of convoluted paths
             /// GRAB: bucket to sub 1, then intake
             case 1001:
                 if (pathTimer.getElapsedTimeSeconds() >= DEPOSIT_DELAY) { // delay
@@ -392,7 +396,21 @@ public class SixSample extends OpMode {
                     setPathState(3003);
                 }
                 break;
-
+            /// GRAB: bucket to sub 4, then intake
+            case 4001:
+                if (pathTimer.getElapsedTimeSeconds() >= DEPOSIT_DELAY) { // delay
+                    follower.followPath(scoreToSub4,true);
+                    setPathState(4002);
+                }
+                break;
+            case 4002:
+                if (follower.getPose().getY() < AT_SUB_Y_THRESHOLD) {
+                    subIntakeAction();
+                    runningActions.add(new InstantAction(() -> horizontalSlides.extendPartial()));
+                    slidesDistanceTraveled = 1;
+                    setPathState(4003);
+                }
+                break;
 
             /// INTAKE: logic at sub 1 pose
             case 1003:
@@ -426,9 +444,9 @@ public class SixSample extends OpMode {
                     slidesDistanceTraveled = 2;
                     runningActions.add(new SequentialAction(
                             new InstantAction(() -> horizontalSlides.extendMostly()),
-                            new SleepAction(0.2),
+                            new SleepAction(0.2), // TODO
                             new InstantAction(() -> horizontalSlides.extendBarely()),
-                            new SleepAction(0.2),
+                            new SleepAction(0.2), // TODO
                             new InstantAction(() -> horizontalSlides.extendMostly())
                     ));
                     // stays in this case
@@ -467,9 +485,9 @@ public class SixSample extends OpMode {
                     slidesDistanceTraveled = 2;
                     runningActions.add(new SequentialAction(
                             new InstantAction(() -> horizontalSlides.extendMostly()),
-                            new SleepAction(0.2),
+                            new SleepAction(0.2), // TODO
                             new InstantAction(() -> horizontalSlides.extendBarely()),
-                            new SleepAction(0.2),
+                            new SleepAction(0.2), // TODO
                             new InstantAction(() -> horizontalSlides.extendMostly())
                     ));
                     // stays in this case
@@ -494,9 +512,10 @@ public class SixSample extends OpMode {
                     )); // stays in this case
                 }
                 else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_3) {
-                    // should be very hard to get here, gives up
-                    retractIntakeAction();
-                    setPathState(-10);
+                    // gives up and moves on to next pose
+                    runningActions.add(new InstantAction(() -> horizontalSlides.extendBarely())); // says extend, but actually retract
+                    follower.followPath(sub3ToSub4);
+                    setPathState(4003);
                 }
                 else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_2 && slidesDistanceTraveled != 3) {
                     slidesDistanceTraveled = 3;
@@ -507,15 +526,55 @@ public class SixSample extends OpMode {
                     slidesDistanceTraveled = 2;
                     runningActions.add(new SequentialAction(
                             new InstantAction(() -> horizontalSlides.extendMostly()),
-                            new SleepAction(0.2),
+                            new SleepAction(0.2), // TODO
                             new InstantAction(() -> horizontalSlides.extendBarely()),
-                            new SleepAction(0.2),
+                            new SleepAction(0.2), // TODO
                             new InstantAction(() -> horizontalSlides.extendMostly())
                     ));
                     // stays in this case
                 }
                 break;
 
+            /// INTAKE: logic at sub 4 pose
+            case 4003:
+                if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                    samplesGrabbedFromSub++;
+                    retractIntakeAction();
+                    setPathState(4004); // sub 1 to bucket
+                } else if (intake.chamberState == COLOR_TO_REJECT) {
+                    // reject sample and try again at same pose
+                    runningActions.add(new SequentialAction(
+                            new InstantAction(() -> intake.flipUp()),
+                            new SleepAction(0.2),
+                            new InstantAction(() -> intake.reverse()),
+                            new SleepAction(0.4),
+                            new InstantAction(() -> intake.intake()),
+                            new InstantAction(() -> intake.dropDown())
+                    )); // stays in this case
+                }
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_3) {
+                    // how tf does it even make it to this case?
+                    // gives up and retracts in prep for teleop
+                    retractIntakeAction();
+                    setPathState(-100);
+                }
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_2 && slidesDistanceTraveled != 3) {
+                    slidesDistanceTraveled = 3;
+                    runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
+                    // stays in this case
+                }
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_1 && slidesDistanceTraveled != 2) {
+                    slidesDistanceTraveled = 2;
+                    runningActions.add(new SequentialAction(
+                            new InstantAction(() -> horizontalSlides.extendMostly()),
+                            new SleepAction(0.2), // TODO
+                            new InstantAction(() -> horizontalSlides.extendBarely()),
+                            new SleepAction(0.2), // TODO
+                            new InstantAction(() -> horizontalSlides.extendMostly())
+                    ));
+                    // stays in this case
+                }
+                break;
 
             /// SCORE: sub 1 to bucket
             case 1004:
@@ -531,10 +590,10 @@ public class SixSample extends OpMode {
                 }
                 break;
             case 1006: // score from sub 1
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
+                if (follower.getPose().getX() < RUSH_SCORE_X_THRESHOLD && follower.getPose().getY() > RUSH_SCORE_Y_THRESHOLD && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleSubAction();
                     setPathState(2001); // back to sub to grab second sample
-                                        // guaranteed hasn't gotten 2 samples yet
+                    // guaranteed hasn't gotten 2 samples yet
                 }
                 break;
             /// SCORE: sub 2 to bucket
@@ -551,14 +610,9 @@ public class SixSample extends OpMode {
                 }
                 break;
             case 2006: // score from sub 2
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
+                if (follower.getPose().getX() < RUSH_SCORE_X_THRESHOLD && follower.getPose().getY() > RUSH_SCORE_Y_THRESHOLD && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleSubAction();
-                    if (samplesGrabbedFromSub == 1) {
-                        setPathState(3001); // not done, go back
-                    } else if (samplesGrabbedFromSub == 2) {
-                        setPathState(-1); // already done, park
-                    }
-                    // comment out above when 7 sample
+                    setPathState(3001); // back to sub to grab another sample, since guaranteed hasn't grabbed 3 yet
                 }
                 break;
             /// SCORE: sub 3 to bucket
@@ -575,24 +629,38 @@ public class SixSample extends OpMode {
                 }
                 break;
             case 3006: // score from sub 3
-                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
+                if (follower.getPose().getX() < RUSH_SCORE_X_THRESHOLD && follower.getPose().getY() > RUSH_SCORE_Y_THRESHOLD && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleParkAction();
-                    if (samplesGrabbedFromSub == 1) {
+                    if (samplesGrabbedFromSub <= 2) {
                         setPathState(4001); // not done, go back
-                    } else if (samplesGrabbedFromSub == 2) {
-                        setPathState(-1); // park, already done
+                    } else if (samplesGrabbedFromSub == 3) {
+                        setPathState(-1); // done, park
                     }
-                    //                    depositSampleParkAction(); // for 7 sample
-//                    if (samplesGrabbedFromSub <= 2) {
-//                        setPathState(4001); // not done, go back
-//                    } else if (samplesGrabbedFromSub == 3) {
-//                        setPathState(-1); // done, park
-//                    }
+                }
+                break;
+            /// SCORE: sub 4 to bucket
+            case 4004:
+                if (intake.wristFlippedUp) {
+                    follower.followPath(scoreFrom4, true);
+                    setPathState(4005);
+                }
+                break;
+            case 4005: // transfer from sub 3
+                if (horizontalSlides.slidesRetracted && intake.wristFlippedUp) { // ready to transfer, runs during middle of path
+                    transferAndToScoreSubAction();
+                    setPathState(4006);
+                }
+                break;
+            case 4006: // score from sub 3
+                if (follower.getPose().getX() < RUSH_SCORE_X_THRESHOLD && follower.getPose().getY() > RUSH_SCORE_Y_THRESHOLD && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
+                    depositSampleParkAction();
+                    setPathState(-1);
+                    // even if only 1, 2, or 3 sample grabbed, it's time to give up and try to park, there's just no way I add even more cases or have enough time
                 }
                 break;
 
-
-            case -1: // park
+            /// park
+            case -1:
                 if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.STOW) {
                     follower.followPath(park);
                     setPathState(-2);
@@ -601,8 +669,10 @@ public class SixSample extends OpMode {
             case -2:
                 if (follower.getPose().getX() > 30) {
                     stowToParkAction();
-                    setPathState(-3);
+                    setPathState(-100);
                 }
+                break;
+
         }
     }
 
@@ -782,23 +852,24 @@ public class SixSample extends OpMode {
     public void prepToIntakeAction() {
         runningActions.add(new SequentialAction(
                 new InstantAction(() -> horizontalSlides.extendPartial()),
-                new InstantAction(() -> intake.dropDown()),
-                new InstantAction(() -> intake.intake())
+                new InstantAction(() -> intake.intake()),
+                new InstantAction(() -> intake.dropDown())
         ));
     }
 
     public void subIntakeAction() {
         runningActions.add(new SequentialAction(
                 new InstantAction(() -> horizontalSlides.extendBarely()),
+                new InstantAction(() -> intake.intake()),
                 new InstantAction(() -> intake.dropDown())
         ));
     }
 
     public void retractIntakeAction() {
         runningActions.add(new SequentialAction(
-                new InstantAction(() -> horizontalSlides.retract()),
                 new InstantAction(() -> intake.flipUp()),
-                new InstantAction(() -> intake.idle())
+                new InstantAction(() -> intake.idle()),
+                new InstantAction(() -> horizontalSlides.retract())
         ));
     }
 

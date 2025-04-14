@@ -193,15 +193,13 @@ public class FourSample extends OpMode {
                 break;
             case 3:
                 // wait until sample picked up
-                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY || pathTimer.getElapsedTimeSeconds() > 2) {
                     // retract and prep for transfer
                     retractIntakeAction();
 
                     // drive up to scoring
                     follower.followPath(scorePickup1,true);
                     setPathState(4);
-                } else if (pathTimer.getElapsedTimeSeconds() > 2.5) { // intake's emptiness already assumed
-                    setPathState(991);
                 }
                 break;
             case 4:
@@ -236,7 +234,7 @@ public class FourSample extends OpMode {
                 break;
             case 7:
                 // wait until sample picked up
-                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY || pathTimer.getElapsedTimeSeconds() > 2) {
                     // retract and prep for transfer
                     retractIntakeAction();
 
@@ -273,7 +271,7 @@ public class FourSample extends OpMode {
                 break;
             case 11:
                 // wait until sample picked up
-                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY || pathTimer.getElapsedTimeSeconds() > 2) {
                     // retract and prep for transfer
                     retractIntakeAction();
 

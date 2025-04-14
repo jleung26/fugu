@@ -291,9 +291,9 @@ public class FullTeleOpCopy extends OpMode {
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && horizontalSlides.slidesRetracted && intake.wristFlippedUp && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
                 if (highBucketBool) { // high bucket
                     runningActions.add(new SequentialAction(
-                            new InstantAction(() -> intake.setIntake(0.5)), // push sample all the way in, kinda jank, maybe not necessary
+                            new InstantAction(() -> intake.setIntake(0.5)),
                             new InstantAction(() -> outtake.toTransfer()),
-                            new SleepAction(0.2), // TODO: play around with timings
+                            new SleepAction(0.2),
                             new InstantAction(() -> outtake.closeClawTight()),
                             new SleepAction(0.4),
                             new InstantAction(() -> outtake.toStow()),
@@ -302,7 +302,7 @@ public class FullTeleOpCopy extends OpMode {
                             new InstantAction(() -> verticalSlides.raiseToHighBucket()),
                             new SleepAction(0.2),
                             new InstantAction(() -> outtake.toVert()),
-                            new SleepAction(0.6), // TODO: tune this based on extension speed 0.3+0.5, probably only change 0.5
+                            new SleepAction(0.6),
                             new InstantAction(() -> outtake.toScoreBucket())
                     ));
                 } else { // low bucket
