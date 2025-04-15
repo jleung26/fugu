@@ -24,7 +24,7 @@ public class HorizontalSlides {
     public static double AT_TARGET_THRESHOLD = 80;
     public static int UPPER_LIMIT = 1100; // this is for 1150s
     public static int LOWER_LIMIT = -2;
-    public static double MAPPING_EXPONENT = 0.7; // TODO: tune
+    public static double MAPPING_EXPONENT = 0.7;
 
     // encoder positions
     public static double extendedPos = 880;

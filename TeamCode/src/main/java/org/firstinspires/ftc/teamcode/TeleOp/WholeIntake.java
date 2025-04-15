@@ -181,8 +181,6 @@ public class WholeIntake extends OpMode {
                 ));
             }
         } else if (intake.intakeState == Intake.IntakeState.REVERSE) {
-            // TODO: if the following doesn't work, have to go back to timer based
-
             // stop reversing when no more sample
             if (intake.wristFlippedUp && intake.chamberState == Intake.IntakeChamberState.EMPTY) {
                 runningActions.add( new InstantAction(() -> intake.idle()) );

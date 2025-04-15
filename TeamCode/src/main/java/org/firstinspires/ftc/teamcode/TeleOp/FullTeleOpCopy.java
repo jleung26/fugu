@@ -282,7 +282,7 @@ public class FullTeleOpCopy extends OpMode {
                         new InstantAction(() -> verticalSlides.raiseToPrepClip()),
                         new SleepAction(0.25),
                         new InstantAction(() -> outtake.armPitch.setArmScoreClip()), // decompose into two movements to add delay
-                        new SleepAction(0.4), // TODO: tune delay
+                        new SleepAction(0.4),
                         new InstantAction(() -> outtake.armExtend.extendToScoreClip())
                 ));
             }
@@ -309,7 +309,7 @@ public class FullTeleOpCopy extends OpMode {
                     runningActions.add(new SequentialAction(
                             new InstantAction(() -> intake.setIntake(0.5)), // push sample all the way in, kinda jank, maybe not necessary
                             new InstantAction(() -> outtake.toTransfer()),
-                            new SleepAction(0.2), // TODO: play around with timings
+                            new SleepAction(0.2),
                             new InstantAction(() -> outtake.closeClawTight()),
                             new SleepAction(0.4),
                             new InstantAction(() -> outtake.toStow()),

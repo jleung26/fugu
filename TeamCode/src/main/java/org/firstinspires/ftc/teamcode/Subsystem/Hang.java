@@ -156,7 +156,6 @@ public class Hang {
         Fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         Br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        // TODO: drive and vert slide operates need to be turned off
     }
 
     public void operate(Gamepad currentGamepad1, Gamepad currentGamepad2, Gamepad previousGamepad1, Gamepad previousGamepad2) {
