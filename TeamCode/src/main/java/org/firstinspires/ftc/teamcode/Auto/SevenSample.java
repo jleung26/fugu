@@ -33,7 +33,7 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "0+6 OPTIMIZED TEST", group = "A", preselectTeleOp = "Full TeleOp FINAL")
+@Autonomous(name = "0+7 TEST", group = "A", preselectTeleOp = "Full TeleOp FINAL")
 public class SevenSample extends OpMode {
     // declaring subsystems
     RobotHardware robotHardware = new RobotHardware();

@@ -316,8 +316,9 @@ public class FullTeleOpCopy extends OpMode {
                             new SleepAction(0.1),
                             new InstantAction(() -> intake.setIntake(0)),
                             new InstantAction(() -> verticalSlides.raiseToLowBucket()),
+                            new InstantAction(() -> outtake.armPitch.setArmScoreBucket()),
                             new SleepAction(0.2),
-                            new InstantAction(() -> outtake.toScoreBucket())
+                            new InstantAction(() -> outtake.armExtend.extendToScoreBucket())
                     ));
                 }
             }

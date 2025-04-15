@@ -74,34 +74,34 @@ public class SixSampleOptimized extends OpMode {
     // back of bot towards bucket
 
     /** Bucket Scoring Pose */
-    private final Pose score0Pose = new Pose(12, 130, Math.toRadians(340)); // TODO: tune
+    private final Pose score0Pose = new Pose(14, 132.5, Math.toRadians(340)); // TODO: tune
 
-    private final Pose score1Pose = new Pose(12, 132, Math.toRadians(330)); // TODO: tune
+    private final Pose score1Pose = new Pose(13, 133, Math.toRadians(330)); // TODO: tune
 
-    private final Pose score2Pose = new Pose(15, 137, 0); // TODO: tune, maybe >15 so no L4
+    private final Pose score2Pose = new Pose(16, 137, Math.toRadians(0)); // TODO: tune, maybe >15 so no L4
 
-    private final Pose score3Pose = new Pose(14, 132, 330); //
+    private final Pose score3Pose = new Pose(14, 132, Math.toRadians(315)); //
 
     // Pick up spike marks
-    private final Pose pickup1Pose = new Pose(17, 131, Math.toRadians(340)); // TODO: tune
+    private final Pose pickup1Pose = new Pose(18, 132.5, Math.toRadians(340)); // TODO: tune
 
-    private final Pose pickup2Pose = new Pose(16, 132, Math.toRadians(0)); // TODO: tune
+    private final Pose pickup2Pose = new Pose(17, 133.5, Math.toRadians(0)); // TODO: tune
 
-    private final Pose pickup3Pose = new Pose(24, 124, Math.toRadians(40)); // TODO: tune
+    private final Pose pickup3Pose = new Pose(24, 128, Math.toRadians(45)); // TODO: tune
 
 
     // to and from sub
-    private final Pose scoreControlPose = new Pose(64, 110, Math.toRadians(999)/* heading unused*/);
+    private final Pose scoreControlPose = new Pose(62, 110, Math.toRadians(999)/* heading unused*/);
 
     private final Pose subScorePose = new Pose(12, 132, Math.toRadians(330)); // TODO: tune
 
-    private final Pose sub1Pose = new Pose(62, 98, Math.toRadians(270));
+    private final Pose sub1Pose = new Pose(54, 98, Math.toRadians(270));
 
-    private final Pose sub2Pose = new Pose(67, 98, Math.toRadians(270));
+    private final Pose sub2Pose = new Pose(58, 98, Math.toRadians(270));
 
-    private final Pose sub3Pose = new Pose(72, 98, Math.toRadians(270));
+    private final Pose sub3Pose = new Pose(63, 98, Math.toRadians(270));
 
-    private final Pose sub4Pose = new Pose(77, 98, Math.toRadians(270));
+    private final Pose sub4Pose = new Pose(67, 98, Math.toRadians(270));
 
     /** Park Pose for our robot, after we do all of the scoring. */
     private final Pose parkPose = new Pose(62, 98, Math.toRadians(90)); // tuned
@@ -109,15 +109,15 @@ public class SixSampleOptimized extends OpMode {
     private final Pose parkControlPose = new Pose(64, 110, Math.toRadians(999)/* heading unused*/); // done
 
     // constants and thresholds
-    private final double SUB_GRAB_TIMEOUT_1 = 0.4; // TODO
-    private final double SUB_GRAB_TIMEOUT_2 = 0.8; // TODO
-    private final double SUB_GRAB_TIMEOUT_3 = 1.5; // TODO
+    private final double SUB_GRAB_TIMEOUT_1 = 0.75; // TODO
+    private final double SUB_GRAB_TIMEOUT_2 = 1.25; // TODO
+    private final double SUB_GRAB_TIMEOUT_3 = 2; // TODO
     private final double DEPOSIT_DELAY = 0.4; // delay to wait before follow next path after deposit sample Action
     private final double VERT_SLIDES_EXTENDED_THRESHOLD = 800;
     private final double SLIDES_STUCK_TIMEOUT = 3;
-    private final double SPIKE_MARK_TIMEOUT = 2;
+    private final double SPIKE_MARK_TIMEOUT = 1.5;
     private final double AT_SUB_Y_THRESHOLD = 100; // TODO
-    private final double RUSH_SCORE_X_THRESHOLD = subScorePose.getX() + 2; // TODO
+    private final double RUSH_SCORE_X_THRESHOLD = subScorePose.getX() + 3.5; // TODO
     private final double RUSH_SCORE_Y_THRESHOLD = subScorePose.getY() - 2; // TODO
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
@@ -141,7 +141,6 @@ public class SixSampleOptimized extends OpMode {
                 .addPath(new BezierLine(new Point(pickup1Pose), new Point(score1Pose)))
                 .setLinearHeadingInterpolation(pickup1Pose.getHeading(), score1Pose.getHeading())
                 .setZeroPowerAccelerationMultiplier(2)
-                // TODO: maybe constant heading here?
                 .build();
 
         grabPickup2 = follower.pathBuilder()
@@ -245,15 +244,16 @@ public class SixSampleOptimized extends OpMode {
             case 2:
                 if (pathTimer.getElapsedTimeSeconds() >= DEPOSIT_DELAY) {
                     follower.followPath(grabPickup1,true);
-                    setPathState(3);
-                }
-                break;
-            case 3:
-                if(!follower.isBusy()) {
                     runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
                     setPathState(4);
                 }
                 break;
+//            case 3:
+//                if(!follower.isTurning()) {
+//                    runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
+//                    setPathState(4);
+//                }
+//                break;
             case 4:
                 // wait until sample picked up
                 if (intake.chamberState != Intake.IntakeChamberState.EMPTY || pathTimer.getElapsedTimeSeconds() > SPIKE_MARK_TIMEOUT) {
@@ -361,7 +361,6 @@ public class SixSampleOptimized extends OpMode {
             case 1002:
                 if (follower.getPose().getY() < AT_SUB_Y_THRESHOLD) {
                     subIntakeAction();
-                    runningActions.add(new InstantAction(() -> horizontalSlides.extendPartial()));
                     slidesDistanceTraveled = 1;
                     setPathState(1003);
                 }
@@ -376,7 +375,6 @@ public class SixSampleOptimized extends OpMode {
             case 2002:
                 if (follower.getPose().getY() < AT_SUB_Y_THRESHOLD) {
                     subIntakeAction();
-                    runningActions.add(new InstantAction(() -> horizontalSlides.extendPartial()));
                     slidesDistanceTraveled = 1;
                     setPathState(2003);
                 }
@@ -391,7 +389,6 @@ public class SixSampleOptimized extends OpMode {
             case 3002:
                 if (follower.getPose().getY() < AT_SUB_Y_THRESHOLD) {
                     subIntakeAction();
-                    runningActions.add(new InstantAction(() -> horizontalSlides.extendPartial()));
                     slidesDistanceTraveled = 1;
                     setPathState(3003);
                 }
@@ -406,7 +403,6 @@ public class SixSampleOptimized extends OpMode {
             case 4002:
                 if (follower.getPose().getY() < AT_SUB_Y_THRESHOLD) {
                     subIntakeAction();
-                    runningActions.add(new InstantAction(() -> horizontalSlides.extendPartial()));
                     slidesDistanceTraveled = 1;
                     setPathState(4003);
                 }
@@ -414,10 +410,11 @@ public class SixSampleOptimized extends OpMode {
 
             /// INTAKE: logic at sub 1 pose
             case 1003:
-                if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY && intake.chamberState != Intake.IntakeChamberState.UNKNOWN) {
                     samplesGrabbedFromSub++;
                     retractIntakeAction();
                     setPathState(1004); // sub 1 to bucket
+                    break;
                 } else if (intake.chamberState == COLOR_TO_REJECT) {
                     // reject sample and try again at same pose
                     runningActions.add(new SequentialAction(
@@ -425,40 +422,43 @@ public class SixSampleOptimized extends OpMode {
                             new SleepAction(0.2),
                             new InstantAction(() -> intake.reverse()),
                             new SleepAction(0.4),
-                            new InstantAction(() -> intake.intake()),
-                            new InstantAction(() -> intake.dropDown())
+                            new InstantAction(() -> intake.intake())
+//                            new InstantAction(() -> intake.dropDown())
                     )); // stays in this case
+                    break;
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_3) { // how tf does it even make it to this case?
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_3 && slidesDistanceTraveled == 3) { // how tf does it even make it to this case?
                     // gives up and moves on to next pose
-                    runningActions.add(new InstantAction(() -> horizontalSlides.extendBarely())); // says extend, but actually retract
+                    slidesDistanceTraveled = -1;
+                    retractIntakeAction();
                     follower.followPath(sub1ToSub2);
                     setPathState(2003);
+                    break;
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_2 && slidesDistanceTraveled != 3) {
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_2 && slidesDistanceTraveled == 2) {
                     slidesDistanceTraveled = 3;
                     runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
+                    break;
                     // stays in this case
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_1 && slidesDistanceTraveled != 2) {
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_1 && slidesDistanceTraveled == 1) {
                     slidesDistanceTraveled = 2;
-                    runningActions.add(new SequentialAction(
-                            new InstantAction(() -> horizontalSlides.extendMostly()),
-                            new SleepAction(0.2), // TODO
-                            new InstantAction(() -> horizontalSlides.extendBarely()),
-                            new SleepAction(0.2), // TODO
-                            new InstantAction(() -> horizontalSlides.extendMostly())
-                    ));
+                    wiggleSlides();
+                    break;
                     // stays in this case
                 }
                 break;
 
             /// INTAKE: logic at sub 2 pose
             case 2003:
-                if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.wristFlippedUp && follower.getPose().getX() > sub2Pose.getX() - 3) {
+                    subIntakeAction();
+                }
+                else if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY && intake.chamberState != Intake.IntakeChamberState.UNKNOWN) {
                     samplesGrabbedFromSub++;
                     retractIntakeAction();
                     setPathState(2004); // sub 1 to bucket
+                    break;
                 } else if (intake.chamberState == COLOR_TO_REJECT) {
                     // reject sample and try again at same pose
                     runningActions.add(new SequentialAction(
@@ -466,40 +466,43 @@ public class SixSampleOptimized extends OpMode {
                             new SleepAction(0.2),
                             new InstantAction(() -> intake.reverse()),
                             new SleepAction(0.4),
-                            new InstantAction(() -> intake.intake()),
-                            new InstantAction(() -> intake.dropDown())
+                            new InstantAction(() -> intake.intake())
+//                            new InstantAction(() -> intake.dropDown())
                     )); // stays in this case
+                    break;
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_3) { // how tf does it even make it to this if statement?
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_3  && slidesDistanceTraveled == 3) { // how tf does it even make it to this if statement?
                     // gives up and moves on to next pose
-                    runningActions.add(new InstantAction(() -> horizontalSlides.extendBarely())); // says extend, but actually retract
+                    slidesDistanceTraveled = -1;
+                    retractIntakeAction();
                     follower.followPath(sub2ToSub3);
                     setPathState(3003);
+                    break;
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_2 && slidesDistanceTraveled != 3) {
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_2 && slidesDistanceTraveled == 2) {
                     slidesDistanceTraveled = 3;
                     runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
+                    break;
                     // stays in this case
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_1 && slidesDistanceTraveled != 2) {
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_1 && slidesDistanceTraveled == 1) {
                     slidesDistanceTraveled = 2;
-                    runningActions.add(new SequentialAction(
-                            new InstantAction(() -> horizontalSlides.extendMostly()),
-                            new SleepAction(0.2), // TODO
-                            new InstantAction(() -> horizontalSlides.extendBarely()),
-                            new SleepAction(0.2), // TODO
-                            new InstantAction(() -> horizontalSlides.extendMostly())
-                    ));
+                    wiggleSlides();
+                    break;
                     // stays in this case
                 }
                 break;
 
             /// INTAKE: logic at sub 3 pose
             case 3003:
-                if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.wristFlippedUp && follower.getPose().getX() > sub3Pose.getX() - 3) {
+                    subIntakeAction();
+                }
+                else if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY && intake.chamberState != Intake.IntakeChamberState.UNKNOWN) {
                     samplesGrabbedFromSub++;
                     retractIntakeAction();
                     setPathState(3004); // sub 1 to bucket
+                    break;
                 } else if (intake.chamberState == COLOR_TO_REJECT) {
                     // reject sample and try again at same pose
                     runningActions.add(new SequentialAction(
@@ -507,40 +510,43 @@ public class SixSampleOptimized extends OpMode {
                             new SleepAction(0.2),
                             new InstantAction(() -> intake.reverse()),
                             new SleepAction(0.4),
-                            new InstantAction(() -> intake.intake()),
-                            new InstantAction(() -> intake.dropDown())
+                            new InstantAction(() -> intake.intake())
+//                            new InstantAction(() -> intake.dropDown())
                     )); // stays in this case
+                    break;
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_3) {
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_3 && slidesDistanceTraveled == 3) {
+                    slidesDistanceTraveled = -1;
                     // gives up and moves on to next pose
-                    runningActions.add(new InstantAction(() -> horizontalSlides.extendBarely())); // says extend, but actually retract
+                    retractIntakeAction();
                     follower.followPath(sub3ToSub4);
                     setPathState(4003);
+                    break;
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_2 && slidesDistanceTraveled != 3) {
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_2 && slidesDistanceTraveled == 2) {
                     slidesDistanceTraveled = 3;
                     runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
+                    break;
                     // stays in this case
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_1 && slidesDistanceTraveled != 2) {
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_1 && slidesDistanceTraveled == 1) {
                     slidesDistanceTraveled = 2;
-                    runningActions.add(new SequentialAction(
-                            new InstantAction(() -> horizontalSlides.extendMostly()),
-                            new SleepAction(0.2), // TODO
-                            new InstantAction(() -> horizontalSlides.extendBarely()),
-                            new SleepAction(0.2), // TODO
-                            new InstantAction(() -> horizontalSlides.extendMostly())
-                    ));
+                    wiggleSlides();
+                    break;
                     // stays in this case
                 }
                 break;
 
             /// INTAKE: logic at sub 4 pose
             case 4003:
-                if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.wristFlippedUp && follower.getPose().getX() > sub4Pose.getX() - 3) {
+                    subIntakeAction();
+                }
+                else if (intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY && intake.chamberState != Intake.IntakeChamberState.UNKNOWN) {
                     samplesGrabbedFromSub++;
                     retractIntakeAction();
                     setPathState(4004); // sub 1 to bucket
+                    break;
                 } else if (intake.chamberState == COLOR_TO_REJECT) {
                     // reject sample and try again at same pose
                     runningActions.add(new SequentialAction(
@@ -548,39 +554,45 @@ public class SixSampleOptimized extends OpMode {
                             new SleepAction(0.2),
                             new InstantAction(() -> intake.reverse()),
                             new SleepAction(0.4),
-                            new InstantAction(() -> intake.intake()),
-                            new InstantAction(() -> intake.dropDown())
+                            new InstantAction(() -> intake.intake())
+//                            new InstantAction(() -> intake.dropDown())
                     )); // stays in this case
+                    break;
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_3) {
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_3 && slidesDistanceTraveled == 3) {
                     // how tf does it even make it to this case?
                     // gives up and retracts in prep for teleop
+                    slidesDistanceTraveled = -1;
                     retractIntakeAction();
                     setPathState(-100);
+                    break;
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_2 && slidesDistanceTraveled != 3) {
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_2 && slidesDistanceTraveled == 2) {
                     slidesDistanceTraveled = 3;
                     runningActions.add(new InstantAction(() -> horizontalSlides.extend()));
+                    break;
                     // stays in this case
                 }
-                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_1 && slidesDistanceTraveled != 2) {
+                else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_1 && slidesDistanceTraveled == 1) {
                     slidesDistanceTraveled = 2;
-                    runningActions.add(new SequentialAction(
-                            new InstantAction(() -> horizontalSlides.extendMostly()),
-                            new SleepAction(0.2),
-                            new InstantAction(() -> horizontalSlides.extendBarely()),
-                            new SleepAction(0.2),
-                            new InstantAction(() -> horizontalSlides.extendMostly())
-                    ));
+                    wiggleSlides();
+                    break;
                     // stays in this case
                 }
                 break;
 
+
+
             /// SCORE: sub 1 to bucket
             case 1004:
-                if (intake.wristFlippedUp) {
+                if (intake.wristFlippedUp && !horizontalSlides.slidesRetracted) {
+                    runningActions.add(new InstantAction(() -> horizontalSlides.retract()));
+                    break;
+                }
+                else if (intake.wristFlippedUp) {
                     follower.followPath(scoreFrom1, true);
                     setPathState(1005);
+                    break;
                 }
                 break;
             case 1005: // transfer from sub 1
@@ -599,9 +611,14 @@ public class SixSampleOptimized extends OpMode {
                 break;
             /// SCORE: sub 2 to bucket
             case 2004:
-                if (intake.wristFlippedUp) {
+                if (intake.wristFlippedUp && !horizontalSlides.slidesRetracted) {
+                    runningActions.add(new InstantAction(() -> horizontalSlides.retract()));
+                    break;
+                }
+                else if (intake.wristFlippedUp) {
                     follower.followPath(scoreFrom2, true);
                     setPathState(2005);
+                    break;
                 }
                 break;
             case 2005: // transfer from sub 2
@@ -615,20 +632,28 @@ public class SixSampleOptimized extends OpMode {
                     depositSampleSubAction();
                     if (samplesGrabbedFromSub == 1) {
                         setPathState(3001); // not done, go back
+                        break;
                     } else if (samplesGrabbedFromSub == 2) {
                         setPathState(-1); // already done, park
+                        break;
                     } else {
                         telemetry.addLine("SAMPLES GRABBED INTEGER BROKE");
                         follower.turn(Math.toRadians(90), true);
+                        break;
                     }
                     // TODO: comment out above when 7 sample
                 }
                 break;
             /// SCORE: sub 3 to bucket
             case 3004:
-                if (intake.wristFlippedUp) {
+                if (intake.wristFlippedUp && !horizontalSlides.slidesRetracted) {
+                    runningActions.add(new InstantAction(() -> horizontalSlides.retract()));
+                    break;
+                }
+                else if (intake.wristFlippedUp) {
                     follower.followPath(scoreFrom3, true);
                     setPathState(3005);
+                    break;
                 }
                 break;
             case 3005: // transfer from sub 3
@@ -642,8 +667,10 @@ public class SixSampleOptimized extends OpMode {
                     depositSampleParkAction();
                     if (samplesGrabbedFromSub == 1) {
                         setPathState(4001); // not done, go back
+                        break;
                     } else if (samplesGrabbedFromSub == 2) {
                         setPathState(-1); // park, already done
+                        break;
                     }
 //                    if (samplesGrabbedFromSub <= 2) {
 //                        setPathState(4001); // not done, go back
@@ -655,9 +682,14 @@ public class SixSampleOptimized extends OpMode {
                 break;
             /// SCORE: sub 4 to bucket
             case 4004:
-                if (intake.wristFlippedUp) {
+                if (intake.wristFlippedUp && !horizontalSlides.slidesRetracted) {
+                    runningActions.add(new InstantAction(() -> horizontalSlides.retract()));
+                    break;
+                }
+                else if (intake.wristFlippedUp) {
                     follower.followPath(scoreFrom4, true);
                     setPathState(4005);
+                    break;
                 }
                 break;
             case 4005: // transfer from sub 3
@@ -879,7 +911,10 @@ public class SixSampleOptimized extends OpMode {
         runningActions.add(new SequentialAction(
                 new InstantAction(() -> horizontalSlides.extendBarely()),
                 new InstantAction(() -> intake.intake()),
-                new InstantAction(() -> intake.dropDown())
+                new InstantAction(() -> intake.dropDown()),
+                new InstantAction(() -> horizontalSlides.extendPartial()),
+                new SleepAction(0.3),
+                new InstantAction(() -> horizontalSlides.extendBarely())
         ));
     }
 
@@ -897,13 +932,23 @@ public class SixSampleOptimized extends OpMode {
                         new InstantAction(() -> intake.flipUp()),
                         new InstantAction(() -> intake.idle()),
                         new InstantAction(()-> outtake.toSubPark()),
-                        new InstantAction(()-> outtake.openClaw())
+                        new InstantAction(()-> outtake.closeClawLoose())
+                ),
+                new SleepAction(0.35),
+                new ParallelAction(
+                        new InstantAction(() -> verticalSlides.retract()),
+                        new InstantAction(()-> horizontalSlides.retract())
                 )
-//                new SleepAction(0.7),
-//                new ParallelAction(
-//                        new InstantAction(() -> verticalSlides.retract()),
-//                        new InstantAction(()-> horizontalSlides.retract())
-//                )
+        ));
+    }
+
+    public void wiggleSlides() {
+        runningActions.add(new SequentialAction(
+                new InstantAction(() -> horizontalSlides.extendMostly()),
+                new SleepAction(0.3),
+                new InstantAction(() -> horizontalSlides.extendBarely()),
+                new SleepAction(0.3),
+                new InstantAction(() -> horizontalSlides.extendMostly())
         ));
     }
 

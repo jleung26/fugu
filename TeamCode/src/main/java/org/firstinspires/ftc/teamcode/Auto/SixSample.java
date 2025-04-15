@@ -352,6 +352,7 @@ public class SixSample extends OpMode {
                 if (pathTimer.getElapsedTimeSeconds() >= DEPOSIT_DELAY) { // delay
                     follower.followPath(scoreToSub1,true);
                     setPathState(1002);
+                    break;
                 }
                 break;
             case 1002:
@@ -400,6 +401,7 @@ public class SixSample extends OpMode {
                     samplesGrabbedFromSub++;
                     retractIntakeAction();
                     setPathState(1004); // sub 1 to bucket
+                    break;
                 } else if (intake.chamberState == COLOR_TO_REJECT) {
                     // reject sample and try again at same pose
                     runningActions.add(new SequentialAction(
@@ -416,6 +418,7 @@ public class SixSample extends OpMode {
                     runningActions.add(new InstantAction(() -> horizontalSlides.extendBarely())); // says extend, but actually retract
                     follower.followPath(sub1ToSub2);
                     setPathState(2003);
+                    break;
                 }
                 else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_2 && slidesDistanceTraveled != 3) {
                     slidesDistanceTraveled = 3;
@@ -441,6 +444,7 @@ public class SixSample extends OpMode {
                     samplesGrabbedFromSub++;
                     retractIntakeAction();
                     setPathState(2004); // sub 1 to bucket
+                    break;
                 } else if (intake.chamberState == COLOR_TO_REJECT) {
                     // reject sample and try again at same pose
                     runningActions.add(new SequentialAction(
@@ -457,6 +461,7 @@ public class SixSample extends OpMode {
                     runningActions.add(new InstantAction(() -> horizontalSlides.extendBarely())); // says extend, but actually retract
                     follower.followPath(sub2ToSub3);
                     setPathState(3003);
+                    break;
                 }
                 else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_2 && slidesDistanceTraveled != 3) {
                     slidesDistanceTraveled = 3;
@@ -482,6 +487,7 @@ public class SixSample extends OpMode {
                     samplesGrabbedFromSub++;
                     retractIntakeAction();
                     setPathState(3004); // sub 1 to bucket
+                    break;
                 } else if (intake.chamberState == COLOR_TO_REJECT) {
                     // reject sample and try again at same pose
                     runningActions.add(new SequentialAction(
@@ -497,6 +503,7 @@ public class SixSample extends OpMode {
                     // should be very hard to get here, gives up
                     retractIntakeAction();
                     setPathState(-10);
+                    break;
                 }
                 else if (pathTimer.getElapsedTimeSeconds() > SUB_GRAB_TIMEOUT_2 && slidesDistanceTraveled != 3) {
                     slidesDistanceTraveled = 3;
@@ -603,6 +610,7 @@ public class SixSample extends OpMode {
                     stowToParkAction();
                     setPathState(-3);
                 }
+                break;
         }
     }
 
@@ -790,15 +798,16 @@ public class SixSample extends OpMode {
     public void subIntakeAction() {
         runningActions.add(new SequentialAction(
                 new InstantAction(() -> horizontalSlides.extendBarely()),
+                new InstantAction(() -> intake.intake()),
                 new InstantAction(() -> intake.dropDown())
         ));
     }
 
     public void retractIntakeAction() {
         runningActions.add(new SequentialAction(
-                new InstantAction(() -> horizontalSlides.retract()),
                 new InstantAction(() -> intake.flipUp()),
-                new InstantAction(() -> intake.idle())
+                new InstantAction(() -> intake.idle()),
+                new InstantAction(() -> horizontalSlides.retract())
         ));
     }
 

@@ -42,7 +42,7 @@ public class Intake {
     public static double WRIST_TUNING_INCREMENT = 0.001;
 
     // sensor constants
-    public static double DETECTION_THRESHOLD = 1.2; // inches
+    public static double DETECTION_THRESHOLD = 1.3; // inches
 
     // constantly updating states
     public volatile IntakeChamberState chamberState = IntakeChamberState.EMPTY;
