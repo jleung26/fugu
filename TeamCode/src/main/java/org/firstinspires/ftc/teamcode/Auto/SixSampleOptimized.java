@@ -74,44 +74,42 @@ public class SixSampleOptimized extends OpMode {
     // back of bot towards bucket
 
     /** Bucket Scoring Pose */
-    private final Pose score0Pose = new Pose(14, 132.5, Math.toRadians(340)); // TODO: tune
+    private final Pose score0Pose = new Pose(14.5, 134, Math.toRadians(340)); // TODO: tune
 
-    private final Pose score1Pose = new Pose(13, 133, Math.toRadians(350)); // TODO: tune
+    private final Pose score1Pose = new Pose(14, 135, Math.toRadians(345)); // TODO: tune
 
-    private final Pose score2Pose = new Pose(16, 134, Math.toRadians(0)); // TODO: tune
+    private final Pose score2Pose = new Pose(15.5, 137, Math.toRadians(0)); // TODO: tune
 
-    private final Pose score3Pose = new Pose(14, 132, Math.toRadians(315)); //
+    private final Pose score3Pose = new Pose(15, 134, Math.toRadians(315)); //
 
     // Pick up spike marks
     private final Pose pickup1Pose = new Pose(18, 132.5, Math.toRadians(340)); // tuned
 
-    private final Pose pickup2Pose = new Pose(17, 133.5, Math.toRadians(0)); // tuned
+    private final Pose pickup2Pose = new Pose(17, 134.5, Math.toRadians(0)); // tuned
 
-    private final Pose pickup3Pose = new Pose(20, 132, Math.toRadians(23)); // TODO: tune
+    private final Pose pickup3Pose = new Pose(25.5, 127.5, Math.toRadians(49)); // TODO: tune
                                             /// 24, 128, Math.toRadians(45), reliable pose, go back to if too many issues
-
-
     // to and from sub
-    private final Pose scoreControlPose = new Pose(62, 110, Math.toRadians(999)/* heading unused*/);
+    private final Pose scoreControlPose = new Pose(64, 113, Math.toRadians(999)/* heading unused*/);
 
     private final Pose subScorePose = new Pose(12, 132, Math.toRadians(330));
 
-    private final Pose sub1Pose = new Pose(54, 98, Math.toRadians(270));
+    private final Pose sub1Pose = new Pose(56.5, 98, Math.toRadians(270));
 
-    private final Pose sub2Pose = new Pose(58, 98, Math.toRadians(270));
+    private final Pose sub2Pose = new Pose(60, 98, Math.toRadians(270));
 
-    private final Pose sub3Pose = new Pose(63, 98, Math.toRadians(270));
+    private final Pose sub3Pose = new Pose(64, 98, Math.toRadians(270));
 
-    private final Pose sub4Pose = new Pose(67, 98, Math.toRadians(270));
+    private final Pose sub4Pose = new Pose(68, 98, Math.toRadians(270));
 
     private final Pose parkPose = new Pose(62, 98, Math.toRadians(90)); // tuned
 
-    private final Pose parkControlPose = new Pose(64, 110, Math.toRadians(999)/* heading unused*/); // done
+    private final Pose parkControlPose = new Pose(64, 120, Math.toRadians(999)/* heading unused*/); // done
 
     // constants and thresholds
     private final double SUB_GRAB_TIMEOUT_1 = 1; // TODO
-    private final double SUB_GRAB_TIMEOUT_2 = 1.5; // TODO
-    private final double SUB_GRAB_TIMEOUT_3 = 3; // TODO
+    private final double SUB_GRAB_TIMEOUT_2 = 2.25; // TODO
+    private final double SUB_GRAB_TIMEOUT_3 = 3.5; // TODO
     private final double DEPOSIT_DELAY = 0.3; // delay to wait before follow next path after deposit sample Action
     private final double VERT_SLIDES_EXTENDED_THRESHOLD = 800;
     private final double SLIDES_STUCK_TIMEOUT = 3;
@@ -453,6 +451,7 @@ public class SixSampleOptimized extends OpMode {
             /// INTAKE: logic at sub 2 pose
             case 2003:
                 if (intake.wristFlippedUp && follower.getPose().getX() > sub2Pose.getX() - 3) {
+                    slidesDistanceTraveled = 1;
                     subIntakeAction();
                     break;
                 }
@@ -499,6 +498,7 @@ public class SixSampleOptimized extends OpMode {
             /// INTAKE: logic at sub 3 pose
             case 3003:
                 if (intake.wristFlippedUp && follower.getPose().getX() > sub3Pose.getX() - 3) {
+                    slidesDistanceTraveled = 1;
                     subIntakeAction();
                     break;
                 }
@@ -545,6 +545,7 @@ public class SixSampleOptimized extends OpMode {
             /// INTAKE: logic at sub 4 pose
             case 4003:
                 if (intake.wristFlippedUp && follower.getPose().getX() > sub4Pose.getX() - 3) {
+                    slidesDistanceTraveled = 1;
                     subIntakeAction();
                     break;
                 }

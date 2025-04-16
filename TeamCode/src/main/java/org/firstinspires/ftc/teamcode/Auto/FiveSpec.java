@@ -77,23 +77,17 @@ public class FiveSpec extends OpMode {
     /** Intake First Sample from the Spike Mark */
     private final Pose intake1Pose = new Pose(26, 44, Math.toRadians(317));
 
-    private final Pose intake1BackupPose = new Pose(28, 42, Math.toRadians(317));
-
     /** Spit out First Sample */
     private final Pose eject1Pose = new Pose(24, 42, Math.toRadians(240));
 
     /** Intake Second Sample from the Spike Mark */
-    private final Pose intake2Pose = new Pose(24, 36, Math.toRadians(318));
-
-    private final Pose intake2BackupPose = new Pose(26, 34, Math.toRadians(318));
+    private final Pose intake2Pose = new Pose(26, 34, Math.toRadians(318));
 
     /** Spit out Second Sample */
     private final Pose eject2Pose = new Pose(24, 35, Math.toRadians(240));
 
     /** Intake Third Sample from the Spike Mark */
-    private final Pose intake3Pose = new Pose(24, 26, Math.toRadians(318));
-
-    private final Pose intake3BackupPose = new Pose(26, 24, Math.toRadians(318));
+    private final Pose intake3Pose = new Pose(26, 24, Math.toRadians(318));
 
     /** Spit out Third Sample */
     private final Pose eject3Pose = new Pose(24, 33, Math.toRadians(240));
@@ -127,6 +121,8 @@ public class FiveSpec extends OpMode {
 
     private int movingEjectAngleThreshold = 250;
     private double specScoreXThreshold = 38;
+    private final double SPIKE_MARK_TIMEOUT = 1.5;
+
 
 //    /** Park Control Pose for our robot, this is used to manipulate the bezier curve that we will create for the parking.
 //    private final Pose parkControlPose = new Pose(60, 98, Math.toRadians(90));
@@ -279,7 +275,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 4:
-                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY || pathTimer.getElapsedTimeSeconds() > SPIKE_MARK_TIMEOUT) {
                     // successfully grabbed, turn to eject
                     flipUpAction();
                     follower.followPath(eject1);
@@ -312,7 +308,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 8:
-                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY || pathTimer.getElapsedTimeSeconds() > SPIKE_MARK_TIMEOUT) {
                     flipUpAction();
                     follower.followPath(eject2);
                     setPathState(9);
@@ -341,7 +337,7 @@ public class FiveSpec extends OpMode {
                 }
                 break;
             case 12:
-                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY || pathTimer.getElapsedTimeSeconds() > SPIKE_MARK_TIMEOUT) {
                     flipUpAction();
                     follower.followPath(eject3);
                     setPathState(13);
