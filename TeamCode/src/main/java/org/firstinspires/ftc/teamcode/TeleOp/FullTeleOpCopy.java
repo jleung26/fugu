@@ -201,11 +201,11 @@ public class FullTeleOpCopy extends OpMode {
                 // yay grabbed correct color sample, can stow now
 //                gamepad1.rumble(500); /// rumble
                 runningActions.add(new SequentialAction(
-                        new InstantAction(() -> gamepad1.rumble(500)), // maybe fixes massive delay
+                        new InstantAction(() -> gamepad1.rumble(400)), // maybe fixes massive delay
                         new InstantAction(() -> intake.flipUp()),
                         new InstantAction(() -> intake.idle())
                 ));
-            } else if (intake.chamberState == COLOR_TO_REJECT && intake.prevChamberState == COLOR_TO_REJECT) {
+            } else if (intake.chamberState == COLOR_TO_REJECT) {
                 // reverse and go back to intaking
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> intake.flipUp()),
