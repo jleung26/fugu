@@ -122,10 +122,11 @@ public class FiveSpecOneSample extends OpMode {
 
     private final Pose scoreBucketPose = new Pose(7, 126, Math.toRadians(270));
 
-    private final Pose parkPose = new Pose(18, 132, Math.toRadians(270));
+    private final Pose parkPose = new Pose(18, 120, Math.toRadians(270));
 
     private int movingEjectAngleThreshold = 250;
     private double specScoreXThreshold = 38;
+    private final double SPIKE_MARK_TIMEOUT = 1.5;
 
 //    /** Park Control Pose for our robot, this is used to manipulate the bezier curve that we will create for the parking.
 //    private final Pose parkControlPose = new Pose(60, 98, Math.toRadians(90));
@@ -274,7 +275,7 @@ public class FiveSpecOneSample extends OpMode {
                 }
                 break;
             case 4:
-                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY || pathTimer.getElapsedTimeSeconds() > SPIKE_MARK_TIMEOUT) {
                     // successfully grabbed, turn to eject
                     flipUpAction();
                     follower.followPath(eject1);
@@ -307,7 +308,7 @@ public class FiveSpecOneSample extends OpMode {
                 }
                 break;
             case 8:
-                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY || pathTimer.getElapsedTimeSeconds() > SPIKE_MARK_TIMEOUT) {
                     flipUpAction();
                     follower.followPath(eject2);
                     setPathState(9);
@@ -336,7 +337,7 @@ public class FiveSpecOneSample extends OpMode {
                 }
                 break;
             case 12:
-                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY || pathTimer.getElapsedTimeSeconds() > SPIKE_MARK_TIMEOUT) {
                     flipUpAction();
                     follower.followPath(eject3);
                     setPathState(13);
@@ -677,8 +678,9 @@ public class FiveSpecOneSample extends OpMode {
                 new InstantAction(() -> outtake.toStow()),
                 new InstantAction(() -> intake.setIntake(0)),
                 new InstantAction(() -> verticalSlides.raiseToHighBucket()),
-                new SleepAction(0.2),
-                new InstantAction(() -> outtake.toScoreBucket())
+                new InstantAction(() -> outtake.armPitch.setArmScoreBucket()),
+                new SleepAction(0.3),
+                new InstantAction(() -> outtake.armExtend.extendToScoreBucket())
         ));
     }
 
