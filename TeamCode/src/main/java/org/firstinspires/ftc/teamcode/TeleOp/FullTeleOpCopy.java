@@ -97,8 +97,8 @@ public class FullTeleOpCopy extends OpMode {
         if ((currentGamepad1.b && !previousGamepad1.b) || (currentGamepad2.b && !previousGamepad2.b)) {
             sampleModeBool = !sampleModeBool;
         }
-        telemetry.addData("red alliance? ", redAllianceBool);
-        telemetry.addData("sample mode:  ", sampleModeBool);
+        telemetry.addData("GP2 A: red alliance? ", redAllianceBool);
+        telemetry.addData("GP2 B: sample mode:  ", sampleModeBool);
     }
 
     @Override
@@ -155,7 +155,7 @@ public class FullTeleOpCopy extends OpMode {
 
         /// updating booleans
         COLOR_TO_REJECT = (redAllianceBool ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
-        drive.slowModeBool = !horizontalSlides.slidesRetracted || currentGamepad2.left_trigger > 0.1;
+        drive.slowModeBool = !horizontalSlides.slidesRetracted && !(intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY);
         drive.angleLockBool = (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) || (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP);
         if (currentGamepad1.left_trigger > 0.1 && !(previousGamepad1.left_trigger > 0.1)) { // avoids setting every loop since it probably takes time
             drive.setZeroPowerBrake(true);
@@ -291,14 +291,14 @@ public class FullTeleOpCopy extends OpMode {
             if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && horizontalSlides.slidesRetracted && intake.wristFlippedUp && intake.chamberState != Intake.IntakeChamberState.EMPTY) {
                 if (highBucketBool) { // high bucket
                     runningActions.add(new SequentialAction(
-                            new InstantAction(() -> intake.setIntake(0.5)),
+                            new InstantAction(() -> intake.setIntake(Intake.INTAKING_POWER)),
                             new InstantAction(() -> outtake.toTransfer()),
-                            new SleepAction(0.2),
+                            new SleepAction(0.2), // TODO: just changed, maybe too fast now
                             new InstantAction(() -> outtake.closeClawTight()),
-                            new SleepAction(0.4),
+                            new SleepAction(0.35), // TODO: just changed maybe too fast now
                             new InstantAction(() -> outtake.toStow()),
                             new SleepAction(0.1),
-                            new InstantAction(() -> intake.setIntake(0)),
+                            new InstantAction(() -> intake.setIntake(Intake.IDLE_POWER)),
                             new InstantAction(() -> verticalSlides.raiseToHighBucket()),
                             new SleepAction(0.2),
                             new InstantAction(() -> outtake.toVert()),
@@ -315,9 +315,10 @@ public class FullTeleOpCopy extends OpMode {
                             new InstantAction(() -> outtake.toStow()),
                             new SleepAction(0.1),
                             new InstantAction(() -> intake.setIntake(0)),
-                            new InstantAction(() -> verticalSlides.raiseToLowBucket()),
                             new InstantAction(() -> outtake.armPitch.setArmScoreBucket()),
-                            new SleepAction(0.2),
+                            new SleepAction(0.1),
+                            new InstantAction(() -> verticalSlides.raiseToLowBucket()),
+                            new SleepAction(0.1),
                             new InstantAction(() -> outtake.armExtend.extendToScoreBucket())
                     ));
                 }
@@ -370,10 +371,10 @@ public class FullTeleOpCopy extends OpMode {
         }
 
         // telemetry
-        telemetry.addData("Red alliance? ", redAllianceBool);
-        telemetry.addData("Sample Mode: ", sampleModeBool);
-        telemetry.addData("High Bucket Mode: ", highBucketBool);
-        telemetry.addData("Hang Bool: ", hangBool);
+        telemetry.addData("GP2 A: Red alliance? ", redAllianceBool);
+        telemetry.addData("GP2 B: Sample Mode: ", sampleModeBool);
+        telemetry.addData("GP2 Y: High Bucket Mode: ", highBucketBool);
+        telemetry.addData("GP2 RIGHT STICK BUTTON: Hang Bool: ", hangBool);
         telemetry.addData("Loop Times", elapsedtime.milliseconds());
         elapsedtime.reset();
     }

@@ -92,7 +92,7 @@ public class SixSampleOptimized extends OpMode {
     // to and from sub
     private final Pose scoreControlPose = new Pose(64, 113, Math.toRadians(999)/* heading unused*/);
 
-    private final Pose subScorePose = new Pose(12, 132, Math.toRadians(330));
+    private final Pose subScorePose = new Pose(13, 132, Math.toRadians(330));
 
     private final Pose sub1Pose = new Pose(56.5, 98, Math.toRadians(270));
 
@@ -114,8 +114,8 @@ public class SixSampleOptimized extends OpMode {
     private final double VERT_SLIDES_EXTENDED_THRESHOLD = 800;
     private final double SLIDES_STUCK_TIMEOUT = 3;
     private final double SPIKE_MARK_TIMEOUT = 1.5;
-    private final double AT_SUB_Y_THRESHOLD = 100;
-    private final double RUSH_SCORE_X_THRESHOLD = subScorePose.getX() + 3.5;
+    private final double AT_SUB_Y_THRESHOLD = 99.5;
+    private final double RUSH_SCORE_X_THRESHOLD = subScorePose.getX() + 2.5;
     private final double RUSH_SCORE_Y_THRESHOLD = subScorePose.getY() - 2;
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
@@ -456,8 +456,8 @@ public class SixSampleOptimized extends OpMode {
                             new SleepAction(0.2),
                             new InstantAction(() -> intake.reverse()),
                             new SleepAction(0.4),
-                            new InstantAction(() -> intake.intake())
-//                            new InstantAction(() -> intake.dropDown())
+                            new InstantAction(() -> intake.intake()),
+                            new InstantAction(() -> intake.dropDown())
                     )); // stays in this case
                     break;
                 }
@@ -491,8 +491,8 @@ public class SixSampleOptimized extends OpMode {
                             new SleepAction(0.2),
                             new InstantAction(() -> intake.reverse()),
                             new SleepAction(0.4),
-                            new InstantAction(() -> intake.intake())
-//                            new InstantAction(() -> intake.dropDown())
+                            new InstantAction(() -> intake.intake()),
+                            new InstantAction(() -> intake.dropDown())
                     )); // stays in this case
                     break;
                 }
@@ -527,8 +527,8 @@ public class SixSampleOptimized extends OpMode {
                             new SleepAction(0.2),
                             new InstantAction(() -> intake.reverse()),
                             new SleepAction(0.4),
-                            new InstantAction(() -> intake.intake())
-//                            new InstantAction(() -> intake.dropDown())
+                            new InstantAction(() -> intake.intake()),
+                            new InstantAction(() -> intake.dropDown())
                     )); // stays in this case
                     break;
                 }
@@ -601,6 +601,7 @@ public class SixSampleOptimized extends OpMode {
                         setPathState(3001); // not done, go back
                         break;
                     } else if (samplesGrabbedFromSub == 2) {
+                        stowToParkAction();
                         setPathState(-1); // already done, park
                         break;
                     } else {
@@ -608,7 +609,7 @@ public class SixSampleOptimized extends OpMode {
                         follower.turn(Math.toRadians(90), true);
                         break;
                     }
-                    // TODO: COMMENT OUT above in 7 sample, no need anymore, because gauranteed not at 3 yet
+                    // TODO: COMMENT OUT above in 7 sample, no need anymore, because guaranteed not at 3 yet
                 }
                 break;
             /// SCORE: sub 3 to bucket
@@ -636,6 +637,7 @@ public class SixSampleOptimized extends OpMode {
                         setPathState(4001); // not done, go back
                         break;
                     } else if (samplesGrabbedFromSub == 2) {
+                        stowToParkAction();
                         setPathState(-1); // park, already done
                         break;
                     }
@@ -676,7 +678,7 @@ public class SixSampleOptimized extends OpMode {
 
             /// park
             case -1:
-                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.VERT) {
+                if (outtake.armPitch.armState != ExtendingOuttake.ArmPitch.STATE.SCORING_BUCKET) {
                     stowToParkAction();
                     follower.followPath(park);
                     setPathState(-100);
@@ -803,7 +805,7 @@ public class SixSampleOptimized extends OpMode {
                 new InstantAction(() -> outtake.toTransfer()),
                 new SleepAction(0.1),
                 new InstantAction(() -> outtake.closeClawTight()),
-                new SleepAction(0.45),
+                new SleepAction(0.35), // TODO: just changed this from 0.45
                 new InstantAction(() -> outtake.toStow()),
                 new InstantAction(() -> intake.setIntake(0)),
                 new InstantAction(() -> verticalSlides.raiseToHighBucket()),
@@ -814,20 +816,17 @@ public class SixSampleOptimized extends OpMode {
 
     public void transferAndToScoreSubAction() {
         runningActions.add(new SequentialAction(
-                new InstantAction(() -> intake.setIntake(0.5)), // push sample all the way in, kinda jank, maybe not necessary
+                new InstantAction(() -> intake.setIntake(Intake.INTAKING_POWER)),
                 new InstantAction(() -> outtake.toTransfer()),
-                new SleepAction(0.1),
-                new InstantAction(() -> outtake.closeClawLoose()),
+                new SleepAction(0.2),
+                new InstantAction(() -> outtake.closeClawTight()),
                 new SleepAction(0.35),
                 new InstantAction(() -> outtake.toStow()),
-                new InstantAction(() -> intake.setIntake(0)),
+                new SleepAction(0.1),
+                new InstantAction(() -> intake.setIntake(Intake.IDLE_POWER)),
+                new InstantAction(() -> verticalSlides.raiseToHighBucket()),
                 new SleepAction(0.2),
-                new InstantAction(() -> outtake.armPitch.setArmScoreBucket()),
-                new SleepAction(0.2),
-                new InstantAction(() -> outtake.armExtend.extendToScoreBucket()),
-                new SleepAction(0.2),
-                new InstantAction(() -> verticalSlides.raiseToHighBucket())
-
+                new InstantAction(() -> outtake.toScoreBucket())
         ));
     }
 

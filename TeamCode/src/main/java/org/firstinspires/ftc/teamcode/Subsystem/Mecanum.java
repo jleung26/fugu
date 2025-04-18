@@ -147,7 +147,7 @@ public class Mecanum {
     public void driveFieldCentric(double x, double y, double rx, double heading, boolean slowmode) {
         x = x * (slowmode ? SLOW_MODE_FACTOR: 1);
         y = y * (slowmode ? SLOW_MODE_FACTOR: 1);
-        rx = rx * (slowmode ? SLOW_MODE_FACTOR * 0.5 : 1);
+        rx = rx * (slowmode ? SLOW_MODE_FACTOR * 0.5 : 0.7);
         // calculating output
         double headingRads = -Math.toRadians(heading);
         double rotX = y * Math.cos(headingRads) + x * Math.sin(headingRads);

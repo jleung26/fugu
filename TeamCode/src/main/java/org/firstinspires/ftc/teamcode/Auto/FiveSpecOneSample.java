@@ -126,7 +126,7 @@ public class FiveSpecOneSample extends OpMode {
 
     private int movingEjectAngleThreshold = 250;
     private double specScoreXThreshold = 38;
-    private final double SPIKE_MARK_TIMEOUT = 1.5;
+    private final double SPIKE_MARK_TIMEOUT = 1.25;
 
 //    /** Park Control Pose for our robot, this is used to manipulate the bezier curve that we will create for the parking.
 //    private final Pose parkControlPose = new Pose(60, 98, Math.toRadians(90));
@@ -475,7 +475,7 @@ public class FiveSpecOneSample extends OpMode {
                 break;
             case 32:
                 if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
-                    retractIntakeAction();
+                    retractIntakeRushAction();
                     follower.followPath(scoreBucket);
                     setPathState(33);
                 }
@@ -486,7 +486,7 @@ public class FiveSpecOneSample extends OpMode {
                     setPathState(34);
                 }
             case 34:
-                if(!follower.isBusy() && verticalSlides.getCurrentPos() > 800) {
+                if(follower.getPose().getY() > 125 && verticalSlides.getCurrentPos() > 800) {
                     depositSampleRushAction();
                     setPathState(35);
                 }
@@ -689,6 +689,14 @@ public class FiveSpecOneSample extends OpMode {
                 new InstantAction(() -> outtake.openClaw()),
                 new SleepAction(0.2),
                 new InstantAction(() -> outtake.toStow())
+        ));
+    }
+
+    public void retractIntakeRushAction() {
+        runningActions.add(new SequentialAction(
+                new InstantAction(() -> horizontalSlides.retract()),
+                new InstantAction(() -> intake.flipUp()),
+                new InstantAction(() -> intake.idle())
         ));
     }
 }

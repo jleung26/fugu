@@ -36,7 +36,7 @@ public class Intake {
     public static double IDLE_POWER = 0.2;
 
     // wrist constants // wrists synchronized :)
-    public static double TRANSFER_POS = 0.14;
+    public static double TRANSFER_POS = 0.12;
     public static double DROP_DOWN_POS = 0.455;
     public static double PARTIAL_DROPDOWN_POS = 0.217;
     public static double WRIST_TUNING_INCREMENT = 0.001;
