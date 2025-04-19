@@ -92,7 +92,7 @@ public class SixSampleOptimized extends OpMode {
     // to and from sub
     private final Pose scoreControlPose = new Pose(64, 113, Math.toRadians(999)/* heading unused*/);
 
-    private final Pose subScorePose = new Pose(13, 132, Math.toRadians(330));
+    private final Pose subScorePose = new Pose(14, 132, Math.toRadians(320));
 
     private final Pose sub1Pose = new Pose(56.5, 98, Math.toRadians(270));
 
@@ -115,7 +115,7 @@ public class SixSampleOptimized extends OpMode {
     private final double SLIDES_STUCK_TIMEOUT = 3;
     private final double SPIKE_MARK_TIMEOUT = 1.5;
     private final double AT_SUB_Y_THRESHOLD = 99.5;
-    private final double RUSH_SCORE_X_THRESHOLD = subScorePose.getX() + 2.5;
+    private final double RUSH_SCORE_X_THRESHOLD = subScorePose.getX() + 3;
     private final double RUSH_SCORE_Y_THRESHOLD = subScorePose.getY() - 2;
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
@@ -569,7 +569,7 @@ public class SixSampleOptimized extends OpMode {
                 }
                 break;
             case 1006: // score from sub 1
-                if (follower.getPose().getX() < RUSH_SCORE_X_THRESHOLD && follower.getPose().getY() > RUSH_SCORE_Y_THRESHOLD && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleSubAction();
                     setPathState(2001); // back to sub to grab second sample
                     // guaranteed hasn't gotten 2 samples yet
@@ -595,13 +595,13 @@ public class SixSampleOptimized extends OpMode {
                 }
                 break;
             case 2006: // score from sub 2
-                if (follower.getPose().getX() < RUSH_SCORE_X_THRESHOLD && follower.getPose().getY() > RUSH_SCORE_Y_THRESHOLD && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleSubAction();
                     if (samplesGrabbedFromSub == 1) {
                         setPathState(3001); // not done, go back
                         break;
                     } else if (samplesGrabbedFromSub == 2) {
-                        stowToParkAction();
+//                        stowToParkAction();
                         setPathState(-1); // already done, park
                         break;
                     } else {
@@ -631,13 +631,13 @@ public class SixSampleOptimized extends OpMode {
                 }
                 break;
             case 3006: // score from sub 3
-                if (follower.getPose().getX() < RUSH_SCORE_X_THRESHOLD && follower.getPose().getY() > RUSH_SCORE_Y_THRESHOLD && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleSubAction();
                     if (samplesGrabbedFromSub == 1) {
                         setPathState(4001); // not done, go back
                         break;
                     } else if (samplesGrabbedFromSub == 2) {
-                        stowToParkAction();
+//                        stowToParkAction();
                         setPathState(-1); // park, already done
                         break;
                     }
@@ -668,7 +668,7 @@ public class SixSampleOptimized extends OpMode {
                 }
                 break;
             case 4006: // score from sub 3
-                if (follower.getPose().getX() < RUSH_SCORE_X_THRESHOLD && follower.getPose().getY() > RUSH_SCORE_Y_THRESHOLD && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
+                if (!follower.isBusy() && verticalSlides.getCurrentPos() > VERT_SLIDES_EXTENDED_THRESHOLD) {
                     depositSampleParkAction();
                     setPathState(-1);
                     // even if only 1 sample grabbed, it's time to give up, there's just no way I add even more cases
@@ -679,8 +679,13 @@ public class SixSampleOptimized extends OpMode {
             /// park
             case -1:
                 if (outtake.armPitch.armState != ExtendingOuttake.ArmPitch.STATE.SCORING_BUCKET) {
-                    stowToParkAction();
                     follower.followPath(park);
+                    setPathState(-2);
+                }
+                break;
+            case -2:
+                if (pathTimer.getElapsedTimeSeconds() > 0.75) {
+                    stowToParkAction();
                     setPathState(-100);
                 }
                 break;

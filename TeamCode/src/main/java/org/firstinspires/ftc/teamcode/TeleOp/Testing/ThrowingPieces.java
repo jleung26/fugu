@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOp;
+package org.firstinspires.ftc.teamcode.TeleOp.Testing;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -25,8 +26,9 @@ import org.firstinspires.ftc.teamcode.Util.RobotHardware;
 import java.util.ArrayList;
 import java.util.List;
 
-@TeleOp(name = "Full TeleOp FINAL", group = "A")
-public class FullTeleOpCopy extends OpMode {
+@TeleOp(name = "Throwing Stuff", group = "B")
+@Disabled
+public class ThrowingPieces extends OpMode {
     // subsystems
     RobotHardware robotHardware = new RobotHardware();
     Mecanum drive = new Mecanum();
@@ -34,14 +36,11 @@ public class FullTeleOpCopy extends OpMode {
     HorizontalSlides horizontalSlides = new HorizontalSlides();
     ExtendingOuttake outtake = new ExtendingOuttake();
     Intake intake = new Intake();
-    Hang hang = new Hang();
 
     // booleans
     // team color
     // spec/sample
     boolean redAllianceBool = true;
-    boolean sampleModeBool = true;
-    boolean hangBool = false;
     boolean highBucketBool = true;
     Intake.IntakeChamberState COLOR_TO_REJECT;
 
@@ -74,7 +73,6 @@ public class FullTeleOpCopy extends OpMode {
         horizontalSlides.initialize(this, robotHardware, false);
         outtake.initialize(this, robotHardware);
         intake.initialize(this, robotHardware);
-        hang.initialize(this, robotHardware);
 
         // bulk cache reading
         allHubs = hardwareMap.getAll(LynxModule.class);
@@ -93,18 +91,12 @@ public class FullTeleOpCopy extends OpMode {
         if ((currentGamepad1.a && !previousGamepad1.a) || (currentGamepad2.a && !previousGamepad2.a)) {
             redAllianceBool = !redAllianceBool;
         }
-
-        if ((currentGamepad1.b && !previousGamepad1.b) || (currentGamepad2.b && !previousGamepad2.b)) {
-            sampleModeBool = !sampleModeBool;
-        }
         telemetry.addData("GP2 A: red alliance? ", redAllianceBool);
-        telemetry.addData("GP2 B: sample mode:  ", sampleModeBool);
     }
 
     @Override
     public void start() {
         COLOR_TO_REJECT = (redAllianceBool ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
-        hang.disengagePTO();
         outtake.toStow();
         outtake.openClaw();
         intake.flipUp();
@@ -136,19 +128,9 @@ public class FullTeleOpCopy extends OpMode {
         }
         runningActions = newActions;
 
-        /// loops
-        if (hangBool) {
-            hang.operate(currentGamepad1, currentGamepad2, previousGamepad1, previousGamepad2);
-            // failed wheely tilt, reset button
-            if (currentGamepad2.dpad_down && !previousGamepad2.dpad_down) {
-                //undo wheely
-                hang.setHangState(-1);
-            }
-            drive.operateHang();
-        } else {
-            drive.operateTeleOp();
-            verticalSlides.operate();
-        }
+
+        drive.operateTeleOp();
+        verticalSlides.operate();
 
         horizontalSlides.operate();
         intake.operateColorChecking();
@@ -156,7 +138,6 @@ public class FullTeleOpCopy extends OpMode {
         /// updating booleans
         COLOR_TO_REJECT = (redAllianceBool ? Intake.IntakeChamberState.BLUE : Intake.IntakeChamberState.RED);
         drive.slowModeBool = !horizontalSlides.slidesRetracted && !(intake.chamberState != COLOR_TO_REJECT && intake.chamberState != Intake.IntakeChamberState.EMPTY);
-        drive.angleLockBool = (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.GRABBING_CLIP) || (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP);
         if (currentGamepad1.left_trigger > 0.1 && !(previousGamepad1.left_trigger > 0.1)) { // avoids setting every loop since it probably takes time
             drive.setZeroPowerBrake(true);
         } else if (currentGamepad1.left_trigger <= 0.1 && !(previousGamepad1.left_trigger <= 0.1)) {
@@ -173,9 +154,6 @@ public class FullTeleOpCopy extends OpMode {
                             new InstantAction(() -> intake.intake())
                     ));
                 }
-            }
-            else if (!sampleModeBool && intake.chamberState == Intake.IntakeChamberState.YELLOW) {
-                runningActions.add(new InstantAction(() -> intake.reverse()));
             }
             else if (intake.chamberState != COLOR_TO_REJECT) {
                 if (currentGamepad1.right_bumper && !previousGamepad1.right_bumper) {
@@ -195,9 +173,8 @@ public class FullTeleOpCopy extends OpMode {
                             new InstantAction(() -> intake.idle())
                     ));
                 }
-            } else if (!sampleModeBool && intake.chamberState == Intake.IntakeChamberState.YELLOW) {
-                runningActions.add(new InstantAction(() -> intake.reverse()));
-            } else if (intake.chamberState != COLOR_TO_REJECT) {
+            }
+            else if (intake.chamberState != COLOR_TO_REJECT) {
                 // yay grabbed correct color sample, can stow now
 //                gamepad1.rumble(500); /// rumble
                 runningActions.add(new SequentialAction(
@@ -245,17 +222,7 @@ public class FullTeleOpCopy extends OpMode {
                 ));
             }
         } else if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.SCORING_CLIP) {
-            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && !sampleModeBool) {
-                // finish depositing clip and return to grab another
-                runningActions.add(new SequentialAction(
-                        new InstantAction(() -> outtake.openClaw()),
-                        new SleepAction(0.3),
-                        new InstantAction(() -> outtake.retractExtender()),
-                        new SleepAction(0.2),
-                        new InstantAction(() -> outtake.toGrabClip()),
-                        new InstantAction(() -> verticalSlides.retract())
-                ));
-            } else if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper && sampleModeBool) {
+            if (currentGamepad1.left_bumper && !previousGamepad1.left_bumper) {
                 // finish depositing sample and return to stow
                 runningActions.add(new SequentialAction(
                         new InstantAction(() -> outtake.openClaw()),
@@ -349,25 +316,14 @@ public class FullTeleOpCopy extends OpMode {
             redAllianceBool = !redAllianceBool;
         }
 
-        if (currentGamepad2.b && !previousGamepad2.b) { // sample spec mode
-            sampleModeBool = !sampleModeBool;
-        }
-
         // high low bucket toggle
         if (currentGamepad2.y && !previousGamepad2.y) { // high low bucket scoring
             highBucketBool = !highBucketBool;
         }
 
-        // hang logic (this is where it gets messy :NOOOOO:)
-        if (currentGamepad2.right_stick_button && !previousGamepad2.right_stick_button) {
-            hangBool = !hangBool;
-        }
-
         // telemetry
         telemetry.addData("GP2 A: Red alliance? ", redAllianceBool);
-        telemetry.addData("GP2 B: Sample Mode: ", sampleModeBool);
         telemetry.addData("GP2 Y: High Bucket Mode: ", highBucketBool);
-        telemetry.addData("GP2 RIGHT STICK BUTTON: Hang Bool: ", hangBool);
         telemetry.addData("Loop Times", elapsedtime.milliseconds());
         elapsedtime.reset();
     }

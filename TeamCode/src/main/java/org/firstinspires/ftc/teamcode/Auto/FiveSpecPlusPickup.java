@@ -34,8 +34,8 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
 
 
-@Autonomous(name = "5+1", group = "A", preselectTeleOp = "Full TeleOp FINAL")
-public class FiveSpecOneSample extends OpMode {
+@Autonomous(name = "5 PLUS PICKUP", group = "A", preselectTeleOp = "Full TeleOp FINAL")
+public class FiveSpecPlusPickup extends OpMode {
     // declaring subsystems
     RobotHardware robotHardware = new RobotHardware();
     VerticalSlides verticalSlides = new VerticalSlides();
@@ -122,7 +122,7 @@ public class FiveSpecOneSample extends OpMode {
 
     private final Pose scoreBucketPose = new Pose(7, 126, Math.toRadians(270));
 
-    private final Pose parkPose = new Pose(18, 120, Math.toRadians(270));
+    private final Pose parkPose = new Pose(7, 30, Math.toRadians(270));
 
     private int movingEjectAngleThreshold = 250;
     private double specScoreXThreshold = 38.5;
@@ -230,14 +230,9 @@ public class FiveSpecOneSample extends OpMode {
                 .setLinearHeadingInterpolation(score4Pose.getHeading(), grabYellowPose.getHeading())
                 .build();
 
-        scoreBucket = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(grabYellowPose), new Point(scoreBucketPose)))
-                .setConstantHeadingInterpolation(scoreBucketPose.getHeading())
-                .build();
-
         park = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(scoreBucketPose), new Point(parkPose)))
-                .setLinearHeadingInterpolation(scoreBucketPose.getHeading(), parkPose.getHeading())
+                .addPath(new BezierLine(new Point(grabYellowPose), new Point(parkPose)))
+                .setLinearHeadingInterpolation(grabYellowPose.getHeading(), parkPose.getHeading())
                 .build();
     }
 
@@ -462,12 +457,7 @@ public class FiveSpecOneSample extends OpMode {
                     setPathState(31);
                 }
                 break;
-            // TODO TODO TODO TODO TODO TODO TODO TODO: tune from here below, change
-            //      maybe change case 31 isBusy
-            //      maybe change case 33 70 -> 60
-            //      maybe change case 34 -2 > -4, 800 -> 900, etc.
-            // praying we don't run out of time
-            case 31:
+            case 31: // grab, then timeout
                 if (!follower.isBusy()) {
                     prepToIntakeAction();
                     extendIntakeAction();
@@ -475,26 +465,8 @@ public class FiveSpecOneSample extends OpMode {
                 }
                 break;
             case 32:
-                if (intake.chamberState != Intake.IntakeChamberState.EMPTY) {
+                if (intake.chamberState != Intake.IntakeChamberState.EMPTY || opmodeTimer.getElapsedTimeSeconds() > 28) {
                     retractIntakeRushAction();
-                    follower.followPath(scoreBucket);
-                    setPathState(33);
-                }
-                break;
-            case 33:
-                if (horizontalSlides.horiMotor.getCurrentPosition() < 20) {
-                    transferAndRushToScoreAction();
-                    setPathState(34);
-                }
-            case 34:
-                if(follower.getPose().getY() > 125 && verticalSlides.getCurrentPos() > 800) {
-                    depositSampleRushAction();
-                    setPathState(35);
-                }
-                break;
-            case 35:
-                if (outtake.armPitch.armState == ExtendingOuttake.ArmPitch.STATE.STOW) {
-                    runningActions.add(new InstantAction(() -> verticalSlides.retract()));
                     follower.followPath(park);
                     setPathState(-1);
                 }
